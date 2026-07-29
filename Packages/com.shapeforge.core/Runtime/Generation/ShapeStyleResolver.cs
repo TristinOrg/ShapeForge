@@ -8,9 +8,8 @@ namespace ShapeForge
     /// </summary>
     public sealed class ShapeStyleResolver : IShapeStyleResolver
     {
-        private readonly Dictionary<string, ShapeStyleDefinition> styles =
-            new Dictionary<string, ShapeStyleDefinition>(StringComparer.Ordinal);
-        private readonly ShapeStyleDefinitionValidator validator = new ShapeStyleDefinitionValidator();
+        private readonly Dictionary<string, ShapeStyleDefinition> styles = new(StringComparer.Ordinal);
+        private readonly ShapeStyleDefinitionValidator validator = new();
 
         /// <summary>
         /// Initializes a resolver with its available style definitions.
@@ -30,6 +29,18 @@ namespace ShapeForge
                 if (!this.styles.TryAdd(style.Id, style))
                     throw new ArgumentException($"Duplicate style ID '{style.Id}'.", nameof(styles));
             }
+        }
+
+        /// <summary>
+        /// Adds or replaces a validated style without rebuilding the resolver.
+        /// </summary>
+        public void Set(ShapeStyleDefinition style)
+        {
+            if (style == null)
+                throw new ArgumentNullException(nameof(style));
+
+            validator.Validate(style);
+            styles[style.Id] = style;
         }
 
         /// <inheritdoc />

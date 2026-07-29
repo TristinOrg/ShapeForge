@@ -7,7 +7,7 @@ namespace ShapeForge.LowPoly.Tests
     /// <summary>
     /// Verifies the first official Low Poly shape implementation.
     /// </summary>
-    public sealed class LowPolyCubeGeneratorTests
+    public sealed class LowPolyPrimitiveGeneratorTests
     {
         private GameObject generatedRoot;
 
@@ -28,7 +28,7 @@ namespace ShapeForge.LowPoly.Tests
 
             UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
             {
-                new LowPolyCubeGenerator()
+                new LowPolyPrimitiveGenerator()
             });
 
             generatedRoot = generator.Generate(new("Cube", cube));
