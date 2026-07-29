@@ -1,0 +1,68 @@
+using NUnit.Framework;
+using ShapeForge.Unity;
+using UnityEngine;
+
+namespace ShapeForge.LowPoly.Tests
+{
+    /// <summary>
+    /// Verifies the modular robot preset and its transform-ready pivot hierarchy.
+    /// </summary>
+    public sealed class LowPolyRobotPresetTests
+    {
+        private GameObject generatedRoot;
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (generatedRoot != null)
+                Object.DestroyImmediate(generatedRoot);
+        }
+
+        [Test]
+        public void DefinitionKeepsMotionTargetsSeparateFromGeometry()
+        {
+            ShapeDefinition definition = LowPolyRobotPreset.CreateDefinition();
+
+            ShapeNode leftShoulder = FindNode(definition.Root, "robot.arm.left.pivot");
+            ShapeNode leftArm      = FindNode(definition.Root, "robot.arm.left");
+
+            Assert.That(leftShoulder, Is.Not.Null);
+            Assert.That(leftArm, Is.Not.Null);
+            Assert.That(leftShoulder.Type, Is.EqualTo(ShapeTypes.Group));
+            Assert.That(leftShoulder.Children[0], Is.SameAs(leftArm));
+            Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.Cube));
+        }
+
+        [Test]
+        public void GenerateCreatesColoredRobotWithEditablePivots()
+        {
+            ShapeDefinition          definition = LowPolyRobotPreset.CreateDefinition();
+            ShapeStyleDefinition     style      = LowPolyRobotPreset.CreateStyle();
+            ShapeStyleResolver       resolver   = new ShapeStyleResolver(new[] { style });
+            UnityShapeModelGenerator generator  = new UnityShapeModelGenerator(
+                new IUnityShapeGenerator[] { new LowPolyCubeGenerator() },
+                resolver);
+
+            generatedRoot = generator.Generate(definition);
+
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(7));
+            Assert.That(generatedRoot.transform.Find("Left Shoulder Pivot/Left Arm"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Right Hip Pivot/Right Leg"), Is.Not.Null);
+        }
+
+        private static ShapeNode FindNode(ShapeNode node, string id)
+        {
+            if (node.Id == id)
+                return node;
+
+            foreach (ShapeNode child in node.Children)
+            {
+                ShapeNode result = FindNode(child, id);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
+        }
+    }
+}
