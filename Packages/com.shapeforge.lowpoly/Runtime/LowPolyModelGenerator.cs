@@ -50,11 +50,19 @@ namespace ShapeForge.LowPoly
         }
 
         /// <summary>
-        /// Validates and generates a model directly from a ShapeForge JSON document.
+        /// Parses and validates JSON once for efficient repeated model generation.
+        /// </summary>
+        public ShapeDefinition ParseJson(string json)
+        {
+            return serializer.DeserializeShape(json);
+        }
+
+        /// <summary>
+        /// Parses and generates a one-off model directly from a ShapeForge JSON document.
         /// </summary>
         public GameObject GenerateJson(string json, Transform parent = null)
         {
-            return Generate(serializer.DeserializeShape(json), parent);
+            return Generate(ParseJson(json), parent);
         }
     }
 }
