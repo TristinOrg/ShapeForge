@@ -9,9 +9,6 @@ namespace ShapeForge.LowPoly
     /// </summary>
     public sealed class LowPolyCubeGenerator : IUnityShapeGenerator
     {
-        private static readonly int ColorProperty     = Shader.PropertyToID("_Color");
-        private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
-
         /// <inheritdoc />
         public bool CanGenerate(ShapeNode node)
         {
@@ -38,10 +35,8 @@ namespace ShapeForge.LowPoly
 
             if (context.TryResolveColor(node, out ForgeColor color))
             {
-                MaterialPropertyBlock properties = new MaterialPropertyBlock();
-                properties.SetColor(ColorProperty, color.ToUnity());
-                properties.SetColor(BaseColorProperty, color.ToUnity());
-                renderer.SetPropertyBlock(properties);
+                UnityShapeColor shapeColor = gameObject.AddComponent<UnityShapeColor>();
+                shapeColor.Configure(renderer, color);
             }
 
             return gameObject;

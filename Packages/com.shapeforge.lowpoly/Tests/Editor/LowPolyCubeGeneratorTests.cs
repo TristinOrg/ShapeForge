@@ -38,8 +38,18 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.GetComponent<Collider>(), Is.Null);
             Assert.That(generatedRoot.transform.localScale, Is.EqualTo(new Vector3(2f, 3f, 4f)));
 
+            UnityShapeColor shapeColor = generatedRoot.GetComponent<UnityShapeColor>();
+            Assert.That(shapeColor, Is.Not.Null);
+            Assert.That(shapeColor.Color, Is.EqualTo(Color.red));
+
             MaterialPropertyBlock properties = new MaterialPropertyBlock();
-            generatedRoot.GetComponent<Renderer>().GetPropertyBlock(properties);
+            Renderer renderer = generatedRoot.GetComponent<Renderer>();
+            renderer.GetPropertyBlock(properties);
+            Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
+
+            renderer.SetPropertyBlock(null);
+            shapeColor.Apply();
+            renderer.GetPropertyBlock(properties);
             Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
         }
     }
