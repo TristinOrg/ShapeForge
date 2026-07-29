@@ -1,0 +1,15 @@
+{
+  "name": "ShapeForge.Unity.Tests.Editor",
+  "rootNamespace": "ShapeForge.Unity.Tests",
+  "references": [
+    "ShapeForge.Schema",
+    "ShapeForge.Core",
+    "ShapeForge.Unity"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

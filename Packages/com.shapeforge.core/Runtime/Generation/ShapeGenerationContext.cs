@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 namespace ShapeForge
 {
@@ -32,7 +31,7 @@ namespace ShapeForge
         /// <summary>
         /// Resolves a direct color override or delegates to the configured style resolver.
         /// </summary>
-        public bool TryResolveColor(ShapeNode node, out Color color)
+        public bool TryResolveColor(ShapeNode node, out ForgeColor color)
         {
             if (node == null)
                 throw new ArgumentNullException(nameof(node));

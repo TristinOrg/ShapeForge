@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using ShapeForge.Unity;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly.Tests
@@ -21,11 +22,11 @@ namespace ShapeForge.LowPoly.Tests
         public void GenerateCreatesRenderableCubeWithoutPhysicsDependency()
         {
             ShapeNode cube = new ShapeNode("cube", "Cube", LowPolyShapeTypes.Cube);
-            cube.Transform.Scale                = new Vector3(2f, 3f, 4f);
+            cube.Transform.Scale                = new ForgeVector3(2f, 3f, 4f);
             cube.Appearance.HasColorOverride    = true;
-            cube.Appearance.Color               = Color.red;
+            cube.Appearance.Color               = new ForgeColor(1f, 0f, 0f);
 
-            ShapeModelGenerator generator = new ShapeModelGenerator(new IShapeGenerator[]
+            UnityShapeModelGenerator generator = new UnityShapeModelGenerator(new IUnityShapeGenerator[]
             {
                 new LowPolyCubeGenerator()
             });

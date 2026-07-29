@@ -2,6 +2,7 @@
   "name": "ShapeForge.Core.Tests.Editor",
   "rootNamespace": "ShapeForge.Tests",
   "references": [
+    "ShapeForge.Schema",
     "ShapeForge.Core"
   ],
   "includePlatforms": [

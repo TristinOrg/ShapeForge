@@ -7,7 +7,7 @@
 - Project root: `D:/git/ShapeForge`
 - Purpose: extensible procedural shape framework; Low Poly is the first official implementation.
 - Last analyzed: 2026-07-29
-- Last analyzed commit: `7eed918`
+- Last analyzed commit: `ef20d77`
 
 ## Confirmed Environment
 
@@ -29,13 +29,15 @@
 | Path | Purpose | Confidence | Evidence |
 | --- | --- | --- | --- |
 | `Assets/Scenes` | Default Unity sample scene | Confirmed | repository files |
-| `Packages/com.shapeforge.core` | Style-independent data and extension contracts | Confirmed | package manifest |
+| `Packages/com.shapeforge.core` | Engine-neutral validation and style resolution | Confirmed | package manifest |
+| `Packages/com.shapeforge.schema` | Engine-agnostic versioned data contracts | Confirmed | package manifest |
+| `Packages/com.shapeforge.unity` | Unity generation and reference JSON adapter | Confirmed | package manifest |
 | `Packages/com.shapeforge.lowpoly` | Official Low Poly implementation | Confirmed | package manifest |
 | `Docs/AI` | Concise persistent project context | Confirmed | this document |
 
 ## Assembly Boundaries
 
-Core and LowPoly each have separate runtime, editor, and EditMode test assemblies. LowPoly references Core; Core has no LowPoly dependency.
+Schema and Core use assemblies with no UnityEngine references. Unity adapts Schema/Core to GameObjects and JSON. LowPoly references the Unity Adapter; dependencies remain one-directional.
 
 ## Scenes And Startup Flow
 
@@ -45,7 +47,7 @@ Core and LowPoly each have separate runtime, editor, and EditMode test assemblie
 
 ## Architecture
 
-Core now provides serializable shape definitions, stable node identity, palettes, replaceable style resolution, editable hierarchy generation, and explicit generator injection. LowPoly supplies the first Cube implementation with per-instance color through the Core contracts. Core does not depend on LowPoly, a render pipeline, or external AI providers.
+Schema provides versioned engine-agnostic shape and style documents. Core provides validation and style resolution without UnityEngine. The Unity Adapter owns JSON and GameObject generation. LowPoly supplies the first Unity Cube implementation with per-instance color.
 
 ## Coding Conventions
 
@@ -56,7 +58,7 @@ Core now provides serializable shape definitions, stable node identity, palettes
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Seven first-party EditMode tests cover serialization, hierarchy generation, identity validation, style resolution, color precedence, and LowPoly Cube generation.
+- Eight first-party EditMode tests cover the JSON contract, hierarchy adaptation, identity validation, style resolution, color precedence, and LowPoly Cube generation.
 - No first-party PlayMode, CI, or build validation exists yet.
 
 ## Available Unity Tooling

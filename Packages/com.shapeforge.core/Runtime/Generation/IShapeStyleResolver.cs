@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace ShapeForge
 {
     /// <summary>
@@ -10,6 +8,6 @@ namespace ShapeForge
         /// <summary>
         /// Attempts to resolve the color requested by a shape node.
         /// </summary>
-        bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out Color color);
+        bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out ForgeColor color);
     }
 }

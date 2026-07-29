@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ShapeForge
 {
@@ -11,6 +10,7 @@ namespace ShapeForge
     {
         private readonly Dictionary<string, ShapeStyleDefinition> styles =
             new Dictionary<string, ShapeStyleDefinition>(StringComparer.Ordinal);
+        private readonly ShapeStyleDefinitionValidator validator = new ShapeStyleDefinitionValidator();
 
         /// <summary>
         /// Initializes a resolver with its available style definitions.
@@ -25,8 +25,7 @@ namespace ShapeForge
                 if (style == null)
                     throw new ArgumentException("Styles cannot contain null entries.", nameof(styles));
 
-                if (string.IsNullOrWhiteSpace(style.Id))
-                    throw new ArgumentException("Every style requires a stable ID.", nameof(styles));
+                validator.Validate(style);
 
                 if (!this.styles.TryAdd(style.Id, style))
                     throw new ArgumentException($"Duplicate style ID '{style.Id}'.", nameof(styles));
@@ -34,7 +33,7 @@ namespace ShapeForge
         }
 
         /// <inheritdoc />
-        public bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out Color color)
+        public bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out ForgeColor color)
         {
             if (definition == null)
                 throw new ArgumentNullException(nameof(definition));

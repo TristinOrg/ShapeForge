@@ -4,6 +4,9 @@
   "displayName": "ShapeForge Core",
   "description": "Extensible shape definitions and generation contracts for ShapeForge.",
   "unity": "2022.3",
+  "dependencies": {
+    "com.shapeforge.schema": "0.1.0"
+  },
   "author": {
     "name": "Tristin Wen"
   }

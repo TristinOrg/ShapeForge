@@ -1,4 +1,5 @@
 using System;
+using ShapeForge.Unity;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly
@@ -6,7 +7,7 @@ namespace ShapeForge.LowPoly
     /// <summary>
     /// Generates the official Low Poly cube implementation.
     /// </summary>
-    public sealed class LowPolyCubeGenerator : IShapeGenerator
+    public sealed class LowPolyCubeGenerator : IUnityShapeGenerator
     {
         private static readonly int ColorProperty     = Shader.PropertyToID("_Color");
         private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
@@ -35,11 +36,11 @@ namespace ShapeForge.LowPoly
             else
                 UnityEngine.Object.DestroyImmediate(collider);
 
-            if (context.TryResolveColor(node, out Color color))
+            if (context.TryResolveColor(node, out ForgeColor color))
             {
                 MaterialPropertyBlock properties = new MaterialPropertyBlock();
-                properties.SetColor(ColorProperty, color);
-                properties.SetColor(BaseColorProperty, color);
+                properties.SetColor(ColorProperty, color.ToUnity());
+                properties.SetColor(BaseColorProperty, color.ToUnity());
                 renderer.SetPropertyBlock(properties);
             }
 

@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using UnityEngine;
 
 namespace ShapeForge.Tests
 {
@@ -12,7 +11,7 @@ namespace ShapeForge.Tests
         public void ResolverUsesSelectedStylePalette()
         {
             ShapeStyleDefinition style = new ShapeStyleDefinition("lowpoly/default");
-            style.Palette.Set("primary", Color.blue);
+            style.Palette.Set("primary", new ForgeColor(0f, 0f, 1f));
 
             ShapeDefinition definition = new ShapeDefinition(
                 "Model",
@@ -23,13 +22,10 @@ namespace ShapeForge.Tests
             ShapeNode node = new ShapeNode("body", "Body", "example/cube");
             node.Appearance.ColorRole = "primary";
 
-            string json = JsonUtility.ToJson(style);
-            style       = JsonUtility.FromJson<ShapeStyleDefinition>(json);
-
             ShapeStyleResolver resolver = new ShapeStyleResolver(new[] { style });
 
-            Assert.That(resolver.TryResolveColor(definition, node, out Color color), Is.True);
-            Assert.That(color, Is.EqualTo(Color.blue));
+            Assert.That(resolver.TryResolveColor(definition, node, out ForgeColor color), Is.True);
+            Assert.That(color, Is.EqualTo(new ForgeColor(0f, 0f, 1f)));
         }
 
         [Test]
@@ -40,14 +36,14 @@ namespace ShapeForge.Tests
                 new ShapeNode("root", "Root", ShapeTypes.Group));
             ShapeNode node = new ShapeNode("body", "Body", "example/cube");
             node.Appearance.HasColorOverride = true;
-            node.Appearance.Color            = Color.red;
+            node.Appearance.Color            = new ForgeColor(1f, 0f, 0f);
 
             ShapeGenerationContext context = new ShapeGenerationContext(
                 definition,
-                new ConstantColorResolver(Color.blue));
+                new ConstantColorResolver(new ForgeColor(0f, 0f, 1f)));
 
-            Assert.That(context.TryResolveColor(node, out Color color), Is.True);
-            Assert.That(color, Is.EqualTo(Color.red));
+            Assert.That(context.TryResolveColor(node, out ForgeColor color), Is.True);
+            Assert.That(color, Is.EqualTo(new ForgeColor(1f, 0f, 0f)));
         }
 
         [Test]
@@ -69,14 +65,14 @@ namespace ShapeForge.Tests
 
         private sealed class ConstantColorResolver : IShapeStyleResolver
         {
-            private readonly Color color;
+            private readonly ForgeColor color;
 
-            public ConstantColorResolver(Color color)
+            public ConstantColorResolver(ForgeColor color)
             {
                 this.color = color;
             }
 
-            public bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out Color color)
+            public bool TryResolveColor(ShapeDefinition definition, ShapeNode node, out ForgeColor color)
             {
                 color = this.color;
                 return true;
