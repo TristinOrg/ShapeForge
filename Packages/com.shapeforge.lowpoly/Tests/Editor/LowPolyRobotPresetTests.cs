@@ -38,9 +38,9 @@ namespace ShapeForge.LowPoly.Tests
         {
             ShapeDefinition          definition = LowPolyRobotPreset.CreateDefinition();
             ShapeStyleDefinition     style      = LowPolyRobotPreset.CreateStyle();
-            ShapeStyleResolver       resolver   = new ShapeStyleResolver(new[] { style });
-            UnityShapeModelGenerator generator  = new UnityShapeModelGenerator(
-                new IUnityShapeGenerator[] { new LowPolyCubeGenerator() },
+            ShapeStyleResolver       resolver   = new(new[] { style });
+            UnityShapeModelGenerator generator  = new(
+                new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
 
             generatedRoot = generator.Generate(definition);

@@ -21,17 +21,17 @@ namespace ShapeForge.LowPoly.Tests
         [Test]
         public void GenerateCreatesRenderableCubeWithoutPhysicsDependency()
         {
-            ShapeNode cube = new ShapeNode("cube", "Cube", LowPolyShapeTypes.Cube);
-            cube.Transform.Scale                = new ForgeVector3(2f, 3f, 4f);
+            ShapeNode cube = new("cube", "Cube", LowPolyShapeTypes.Cube);
+            cube.Transform.Scale                = new(2f, 3f, 4f);
             cube.Appearance.HasColorOverride    = true;
-            cube.Appearance.Color               = new ForgeColor(1f, 0f, 0f);
+            cube.Appearance.Color               = new(1f, 0f, 0f);
 
-            UnityShapeModelGenerator generator = new UnityShapeModelGenerator(new IUnityShapeGenerator[]
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
             {
                 new LowPolyCubeGenerator()
             });
 
-            generatedRoot = generator.Generate(new ShapeDefinition("Cube", cube));
+            generatedRoot = generator.Generate(new("Cube", cube));
 
             Assert.That(generatedRoot.GetComponent<MeshFilter>(), Is.Not.Null);
             Assert.That(generatedRoot.GetComponent<MeshRenderer>(), Is.Not.Null);
@@ -42,7 +42,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(manifest, Is.Not.Null);
             Assert.That(manifest.BindingCount, Is.EqualTo(1));
 
-            MaterialPropertyBlock properties = new MaterialPropertyBlock();
+            MaterialPropertyBlock properties = new();
             Renderer renderer = generatedRoot.GetComponent<Renderer>();
             renderer.GetPropertyBlock(properties);
             Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
@@ -51,6 +51,31 @@ namespace ShapeForge.LowPoly.Tests
             manifest.Apply();
             renderer.GetPropertyBlock(properties);
             Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
+        }
+
+        [Test]
+        public void GenerateSupportsCachedBuiltInPrimitiveMeshes()
+        {
+            ShapeNode root = new("primitives", "Primitives", ShapeTypes.Group);
+            root
+                .Add(new("sphere-a", "Sphere A", LowPolyShapeTypes.Sphere))
+                .Add(new("sphere-b", "Sphere B", LowPolyShapeTypes.Sphere))
+                .Add(new("cylinder", "Cylinder", LowPolyShapeTypes.Cylinder))
+                .Add(new("capsule", "Capsule", LowPolyShapeTypes.Capsule));
+
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Primitives", root));
+
+            MeshFilter firstSphere  = generatedRoot.transform.Find("Sphere A").GetComponent<MeshFilter>();
+            MeshFilter secondSphere = generatedRoot.transform.Find("Sphere B").GetComponent<MeshFilter>();
+
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>().Length, Is.EqualTo(4));
+            Assert.That(generatedRoot.GetComponentsInChildren<Collider>().Length, Is.Zero);
+            Assert.That(firstSphere.sharedMesh, Is.SameAs(secondSphere.sharedMesh));
         }
     }
 }

@@ -29,9 +29,9 @@ namespace ShapeForge.LowPoly.Editor
             ShapeDefinition      definition,
             ShapeStyleDefinition style)
         {
-            ShapeStyleResolver       resolver  = new ShapeStyleResolver(new[] { style });
-            UnityShapeModelGenerator generator = new UnityShapeModelGenerator(
-                new IUnityShapeGenerator[] { new LowPolyCubeGenerator() },
+            ShapeStyleResolver       resolver  = new(new[] { style });
+            UnityShapeModelGenerator generator = new(
+                new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
             GameObject generated = generator.Generate(definition);
 

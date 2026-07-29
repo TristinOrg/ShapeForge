@@ -1,4 +1,3 @@
-using System;
 using ShapeForge.Unity;
 using UnityEngine;
 
@@ -9,6 +8,8 @@ namespace ShapeForge.LowPoly
     /// </summary>
     public sealed class LowPolyCubeGenerator : IUnityShapeGenerator
     {
+        private readonly LowPolyPrimitiveGenerator generator = new();
+
         /// <inheritdoc />
         public bool CanGenerate(ShapeNode node)
         {
@@ -18,21 +19,7 @@ namespace ShapeForge.LowPoly
         /// <inheritdoc />
         public GameObject Generate(ShapeNode node, ShapeGenerationContext context)
         {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Collider collider = gameObject.GetComponent<Collider>();
-
-            if (Application.isPlaying)
-                UnityEngine.Object.Destroy(collider);
-            else
-                UnityEngine.Object.DestroyImmediate(collider);
-
-            return gameObject;
+            return generator.Generate(node, context);
         }
     }
 }
