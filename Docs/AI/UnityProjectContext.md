@@ -45,7 +45,7 @@ Core and LowPoly each have separate runtime, editor, and EditMode test assemblie
 
 ## Architecture
 
-Core now provides serializable shape definitions, stable node identity, editable hierarchy generation, and explicit generator injection. LowPoly supplies the first Cube implementation through the Core contract. Core does not depend on LowPoly or external AI providers.
+Core now provides serializable shape definitions, stable node identity, palettes, replaceable style resolution, editable hierarchy generation, and explicit generator injection. LowPoly supplies the first Cube implementation with per-instance color through the Core contracts. Core does not depend on LowPoly, a render pipeline, or external AI providers.
 
 ## Coding Conventions
 
@@ -56,7 +56,7 @@ Core now provides serializable shape definitions, stable node identity, editable
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Four first-party EditMode tests cover serialization, hierarchy generation, identity validation, and LowPoly Cube generation.
+- Seven first-party EditMode tests cover serialization, hierarchy generation, identity validation, style resolution, color precedence, and LowPoly Cube generation.
 - No first-party PlayMode, CI, or build validation exists yet.
 
 ## Available Unity Tooling

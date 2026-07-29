@@ -8,6 +8,9 @@ namespace ShapeForge.LowPoly
     /// </summary>
     public sealed class LowPolyCubeGenerator : IShapeGenerator
     {
+        private static readonly int ColorProperty     = Shader.PropertyToID("_Color");
+        private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
+
         /// <inheritdoc />
         public bool CanGenerate(ShapeNode node)
         {
@@ -25,11 +28,20 @@ namespace ShapeForge.LowPoly
 
             GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Collider   collider   = gameObject.GetComponent<Collider>();
+            Renderer   renderer   = gameObject.GetComponent<Renderer>();
 
             if (Application.isPlaying)
                 UnityEngine.Object.Destroy(collider);
             else
                 UnityEngine.Object.DestroyImmediate(collider);
+
+            if (context.TryResolveColor(node, out Color color))
+            {
+                MaterialPropertyBlock properties = new MaterialPropertyBlock();
+                properties.SetColor(ColorProperty, color);
+                properties.SetColor(BaseColorProperty, color);
+                renderer.SetPropertyBlock(properties);
+            }
 
             return gameObject;
         }

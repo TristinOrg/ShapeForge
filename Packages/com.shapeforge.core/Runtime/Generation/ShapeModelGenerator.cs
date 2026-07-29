@@ -10,14 +10,19 @@ namespace ShapeForge
     public sealed class ShapeModelGenerator
     {
         private readonly List<IShapeGenerator> generators = new List<IShapeGenerator>();
+        private readonly IShapeStyleResolver   styleResolver;
 
         /// <summary>
         /// Initializes a model generator with its available shape implementations.
         /// </summary>
-        public ShapeModelGenerator(IEnumerable<IShapeGenerator> generators)
+        public ShapeModelGenerator(
+            IEnumerable<IShapeGenerator> generators,
+            IShapeStyleResolver           styleResolver = null)
         {
             if (generators == null)
                 throw new ArgumentNullException(nameof(generators));
+
+            this.styleResolver = styleResolver;
 
             foreach (IShapeGenerator generator in generators)
             {
@@ -37,7 +42,7 @@ namespace ShapeForge
                 throw new ArgumentNullException(nameof(definition));
 
             HashSet<string>         nodeIds = new HashSet<string>(StringComparer.Ordinal);
-            ShapeGenerationContext context = new ShapeGenerationContext(definition);
+            ShapeGenerationContext context = new ShapeGenerationContext(definition, styleResolver);
 
             ValidateTree(definition.Root, nodeIds);
             return GenerateNode(definition.Root, parent, context);
