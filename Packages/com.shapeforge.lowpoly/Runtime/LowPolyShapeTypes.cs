@@ -11,4 +11,3 @@ namespace ShapeForge.LowPoly
         public const string Cube = "lowpoly/cube";
     }
 }
-

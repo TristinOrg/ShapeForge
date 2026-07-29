@@ -11,4 +11,3 @@ namespace ShapeForge
         public const string Group = "core/group";
     }
 }
-

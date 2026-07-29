@@ -18,4 +18,3 @@ namespace ShapeForge
         GameObject Generate(ShapeNode node, ShapeGenerationContext context);
     }
 }
-

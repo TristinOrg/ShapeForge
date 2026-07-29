@@ -37,4 +37,3 @@ namespace ShapeForge.LowPoly.Tests
         }
     }
 }
-

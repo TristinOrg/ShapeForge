@@ -21,4 +21,3 @@ namespace ShapeForge
         public ShapeDefinition Definition { get; }
     }
 }
-
