@@ -43,6 +43,9 @@ namespace ShapeForge
             if (node.Appearance == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires appearance data.");
 
+            if (node.Appearance.HasColorOverride)
+                ForgeColorValidator.Validate(node.Appearance.Color, $"Shape node '{node.Id}'");
+
             foreach (ShapeNode child in node.Children)
                 ValidateNode(child, nodeIds);
         }

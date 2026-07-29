@@ -33,6 +33,8 @@ namespace ShapeForge
 
                 if (!roles.Add(entry.Role))
                     throw new ShapeValidationException($"Style '{definition.Id}' contains duplicate role '{entry.Role}'.");
+
+                ForgeColorValidator.Validate(entry.Color, $"Style '{definition.Id}' role '{entry.Role}'");
             }
         }
     }

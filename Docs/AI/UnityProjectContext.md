@@ -47,7 +47,7 @@ Schema and Core use assemblies with no UnityEngine references. Unity adapts Sche
 
 ## Architecture
 
-Schema provides versioned engine-agnostic shape and style documents. Core provides validation and style resolution without UnityEngine. The Unity Adapter owns JSON and GameObject generation. LowPoly supplies the first Unity Cube implementation with per-instance color.
+Schema provides versioned engine-agnostic shape and style documents. Core provides validation, fluent authoring, and style resolution without UnityEngine. The Unity Adapter owns JSON and GameObject generation. LowPoly supplies the first Unity Cube implementation and a five-part furniture preset.
 
 ## Coding Conventions
 
@@ -58,7 +58,7 @@ Schema provides versioned engine-agnostic shape and style documents. Core provid
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Eight first-party EditMode tests cover the JSON contract, hierarchy adaptation, identity validation, style resolution, color precedence, and LowPoly Cube generation.
+- Twelve first-party EditMode tests cover fluent authoring, the JSON contract, hierarchy adaptation, identity and color validation, style resolution, color precedence, LowPoly Cube generation, and a furniture preset.
 - No first-party PlayMode, CI, or build validation exists yet.
 
 ## Available Unity Tooling
