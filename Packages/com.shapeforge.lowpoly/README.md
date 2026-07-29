@@ -7,3 +7,5 @@ Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes an
 Use `LowPolyModelGenerator` as the reusable runtime entry point for validated definitions or external ShapeForge JSON. Register style documents once, then reuse the same pipeline for subsequent models.
 
 Use `ShapeForge > Generate` in the Unity Editor to preview the official Table and Robot presets with full Undo support.
+
+Use `ShapeForge > Diagnostics > Benchmark JSON Generation` to measure the end-to-end JSON generation path, managed heap growth, and shared render resources on the current Editor machine. Treat results as a local baseline, not a cross-platform guarantee.
