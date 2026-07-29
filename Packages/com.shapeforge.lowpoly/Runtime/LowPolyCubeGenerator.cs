@@ -25,19 +25,12 @@ namespace ShapeForge.LowPoly
                 throw new ArgumentNullException(nameof(context));
 
             GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            Collider   collider   = gameObject.GetComponent<Collider>();
-            Renderer   renderer   = gameObject.GetComponent<Renderer>();
+            Collider collider = gameObject.GetComponent<Collider>();
 
             if (Application.isPlaying)
                 UnityEngine.Object.Destroy(collider);
             else
                 UnityEngine.Object.DestroyImmediate(collider);
-
-            if (context.TryResolveColor(node, out ForgeColor color))
-            {
-                UnityShapeColor shapeColor = gameObject.AddComponent<UnityShapeColor>();
-                shapeColor.Configure(renderer, color);
-            }
 
             return gameObject;
         }

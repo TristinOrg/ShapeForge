@@ -38,9 +38,9 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.GetComponent<Collider>(), Is.Null);
             Assert.That(generatedRoot.transform.localScale, Is.EqualTo(new Vector3(2f, 3f, 4f)));
 
-            UnityShapeColor shapeColor = generatedRoot.GetComponent<UnityShapeColor>();
-            Assert.That(shapeColor, Is.Not.Null);
-            Assert.That(shapeColor.Color, Is.EqualTo(Color.red));
+            UnityShapeAppearanceManifest manifest = generatedRoot.GetComponent<UnityShapeAppearanceManifest>();
+            Assert.That(manifest, Is.Not.Null);
+            Assert.That(manifest.BindingCount, Is.EqualTo(1));
 
             MaterialPropertyBlock properties = new MaterialPropertyBlock();
             Renderer renderer = generatedRoot.GetComponent<Renderer>();
@@ -48,7 +48,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
 
             renderer.SetPropertyBlock(null);
-            shapeColor.Apply();
+            manifest.Apply();
             renderer.GetPropertyBlock(properties);
             Assert.That(properties.GetColor(Shader.PropertyToID("_Color")), Is.EqualTo(Color.red));
         }

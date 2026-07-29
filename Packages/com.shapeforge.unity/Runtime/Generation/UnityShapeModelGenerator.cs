@@ -10,6 +10,7 @@ namespace ShapeForge.Unity
     public sealed class UnityShapeModelGenerator
     {
         private readonly List<IUnityShapeGenerator> generators = new List<IUnityShapeGenerator>();
+        private readonly IUnityAppearanceBackend   appearanceBackend;
         private readonly IShapeStyleResolver        styleResolver;
         private readonly ShapeDefinitionValidator  validator = new ShapeDefinitionValidator();
 
@@ -18,12 +19,14 @@ namespace ShapeForge.Unity
         /// </summary>
         public UnityShapeModelGenerator(
             IEnumerable<IUnityShapeGenerator> generators,
-            IShapeStyleResolver                styleResolver = null)
+            IShapeStyleResolver                styleResolver     = null,
+            IUnityAppearanceBackend            appearanceBackend = null)
         {
             if (generators == null)
                 throw new ArgumentNullException(nameof(generators));
 
-            this.styleResolver = styleResolver;
+            this.styleResolver     = styleResolver;
+            this.appearanceBackend = appearanceBackend ?? new HybridUnityAppearanceBackend();
 
             foreach (IUnityShapeGenerator generator in generators)
             {
@@ -41,14 +44,27 @@ namespace ShapeForge.Unity
         {
             validator.Validate(definition);
 
-            ShapeGenerationContext context = new ShapeGenerationContext(definition, styleResolver);
-            return GenerateNode(definition.Root, parent, context);
+            ShapeGenerationContext  context    = new ShapeGenerationContext(definition, styleResolver);
+            IUnityAppearanceSession appearance = appearanceBackend.Begin(context);
+            GameObject              root       = GenerateNode(definition.Root, parent, context, appearance);
+
+            try
+            {
+                appearance.Complete(root);
+                return root;
+            }
+            catch
+            {
+                DestroyGeneratedObject(root);
+                throw;
+            }
         }
 
         private GameObject GenerateNode(
             ShapeNode              node,
             Transform              parent,
-            ShapeGenerationContext context)
+            ShapeGenerationContext context,
+            IUnityAppearanceSession appearance)
         {
             GameObject generated = node.Type == ShapeTypes.Group
                 ? new GameObject(node.Name)
@@ -61,10 +77,14 @@ namespace ShapeForge.Unity
             generated.transform.SetParent(parent, false);
             node.Transform.ApplyTo(generated.transform);
 
+            Renderer renderer = generated.GetComponent<Renderer>();
+            if (renderer != null)
+                appearance.Apply(renderer, node);
+
             try
             {
                 foreach (ShapeNode child in node.Children)
-                    GenerateNode(child, generated.transform, context);
+                    GenerateNode(child, generated.transform, context, appearance);
             }
             catch
             {
