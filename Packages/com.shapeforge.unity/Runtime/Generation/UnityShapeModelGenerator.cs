@@ -9,10 +9,10 @@ namespace ShapeForge.Unity
     /// </summary>
     public sealed class UnityShapeModelGenerator
     {
-        private readonly List<IUnityShapeGenerator> generators = new List<IUnityShapeGenerator>();
+        private readonly List<IUnityShapeGenerator> generators = new();
         private readonly IUnityAppearanceBackend   appearanceBackend;
         private readonly IShapeStyleResolver        styleResolver;
-        private readonly ShapeDefinitionValidator  validator = new ShapeDefinitionValidator();
+        private readonly ShapeDefinitionValidator  validator = new();
 
         /// <summary>
         /// Initializes a Unity model generator with explicit shape implementations.
@@ -44,7 +44,7 @@ namespace ShapeForge.Unity
         {
             validator.Validate(definition);
 
-            ShapeGenerationContext  context    = new ShapeGenerationContext(definition, styleResolver);
+            ShapeGenerationContext  context    = new(definition, styleResolver);
             IUnityAppearanceSession appearance = appearanceBackend.Begin(context);
             GameObject              root       = GenerateNode(definition.Root, parent, context, appearance);
 
@@ -64,10 +64,11 @@ namespace ShapeForge.Unity
             ShapeNode              node,
             Transform              parent,
             ShapeGenerationContext context,
-            IUnityAppearanceSession appearance)
+            IUnityAppearanceSession appearance,
+            UnityShapeModel         model = null)
         {
             GameObject generated = node.Type == ShapeTypes.Group
-                ? new GameObject(node.Name)
+                ? new(node.Name)
                 : GenerateGeometry(node, context);
 
             if (generated == null)
@@ -77,6 +78,11 @@ namespace ShapeForge.Unity
             generated.transform.SetParent(parent, false);
             node.Transform.ApplyTo(generated.transform);
 
+            if (model == null)
+                model = generated.AddComponent<UnityShapeModel>();
+
+            model.AddBinding(node.Id, generated.transform);
+
             Renderer renderer = generated.GetComponent<Renderer>();
             if (renderer != null)
                 appearance.Apply(renderer, node);
@@ -84,7 +90,7 @@ namespace ShapeForge.Unity
             try
             {
                 foreach (ShapeNode child in node.Children)
-                    GenerateNode(child, generated.transform, context, appearance);
+                    GenerateNode(child, generated.transform, context, appearance, model);
             }
             catch
             {

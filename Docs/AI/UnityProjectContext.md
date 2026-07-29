@@ -47,7 +47,7 @@ Schema and Core use assemblies with no UnityEngine references. Unity adapts Sche
 
 ## Architecture
 
-Schema provides versioned engine-agnostic shape and style documents. Core provides validation, fluent authoring, and mutable style registration without UnityEngine. The Unity Adapter owns JSON, GameObject generation, and lifecycle-safe serialized appearance. Its hybrid appearance backend uses cached shared materials for palette roles, property blocks for direct overrides, and one serialized root manifest per model. LowPoly supplies a reusable definition/JSON generation pipeline, cached Cube, Sphere, Cylinder, and Capsule render resources, Cube-based Table and modular Robot presets, plus undoable Editor preview commands.
+Schema provides versioned engine-agnostic shape and style documents. Core provides validation, fluent authoring, mutable style registration, and engine-neutral transform target/resolver contracts without UnityEngine. The Unity Adapter owns JSON, GameObject generation, lifecycle-safe serialized appearance, and a root model manifest that resolves stable node IDs without hierarchy traversal. LowPoly supplies a reusable definition/JSON generation pipeline, cached Cube, Sphere, Cylinder, and Capsule render resources, Cube-based Table and modular Robot presets, plus undoable Editor preview commands.
 
 ## Coding Conventions
 

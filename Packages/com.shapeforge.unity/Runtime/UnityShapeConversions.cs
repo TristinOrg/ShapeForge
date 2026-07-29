@@ -13,7 +13,15 @@ namespace ShapeForge.Unity
         /// </summary>
         public static Vector3 ToUnity(this ForgeVector3 value)
         {
-            return new Vector3(value.X, value.Y, value.Z);
+            return new(value.X, value.Y, value.Z);
+        }
+
+        /// <summary>
+        /// Converts a Unity vector to an engine-agnostic vector.
+        /// </summary>
+        public static ForgeVector3 ToForge(this Vector3 value)
+        {
+            return new(value.x, value.y, value.z);
         }
 
         /// <summary>
@@ -21,7 +29,7 @@ namespace ShapeForge.Unity
         /// </summary>
         public static Color ToUnity(this ForgeColor value)
         {
-            return new Color(value.R, value.G, value.B, value.A);
+            return new(value.R, value.G, value.B, value.A);
         }
 
         /// <summary>

@@ -36,6 +36,14 @@ namespace ShapeForge.Unity.Tests
             Assert.That(generatedRoot.transform.childCount, Is.EqualTo(1));
             Assert.That(generatedRoot.transform.GetChild(0).name, Is.EqualTo("Body"));
             Assert.That(generatedRoot.transform.GetChild(0).localScale, Is.EqualTo(new Vector3(2f, 3f, 4f)));
+
+            UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
+            Assert.That(model.BindingCount, Is.EqualTo(2));
+            Assert.That(model.TryGetTarget("body", out IShapeTransformTarget target), Is.True);
+
+            target.LocalPosition = new(5f, 6f, 7f);
+            Assert.That(generatedRoot.transform.GetChild(0).localPosition, Is.EqualTo(new Vector3(5f, 6f, 7f)));
+            Assert.That(model.TryGetTarget("missing", out _), Is.False);
         }
 
         [Test]
