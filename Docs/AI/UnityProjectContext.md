@@ -7,7 +7,7 @@
 - Project root: `D:/git/ShapeForge`
 - Purpose: extensible procedural shape framework; Low Poly is the first official implementation.
 - Last analyzed: 2026-07-29
-- Last analyzed commit: `3c708b6`
+- Last analyzed commit: `7eed918`
 
 ## Confirmed Environment
 
@@ -45,7 +45,7 @@ Core and LowPoly each have separate runtime, editor, and EditMode test assemblie
 
 ## Architecture
 
-The project currently contains no first-party runtime code. The confirmed direction is a serializable shape hierarchy consumed by replaceable style-aware generators. Core must not depend on LowPoly or external AI providers.
+Core now provides serializable shape definitions, stable node identity, editable hierarchy generation, and explicit generator injection. LowPoly supplies the first Cube implementation through the Core contract. Core does not depend on LowPoly or external AI providers.
 
 ## Coding Conventions
 
@@ -56,7 +56,8 @@ The project currently contains no first-party runtime code. The confirmed direct
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- No first-party EditMode, PlayMode, CI, or build validation exists yet.
+- Four first-party EditMode tests cover serialization, hierarchy generation, identity validation, and LowPoly Cube generation.
+- No first-party PlayMode, CI, or build validation exists yet.
 
 ## Available Unity Tooling
 
@@ -74,7 +75,8 @@ The project currently contains no first-party runtime code. The confirmed direct
 
 ## Unknowns And Confidence
 
-- Package API, serialization schema, stable node identity, and style inheritance remain design work.
+- The initial API and Unity JSON serialization shape are implemented but remain pre-1.0 and may evolve.
+- Style inheritance, palette resolution, animation bindings, and external JSON schema versioning remain design work.
 - Supported Unity versions and public release license are not yet decided.
 
 ## Source Files Inspected
