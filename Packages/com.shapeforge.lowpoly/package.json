@@ -1,0 +1,14 @@
+{
+  "name": "com.shapeforge.lowpoly",
+  "version": "0.1.0",
+  "displayName": "ShapeForge Low Poly",
+  "description": "Official Low Poly implementation and examples for ShapeForge.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.shapeforge.core": "0.1.0"
+  },
+  "author": {
+    "name": "Tristin Wen"
+  }
+}
+

@@ -29,12 +29,13 @@
 | Path | Purpose | Confidence | Evidence |
 | --- | --- | --- | --- |
 | `Assets/Scenes` | Default Unity sample scene | Confirmed | repository files |
-| `Packages` | Unity project dependencies; ShapeForge packages not created yet | Confirmed | repository files |
+| `Packages/com.shapeforge.core` | Style-independent data and extension contracts | Confirmed | package manifest |
+| `Packages/com.shapeforge.lowpoly` | Official Low Poly implementation | Confirmed | package manifest |
 | `Docs/AI` | Concise persistent project context | Confirmed | this document |
 
 ## Assembly Boundaries
 
-No first-party assembly definitions exist yet. Planned boundaries are independent Core and LowPoly runtime, editor, and test assemblies.
+Core and LowPoly each have separate runtime, editor, and EditMode test assemblies. LowPoly references Core; Core has no LowPoly dependency.
 
 ## Scenes And Startup Flow
 
@@ -60,7 +61,7 @@ The project currently contains no first-party runtime code. The confirmed direct
 ## Available Unity Tooling
 
 - Repository and Git CLI access: available.
-- Unity MCP and live Editor inspection: unavailable; no provider detected.
+- Unity MCP and live Editor inspection: available through CoplayDev Unity MCP 10.1.0.
 - Unity Editor-generated C# projects exist, but no first-party code exists to compile.
 
 ## Important Constraints

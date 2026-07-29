@@ -1,0 +1,11 @@
+{
+  "name": "ShapeForge.Core.Editor",
+  "rootNamespace": "ShapeForge.Editor",
+  "references": [
+    "ShapeForge.Core"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
+

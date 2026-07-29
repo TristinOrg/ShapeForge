@@ -17,6 +17,20 @@
       },
       "hash": "c14de1e6dc01ab42d2bb358730cff954bce0ce6b"
     },
+    "com.shapeforge.core": {
+      "version": "file:com.shapeforge.core",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
+    "com.shapeforge.lowpoly": {
+      "version": "file:com.shapeforge.lowpoly",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.shapeforge.core": "0.1.0"
+      }
+    },
     "com.unity.collab-proxy": {
       "version": "2.7.1",
       "depth": 0,

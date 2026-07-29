@@ -1,0 +1,12 @@
+{
+  "name": "ShapeForge.LowPoly.Editor",
+  "rootNamespace": "ShapeForge.LowPoly.Editor",
+  "references": [
+    "ShapeForge.Core",
+    "ShapeForge.LowPoly"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}
+

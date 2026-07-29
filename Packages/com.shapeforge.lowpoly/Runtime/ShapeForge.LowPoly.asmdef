@@ -1,0 +1,8 @@
+{
+  "name": "ShapeForge.LowPoly",
+  "rootNamespace": "ShapeForge.LowPoly",
+  "references": [
+    "ShapeForge.Core"
+  ]
+}
+

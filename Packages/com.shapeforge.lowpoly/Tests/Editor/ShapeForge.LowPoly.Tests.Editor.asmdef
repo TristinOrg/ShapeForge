@@ -1,0 +1,15 @@
+{
+  "name": "ShapeForge.LowPoly.Tests.Editor",
+  "rootNamespace": "ShapeForge.LowPoly.Tests",
+  "references": [
+    "ShapeForge.Core",
+    "ShapeForge.LowPoly"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
+

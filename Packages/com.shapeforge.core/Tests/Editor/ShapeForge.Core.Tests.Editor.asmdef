@@ -1,0 +1,14 @@
+{
+  "name": "ShapeForge.Core.Tests.Editor",
+  "rootNamespace": "ShapeForge.Tests",
+  "references": [
+    "ShapeForge.Core"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
+
