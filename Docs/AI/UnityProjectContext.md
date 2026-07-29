@@ -7,7 +7,7 @@
 - Project root: `D:/git/ShapeForge`
 - Purpose: extensible procedural shape framework; Low Poly is the first official implementation.
 - Last analyzed: 2026-07-29
-- Last analyzed commit: initial uncommitted project
+- Last analyzed commit: `3c708b6`
 
 ## Confirmed Environment
 
@@ -87,4 +87,3 @@ The project currently contains no first-party runtime code. The confirmed direct
 - `Assets/Scenes/SampleScene.unity`
 
 <!-- unity-onboarding:generated:end -->
-
