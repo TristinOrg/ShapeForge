@@ -69,6 +69,22 @@ namespace ShapeForge
                     throw new ShapeValidationException($"Shape node '{node.Id}' profile points must be finite.");
             }
 
+            if (node.ProfileSections == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile section collection.");
+
+            foreach (ShapeProfileSection section in node.ProfileSections)
+            {
+                if (section == null)
+                    throw new ShapeValidationException($"Shape node '{node.Id}' cannot contain null profile sections.");
+
+                if (float.IsNaN(section.Z) || float.IsInfinity(section.Z) ||
+                    float.IsNaN(section.Scale.X) || float.IsInfinity(section.Scale.X) ||
+                    float.IsNaN(section.Scale.Y) || float.IsInfinity(section.Scale.Y) ||
+                    float.IsNaN(section.Offset.X) || float.IsInfinity(section.Offset.X) ||
+                    float.IsNaN(section.Offset.Y) || float.IsInfinity(section.Offset.Y))
+                    throw new ShapeValidationException($"Shape node '{node.Id}' profile sections must be finite.");
+            }
+
             foreach (ShapeNode child in node.Children)
                 ValidateNode(child, nodeIds);
         }

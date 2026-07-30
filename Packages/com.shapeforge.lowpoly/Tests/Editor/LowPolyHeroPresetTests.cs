@@ -33,6 +33,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.name, Is.EqualTo("Fantasy Hero"));
             Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(43));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Hair Crown"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Back Hair"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Front Hair"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Pupil"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Nose"), Is.Not.Null);
@@ -43,8 +44,8 @@ namespace ShapeForge.LowPoly.Tests
             MeshFilter coat = generatedRoot.transform
                 .Find("Pelvis Pivot/Spine Pivot/Fitted Coat")
                 .GetComponent<MeshFilter>();
-            MeshFilter jaw = generatedRoot.transform
-                .Find("Head Pivot/Jaw")
+            MeshFilter head = generatedRoot.transform
+                .Find("Head Pivot/Sculpted Head")
                 .GetComponent<MeshFilter>();
             MeshFilter coatTail = generatedRoot.transform
                 .Find("Pelvis Pivot/Spine Pivot/Left Coat Tail")
@@ -53,10 +54,10 @@ namespace ShapeForge.LowPoly.Tests
                 .Find("Left Hip Pivot/Left Knee Pivot/Left Boot")
                 .GetComponent<MeshFilter>();
 
-            Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
-            Assert.That(jaw.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
+            Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
+            Assert.That(head.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
             Assert.That(coatTail.sharedMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
-            Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
+            Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
 
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
             Assert.That(model.TryGetTarget("hero.spine.pivot", out _), Is.True);

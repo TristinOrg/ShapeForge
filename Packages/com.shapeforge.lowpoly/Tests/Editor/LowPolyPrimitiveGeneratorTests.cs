@@ -163,6 +163,33 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(rebuilt, Is.Not.SameAs(destroyed));
         }
 
+        [Test]
+        public void GenerateBuildsAndCachesConcaveProfileLofts()
+        {
+            ForgeVector2[] points =
+            {
+                new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.5f),
+                new(0f, -0.15f), new(-0.5f, -0.5f)
+            };
+            ShapeNode first  = CreateLoft("loft-a", "Loft A", points);
+            ShapeNode second = CreateLoft("loft-b", "Loft B", points);
+            ShapeNode root   = new("lofts", "Lofts", ShapeTypes.Group);
+            root.Add(first).Add(second);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Lofts", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Loft A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Loft B").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.name, Is.EqualTo("Low Poly Profile Loft"));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(58));
+            Assert.That(firstMesh.bounds.size.z, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+        }
+
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
@@ -181,6 +208,18 @@ namespace ShapeForge.LowPoly.Tests
             foreach (ForgeVector2 point in points)
                 node.Profile.Add(point);
 
+            return node;
+        }
+
+        private static ShapeNode CreateLoft(string id, string name, ForgeVector2[] points)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.ProfileLoft);
+            foreach (ForgeVector2 point in points)
+                node.Profile.Add(point);
+
+            node.ProfileSections.Add(new(-0.5f, new(0.75f, 0.8f), ForgeVector2.Zero));
+            node.ProfileSections.Add(new(0f, ForgeVector2.One, new(0f, 0.05f)));
+            node.ProfileSections.Add(new(0.5f, new(0.8f, 0.9f), ForgeVector2.Zero));
             return node;
         }
     }

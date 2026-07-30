@@ -9,8 +9,9 @@ namespace ShapeForge.LowPoly
     /// </summary>
     internal static class LowPolyProceduralMeshCache
     {
-        private static readonly Dictionary<MeshKey, Mesh> Meshes = new();
-        private static readonly Dictionary<int, List<ProfileMeshEntry>> ProfileMeshes = new();
+        private static readonly Dictionary<MeshKey, Mesh>                    Meshes        = new();
+        private static readonly Dictionary<int, List<ProfileMeshEntry>>      ProfileMeshes = new();
+        private static readonly Dictionary<int, List<LoftMeshEntry>>         LoftMeshes    = new();
 
         public static Mesh GetWedge()
         {
@@ -74,6 +75,70 @@ namespace ShapeForge.LowPoly
             return mesh;
         }
 
+        public static Mesh GetProfileLoft(
+            IList<ForgeVector2>       profile,
+            IList<ShapeProfileSection> sections)
+        {
+            if (profile == null)
+                throw new ArgumentNullException(nameof(profile));
+
+            if (profile.Count < 3)
+                throw new ArgumentException("Profile lofts require at least three points.", nameof(profile));
+
+            ValidateLoftSections(sections);
+            int hash = GetLoftHash(profile, sections);
+            if (LoftMeshes.TryGetValue(hash, out List<LoftMeshEntry> entries))
+            {
+                for (int index = entries.Count - 1; index >= 0; index--)
+                {
+                    LoftMeshEntry entry = entries[index];
+                    if (entry.Mesh == null)
+                    {
+                        entries.RemoveAt(index);
+                        continue;
+                    }
+
+                    if (entry.Matches(profile, sections))
+                        return entry.Mesh;
+                }
+            }
+            else
+            {
+                entries = new();
+                LoftMeshes.Add(hash, entries);
+            }
+
+            ForgeVector2[] points   = CopyProfile(profile);
+            LoftSection[] loft      = CopySections(sections);
+            Mesh          mesh      = CreateProfileLoft(points, loft);
+            entries.Add(new(points, loft, mesh));
+            return mesh;
+        }
+
+        private static void ValidateLoftSections(IList<ShapeProfileSection> sections)
+        {
+            if (sections == null)
+                throw new ArgumentNullException(nameof(sections));
+
+            if (sections.Count < 2)
+                throw new ArgumentException("Profile lofts require at least two sections.", nameof(sections));
+
+            float previousZ = float.NegativeInfinity;
+            foreach (ShapeProfileSection section in sections)
+            {
+                if (section == null)
+                    throw new ArgumentException("Profile loft sections cannot contain null entries.", nameof(sections));
+
+                if (section.Scale.X <= 0f || section.Scale.Y <= 0f)
+                    throw new ArgumentOutOfRangeException(nameof(sections), "Profile loft section scales must be positive.");
+
+                if (section.Z <= previousZ)
+                    throw new ArgumentException("Profile loft sections must be ordered by increasing depth.", nameof(sections));
+
+                previousZ = section.Z;
+            }
+        }
+
         private static int GetProfileHash(IList<ForgeVector2> profile, float depth, float bevel)
         {
             int hash = (depth.GetHashCode() * 397) ^ bevel.GetHashCode();
@@ -90,6 +155,38 @@ namespace ShapeForge.LowPoly
                 points[index] = profile[index];
 
             return points;
+        }
+
+        private static int GetLoftHash(
+            IList<ForgeVector2>       profile,
+            IList<ShapeProfileSection> sections)
+        {
+            int hash = GetProfileHash(profile, 0f, 0f);
+            foreach (ShapeProfileSection section in sections)
+            {
+                hash = (hash * 397) ^ section.Z.GetHashCode();
+                hash = (hash * 397) ^ section.Scale.GetHashCode();
+                hash = (hash * 397) ^ section.Offset.GetHashCode();
+            }
+
+            return hash;
+        }
+
+        private static LoftSection[] CopySections(IList<ShapeProfileSection> sections)
+        {
+            LoftSection[] result = new LoftSection[sections.Count];
+            for (int index = 0; index < sections.Count; index++)
+            {
+                ShapeProfileSection section = sections[index];
+                result[index] = new(
+                    section.Z,
+                    section.Scale.X,
+                    section.Scale.Y,
+                    section.Offset.X,
+                    section.Offset.Y);
+            }
+
+            return result;
         }
 
         private static Mesh GetOrCreate(MeshKey key, Func<Mesh> create)
@@ -112,6 +209,7 @@ namespace ShapeForge.LowPoly
         {
             Meshes.Clear();
             ProfileMeshes.Clear();
+            LoftMeshes.Clear();
         }
 
         private static Mesh CreateWedge()
@@ -209,6 +307,73 @@ namespace ShapeForge.LowPoly
             }
 
             return builder.Build("Low Poly Extruded Profile");
+        }
+
+        private static Mesh CreateProfileLoft(ForgeVector2[] profile, LoftSection[] sections)
+        {
+            ForgeVector2[] points    = EnsureCounterClockwise(profile);
+            ForgeVector2[][] rings   = new ForgeVector2[sections.Length][];
+            MeshBuilder    builder   = new();
+            for (int sectionIndex = 0; sectionIndex < sections.Length; sectionIndex++)
+            {
+                LoftSection section = sections[sectionIndex];
+                ForgeVector2[] ring = new ForgeVector2[points.Length];
+                for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
+                {
+                    ForgeVector2 point = points[pointIndex];
+                    ring[pointIndex] = new(
+                        (point.X * section.ScaleX) + section.OffsetX,
+                        (point.Y * section.ScaleY) + section.OffsetY);
+                }
+
+                rings[sectionIndex] = ring;
+            }
+
+            List<int> frontTriangles = Triangulate(rings[0]);
+            List<int> backTriangles  = Triangulate(rings[rings.Length - 1]);
+            AddLoftCap(builder, rings[0], sections[0].Z, frontTriangles, true);
+            AddLoftCap(
+                builder,
+                rings[rings.Length - 1],
+                sections[sections.Length - 1].Z,
+                backTriangles,
+                false);
+
+            for (int sectionIndex = 0; sectionIndex < rings.Length - 1; sectionIndex++)
+            {
+                ForgeVector2[] front = rings[sectionIndex];
+                ForgeVector2[] back  = rings[sectionIndex + 1];
+                for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
+                {
+                    int next = (pointIndex + 1) % points.Length;
+                    builder.AddQuad(
+                        ToVector3(front[pointIndex], sections[sectionIndex].Z),
+                        ToVector3(front[next], sections[sectionIndex].Z),
+                        ToVector3(back[next], sections[sectionIndex + 1].Z),
+                        ToVector3(back[pointIndex], sections[sectionIndex + 1].Z));
+                }
+            }
+
+            return builder.Build("Low Poly Profile Loft");
+        }
+
+        private static void AddLoftCap(
+            MeshBuilder         builder,
+            IList<ForgeVector2> ring,
+            float               z,
+            IList<int>          triangles,
+            bool                reverse)
+        {
+            for (int index = 0; index < triangles.Count; index += 3)
+            {
+                Vector3 first  = ToVector3(ring[triangles[index]], z);
+                Vector3 second = ToVector3(ring[triangles[index + 1]], z);
+                Vector3 third  = ToVector3(ring[triangles[index + 2]], z);
+                if (reverse)
+                    builder.AddTriangle(third, second, first);
+                else
+                    builder.AddTriangle(first, second, third);
+            }
         }
 
         private static ForgeVector2[] InsetProfile(IList<ForgeVector2> points, float inset)
@@ -480,6 +645,82 @@ namespace ShapeForge.LowPoly
                 }
 
                 return true;
+            }
+        }
+
+        /// <summary>
+        /// Owns immutable profile-loft data and its generated Unity mesh.
+        /// </summary>
+        private sealed class LoftMeshEntry
+        {
+            private readonly LoftSection[] sections;
+
+            public LoftMeshEntry(ForgeVector2[] points, LoftSection[] sections, Mesh mesh)
+            {
+                Points        = points;
+                this.sections = sections;
+                Mesh          = mesh;
+            }
+
+            public ForgeVector2[] Points { get; }
+
+            public Mesh Mesh { get; }
+
+            public bool Matches(
+                IList<ForgeVector2>       profile,
+                IList<ShapeProfileSection> candidateSections)
+            {
+                if (Points.Length != profile.Count || sections.Length != candidateSections.Count)
+                    return false;
+
+                for (int index = 0; index < Points.Length; index++)
+                {
+                    if (!Points[index].Equals(profile[index]))
+                        return false;
+                }
+
+                for (int index = 0; index < sections.Length; index++)
+                {
+                    if (!sections[index].Matches(candidateSections[index]))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Stores one immutable numeric loft section without retaining mutable schema objects.
+        /// </summary>
+        private readonly struct LoftSection
+        {
+            public LoftSection(float z, float scaleX, float scaleY, float offsetX, float offsetY)
+            {
+                Z       = z;
+                ScaleX  = scaleX;
+                ScaleY  = scaleY;
+                OffsetX = offsetX;
+                OffsetY = offsetY;
+            }
+
+            public float Z { get; }
+
+            public float ScaleX { get; }
+
+            public float ScaleY { get; }
+
+            public float OffsetX { get; }
+
+            public float OffsetY { get; }
+
+            public bool Matches(ShapeProfileSection section)
+            {
+                return section != null &&
+                       Z.Equals(section.Z) &&
+                       ScaleX.Equals(section.Scale.X) &&
+                       ScaleY.Equals(section.Scale.Y) &&
+                       OffsetX.Equals(section.Offset.X) &&
+                       OffsetY.Equals(section.Offset.Y);
             }
         }
     }

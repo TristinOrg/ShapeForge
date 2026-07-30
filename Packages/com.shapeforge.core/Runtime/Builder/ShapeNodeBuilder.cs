@@ -88,6 +88,23 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Adds an ordered depth section used to scale and offset a profile loft.
+        /// </summary>
+        public ShapeNodeBuilder ProfileSection(
+            float z,
+            float scaleX,
+            float scaleY,
+            float offsetX = 0f,
+            float offsetY = 0f)
+        {
+            Node.ProfileSections.Add(new(
+                z,
+                new(scaleX, scaleY),
+                new(offsetX, offsetY)));
+            return this;
+        }
+
+        /// <summary>
         /// Adds a non-rendering child group.
         /// </summary>
         public ShapeNodeBuilder Group(

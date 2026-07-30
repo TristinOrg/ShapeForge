@@ -54,5 +54,34 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.ProfileDepth, depth)
                 .Parameter(LowPolyShapeParameters.ProfileBevel, bevel);
         }
+
+        /// <summary>Configures an outline and ordered depth sections for a profile-loft node.</summary>
+        public static ShapeNodeBuilder ProfileLoft(
+            this ShapeNodeBuilder        builder,
+            ForgeVector2[]               profile,
+            params ShapeProfileSection[] sections)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (sections == null)
+                throw new ArgumentNullException(nameof(sections));
+
+            builder.Profile(profile);
+            foreach (ShapeProfileSection section in sections)
+            {
+                if (section == null)
+                    throw new ArgumentException("Profile loft sections cannot contain null entries.", nameof(sections));
+
+                builder.ProfileSection(
+                    section.Z,
+                    section.Scale.X,
+                    section.Scale.Y,
+                    section.Offset.X,
+                    section.Offset.Y);
+            }
+
+            return builder;
+        }
     }
 }

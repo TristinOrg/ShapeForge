@@ -9,9 +9,10 @@ namespace ShapeForge
     [Serializable]
     public sealed class ShapeNode
     {
-        private readonly List<ShapeNode> children = new();
-        private readonly List<ForgeVector2> profile = new();
-        private readonly Dictionary<string, float> parameters = new(StringComparer.Ordinal);
+        private readonly List<ShapeNode>                   children        = new();
+        private readonly List<ForgeVector2>                profile         = new();
+        private readonly List<ShapeProfileSection>         profileSections = new();
+        private readonly Dictionary<string, float>         parameters      = new(StringComparer.Ordinal);
 
         /// <summary>
         /// Initializes an empty group node for serialization.
@@ -66,6 +67,11 @@ namespace ShapeForge
         public IList<ForgeVector2> Profile => profile;
 
         /// <summary>
+        /// Gets the optional ordered depth sections used to form a profile loft.
+        /// </summary>
+        public IList<ShapeProfileSection> ProfileSections => profileSections;
+
+        /// <summary>
         /// Gets the child shape definitions.
         /// </summary>
         public IList<ShapeNode> Children => children;
@@ -90,6 +96,11 @@ namespace ShapeForge
         private bool ShouldSerializeProfile()
         {
             return profile.Count > 0;
+        }
+
+        private bool ShouldSerializeProfileSections()
+        {
+            return profileSections.Count > 0;
         }
     }
 }

@@ -24,10 +24,18 @@ namespace ShapeForge.LowPoly
                             .ColorRole("trousers"))
                         .Group("hero.spine.pivot", "Spine Pivot", spine => spine
                             .Position(0f, 0.18f, 0f)
-                            .Shape("hero.torso", "Fitted Coat", LowPolyShapeTypes.Frustum, torso => torso
+                            .Shape("hero.torso", "Fitted Coat", LowPolyShapeTypes.ProfileLoft, torso => torso
                                 .Position(0f, 0.43f, 0f)
-                                .Scale(0.74f, 0.82f, 0.44f)
-                                .Frustum(1f, 0.86f, 0.66f, 0.7f)
+                                .Scale(0.9f, 0.82f, 0.5f)
+                                .ProfileLoft(
+                                    new ForgeVector2[]
+                                    {
+                                        new(-0.42f, 0.5f), new(0.42f, 0.5f), new(0.34f, -0.34f),
+                                        new(0.22f, -0.5f), new(-0.22f, -0.5f), new(-0.34f, -0.34f)
+                                    },
+                                    Section(-0.5f, 0.88f, 0.96f),
+                                    Section(0f, 1f, 1f),
+                                    Section(0.5f, 0.76f, 0.94f))
                                 .ColorRole("coat"))
                             .Shape("hero.chest", "Chest Panel", LowPolyShapeTypes.Cube, chest => chest
                                 .Position(0f, 0.48f, -0.23f)
@@ -95,11 +103,20 @@ namespace ShapeForge.LowPoly
                 .Position(0f, 1.96f, 0f)
                 .Shape("hero.neck", "Neck", LowPolyShapeTypes.Cylinder, neck => neck
                     .Position(0f, -0.12f, 0f).Scale(0.13f, 0.16f, 0.13f).ColorRole("skin.shadow"))
-                .Shape("hero.head", "Head", LowPolyShapeTypes.Sphere, face => face
-                    .Position(0f, 0.18f, 0f).Scale(0.3f, 0.38f, 0.28f).ColorRole("skin"))
-                .Shape("hero.face.jaw", "Jaw", LowPolyShapeTypes.Frustum, jaw => jaw
-                    .Position(0f, 0.05f, -0.12f).Scale(0.28f, 0.24f, 0.24f)
-                    .Frustum(1f, 0.9f, 0.68f, 0.72f).ColorRole("skin"))
+                .Shape("hero.head", "Sculpted Head", LowPolyShapeTypes.ProfileLoft, face => face
+                    .Position(0f, 0.18f, 0f).Scale(0.62f, 0.72f, 0.56f)
+                    .ProfileLoft(
+                        new ForgeVector2[]
+                        {
+                            new(-0.34f, 0.5f), new(0.34f, 0.5f), new(0.5f, 0.28f),
+                            new(0.46f, -0.24f), new(0.24f, -0.5f), new(-0.24f, -0.5f),
+                            new(-0.46f, -0.24f), new(-0.5f, 0.28f)
+                        },
+                        Section(-0.5f, 0.82f, 0.92f, 0f, -0.02f),
+                        Section(-0.15f, 0.98f, 1f),
+                        Section(0.25f, 1f, 1f),
+                        Section(0.5f, 0.84f, 0.92f))
+                    .ColorRole("skin"))
                 .Shape("hero.ear.left", "Left Ear", LowPolyShapeTypes.Sphere, ear => ear
                     .Position(-0.29f, 0.17f, 0f).Scale(0.055f, 0.09f, 0.045f).ColorRole("skin"))
                 .Shape("hero.ear.right", "Right Ear", LowPolyShapeTypes.Sphere, ear => ear
@@ -124,6 +141,13 @@ namespace ShapeForge.LowPoly
                     .Position(0f, 0.015f, -0.274f).Scale(0.085f, 0.014f, 0.014f).ColorRole("accent"))
                 .Shape("hero.hair.crown", "Layered Hair Crown", LowPolyShapeTypes.Sphere, hair => hair
                     .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair"))
+                .Shape("hero.hair.back", "Layered Back Hair", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(0f, 0.2f, 0.292f).Scale(0.66f, 0.72f, 1f)
+                    .ExtrudedProfile(0.055f, 0.016f,
+                        new(-0.34f, 0.5f), new(0.34f, 0.5f), new(0.5f, 0.26f), new(0.44f, -0.34f),
+                        new(0.28f, -0.5f), new(0.08f, -0.34f), new(-0.1f, -0.5f),
+                        new(-0.3f, -0.34f), new(-0.46f, -0.42f), new(-0.5f, 0.26f))
+                    .ColorRole("hair"))
                 .Shape("hero.hair.front", "Layered Front Hair", LowPolyShapeTypes.ExtrudedProfile, hair => hair
                     .Position(0f, 0.34f, -0.292f).Scale(0.64f, 0.43f, 1f)
                     .ExtrudedProfile(0.06f, 0.018f,
@@ -179,11 +203,30 @@ namespace ShapeForge.LowPoly
                     .Shape($"{prefix}.shin", $"{label} Shin", LowPolyShapeTypes.Frustum, shin => shin
                         .Position(0f, -0.32f, 0f).Scale(0.27f, 0.6f, 0.28f)
                         .Frustum(1f, 1f, 0.66f, 0.7f).ColorRole("trousers"))
-                    .Shape($"{prefix}.boot", $"{label} Boot", LowPolyShapeTypes.Wedge, boot => boot
-                        .Position(0f, -0.66f, -0.1f).Scale(0.32f, 0.24f, 0.52f).ColorRole("leather"))
+                    .Shape($"{prefix}.boot", $"{label} Boot", LowPolyShapeTypes.ProfileLoft, boot => boot
+                        .Position(0f, -0.66f, -0.1f).Scale(0.36f, 0.3f, 0.65f)
+                        .ProfileLoft(
+                            new ForgeVector2[]
+                            {
+                                new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.46f, -0.5f), new(-0.46f, -0.5f)
+                            },
+                            Section(-0.5f, 1f, 0.72f, 0f, -0.12f),
+                            Section(0.05f, 0.88f, 1f),
+                            Section(0.5f, 0.76f, 0.88f, 0f, 0.04f))
+                        .ColorRole("leather"))
                     .Shape($"{prefix}.boot.cuff", $"{label} Boot Cuff", LowPolyShapeTypes.Frustum, cuff => cuff
                         .Position(0f, -0.49f, 0f).Scale(0.3f, 0.18f, 0.31f)
                         .Frustum(1f, 1f, 0.8f, 0.82f).ColorRole("accent"))));
+        }
+
+        private static ShapeProfileSection Section(
+            float z,
+            float scaleX,
+            float scaleY,
+            float offsetX = 0f,
+            float offsetY = 0f)
+        {
+            return new(z, new(scaleX, scaleY), new(offsetX, offsetY));
         }
     }
 }

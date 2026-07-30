@@ -39,6 +39,11 @@ namespace ShapeForge.LowPoly
         /// Identifies a flat-shaded mesh extruded from a normalized two-dimensional outline.
         /// </summary>
         public const string ExtrudedProfile = "lowpoly/extruded-profile";
+
+        /// <summary>
+        /// Identifies a volume formed by scaling and offsetting one profile across ordered depth sections.
+        /// </summary>
+        public const string ProfileLoft = "lowpoly/profile-loft";
     }
 
     /// <summary>

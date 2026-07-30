@@ -23,6 +23,12 @@ namespace ShapeForge
         /// <summary>Gets or sets the Y component.</summary>
         public float Y { get; set; }
 
+        /// <summary>Gets a zero vector.</summary>
+        public static ForgeVector2 Zero => new(0f, 0f);
+
+        /// <summary>Gets a unit vector.</summary>
+        public static ForgeVector2 One => new(1f, 1f);
+
         /// <inheritdoc />
         public bool Equals(ForgeVector2 other)
         {
