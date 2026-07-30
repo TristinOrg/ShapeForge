@@ -63,6 +63,29 @@ namespace ShapeForge.LowPoly.Tests
                 Is.GreaterThan(0.01f));
         }
 
+        [Test]
+        public void HumanExampleWalksWithSubtleSpineAndOpposingHips()
+        {
+            generatedRoot = Generate(
+                LowPolyHeroPreset.CreateDefinition(),
+                LowPolyHeroPreset.CreateStyle());
+            UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
+            model.TryGetTarget("hero", out IShapeTransformTarget root);
+            model.TryGetTarget("hero.spine.pivot", out IShapeTransformTarget spine);
+            model.TryGetTarget("hero.leg.left.hip.pivot", out IShapeTransformTarget leftHip);
+            model.TryGetTarget("hero.leg.right.hip.pivot", out IShapeTransformTarget rightHip);
+            ForgeVector3 initialPosition = root.LocalPosition;
+
+            LowPolyMotionExample motion = generatedRoot.AddComponent<LowPolyMotionExample>();
+            motion.Configure(LowPolyMotionPreset.HumanHeroWalk);
+            motion.Evaluate(0.25f);
+
+            Assert.That(root.LocalPosition.Z, Is.LessThan(initialPosition.Z));
+            Assert.That(Mathf.Abs(spine.LocalEulerAngles.Y), Is.GreaterThan(0.01f));
+            Assert.That(leftHip.LocalEulerAngles.X, Is.GreaterThan(0f));
+            Assert.That(rightHip.LocalEulerAngles.X, Is.GreaterThan(180f));
+        }
+
         private static GameObject Generate(
             ShapeDefinition      definition,
             ShapeStyleDefinition style)

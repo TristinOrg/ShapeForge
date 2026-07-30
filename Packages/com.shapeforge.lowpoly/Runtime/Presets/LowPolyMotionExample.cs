@@ -34,10 +34,20 @@ namespace ShapeForge.LowPoly
             EnsureBindings();
             float phase = Mathf.Repeat(normalizedTime, 1f);
 
-            if (preset == LowPolyMotionPreset.RobotShowcase)
-                EvaluateRobot(phase, phase * walkSpeed * duration);
-            else
-                EvaluateWorkbench(phase);
+            switch (preset)
+            {
+                case LowPolyMotionPreset.RobotShowcase:
+                    EvaluateRobot(phase, phase * walkSpeed * duration);
+                    break;
+                case LowPolyMotionPreset.WorkbenchShowcase:
+                    EvaluateWorkbench(phase);
+                    break;
+                case LowPolyMotionPreset.HumanHeroWalk:
+                    EvaluateHuman(phase, phase * walkSpeed * duration);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void Update()
@@ -46,10 +56,20 @@ namespace ShapeForge.LowPoly
             EnsureBindings();
             float phase = Mathf.Repeat(elapsedTime / duration, 1f);
 
-            if (preset == LowPolyMotionPreset.RobotShowcase)
-                EvaluateRobot(phase, elapsedTime * walkSpeed);
-            else
-                EvaluateWorkbench(phase);
+            switch (preset)
+            {
+                case LowPolyMotionPreset.RobotShowcase:
+                    EvaluateRobot(phase, elapsedTime * walkSpeed);
+                    break;
+                case LowPolyMotionPreset.WorkbenchShowcase:
+                    EvaluateWorkbench(phase);
+                    break;
+                case LowPolyMotionPreset.HumanHeroWalk:
+                    EvaluateHuman(phase, elapsedTime * walkSpeed);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void OnValidate()
@@ -95,6 +115,26 @@ namespace ShapeForge.LowPoly
             SetPositionOffset(3, new(0f, openAmount * 0.04f, 0f));
         }
 
+        private void EvaluateHuman(float phase, float distance)
+        {
+            float wave      = Mathf.Sin(phase * Mathf.PI * 2f);
+            float stepLift  = Mathf.Abs(wave) * 0.025f;
+            float leftKnee  = Mathf.Max(0f, wave) * 36f;
+            float rightKnee = Mathf.Max(0f, -wave) * 36f;
+
+            SetPositionOffset(0, new(0f, stepLift, -distance));
+            SetRotationOffset(1, new(3f, -wave * 4f, wave * 1.5f));
+            SetRotationOffset(2, new(-2f, wave * 2f, -wave));
+            SetRotationOffset(3, new(-wave * 20f, 0f, 0f));
+            SetRotationOffset(4, new(wave * 20f, 0f, 0f));
+            SetRotationOffset(5, new(8f + (Mathf.Max(0f, wave) * 8f), 0f, 0f));
+            SetRotationOffset(6, new(8f + (Mathf.Max(0f, -wave) * 8f), 0f, 0f));
+            SetRotationOffset(7, new(wave * 24f, 0f, 0f));
+            SetRotationOffset(8, new(-wave * 24f, 0f, 0f));
+            SetRotationOffset(9, new(-leftKnee, 0f, 0f));
+            SetRotationOffset(10, new(-rightKnee, 0f, 0f));
+        }
+
         private void EnsureBindings()
         {
             if (targets.Count > 0)
@@ -113,6 +153,22 @@ namespace ShapeForge.LowPoly
                 Bind("robot.leg.right.hip.pivot");
                 Bind("robot.leg.left.knee.pivot");
                 Bind("robot.leg.right.knee.pivot");
+                return;
+            }
+
+            if (preset == LowPolyMotionPreset.HumanHeroWalk)
+            {
+                Bind("hero");
+                Bind("hero.spine.pivot");
+                Bind("hero.head.pivot");
+                Bind("hero.arm.left.shoulder.pivot");
+                Bind("hero.arm.right.shoulder.pivot");
+                Bind("hero.arm.left.elbow.pivot");
+                Bind("hero.arm.right.elbow.pivot");
+                Bind("hero.leg.left.hip.pivot");
+                Bind("hero.leg.right.hip.pivot");
+                Bind("hero.leg.left.knee.pivot");
+                Bind("hero.leg.right.knee.pivot");
                 return;
             }
 
@@ -198,6 +254,7 @@ namespace ShapeForge.LowPoly
     public enum LowPolyMotionPreset
     {
         RobotShowcase     = 0,
-        WorkbenchShowcase = 1
+        WorkbenchShowcase = 1,
+        HumanHeroWalk     = 2
     }
 }

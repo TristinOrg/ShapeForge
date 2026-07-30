@@ -33,6 +33,14 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyJapaneseTownPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Fantasy Hero", false, 13)]
+        private static void GenerateHero()
+        {
+            Generate(
+                LowPolyHeroPreset.CreateDefinition(),
+                LowPolyHeroPreset.CreateStyle());
+        }
+
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
         private static void GenerateAnimatedWorkbench()
         {
@@ -49,6 +57,15 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyRobotPreset.CreateDefinition(),
                 LowPolyRobotPreset.CreateStyle(),
                 LowPolyMotionPreset.RobotShowcase);
+        }
+
+        [MenuItem("ShapeForge/Generate/Animated Fantasy Hero", false, 22)]
+        private static void GenerateAnimatedHero()
+        {
+            Generate(
+                LowPolyHeroPreset.CreateDefinition(),
+                LowPolyHeroPreset.CreateStyle(),
+                LowPolyMotionPreset.HumanHeroWalk);
         }
 
         private static void Generate(
