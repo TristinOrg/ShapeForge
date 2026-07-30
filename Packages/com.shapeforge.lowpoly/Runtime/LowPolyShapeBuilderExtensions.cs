@@ -131,5 +131,17 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.RadialSegments, radialSegments)
                 .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
         }
+
+        /// <summary>Applies bounded curve smoothing to the configured profile control points.</summary>
+        public static ShapeNodeBuilder ProfileSmoothing(this ShapeNodeBuilder builder, int iterations)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (iterations < 0 || iterations > 4)
+                throw new ArgumentOutOfRangeException(nameof(iterations));
+
+            return builder.Parameter(LowPolyShapeParameters.ProfileSmoothing, iterations);
+        }
     }
 }

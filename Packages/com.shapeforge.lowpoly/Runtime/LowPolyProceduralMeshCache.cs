@@ -35,7 +35,8 @@ namespace ShapeForge.LowPoly
             IList<ForgeVector2> profile,
             float                depth,
             float                bevel,
-            int                  bevelSegments)
+            int                  bevelSegments,
+            int                  smoothing)
         {
             if (profile == null)
                 throw new ArgumentNullException(nameof(profile));
@@ -55,7 +56,9 @@ namespace ShapeForge.LowPoly
             if (bevelSegments < 1 || bevelSegments > 8)
                 throw new ArgumentOutOfRangeException(nameof(bevelSegments));
 
-            int hash = GetProfileHash(profile, depth, bevel, bevelSegments);
+            ValidateSmoothing(smoothing);
+
+            int hash = GetProfileHash(profile, depth, bevel, bevelSegments, smoothing);
             if (ProfileMeshes.TryGetValue(hash, out List<ProfileMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -67,7 +70,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(profile, depth, bevel, bevelSegments))
+                    if (entry.Matches(profile, depth, bevel, bevelSegments, smoothing))
                         return entry.Mesh;
                 }
             }
@@ -78,8 +81,12 @@ namespace ShapeForge.LowPoly
             }
 
             ForgeVector2[] points = CopyProfile(profile);
-            Mesh           mesh   = CreateExtrudedProfile(points, depth, bevel, bevelSegments);
-            entries.Add(new(points, depth, bevel, bevelSegments, mesh));
+            Mesh           mesh   = CreateExtrudedProfile(
+                SmoothProfile(points, smoothing, true),
+                depth,
+                bevel,
+                bevelSegments);
+            entries.Add(new(points, depth, bevel, bevelSegments, smoothing, mesh));
             return mesh;
         }
 
@@ -87,7 +94,8 @@ namespace ShapeForge.LowPoly
             IList<ForgeVector2>       profile,
             IList<ShapeProfileSection> sections,
             int                        subdivisions,
-            bool                       smoothNormals)
+            bool                       smoothNormals,
+            int                        smoothing)
         {
             if (profile == null)
                 throw new ArgumentNullException(nameof(profile));
@@ -99,7 +107,9 @@ namespace ShapeForge.LowPoly
             if (subdivisions < 0 || subdivisions > 8)
                 throw new ArgumentOutOfRangeException(nameof(subdivisions));
 
-            int hash = GetLoftHash(profile, sections, subdivisions, smoothNormals);
+            ValidateSmoothing(smoothing);
+
+            int hash = GetLoftHash(profile, sections, subdivisions, smoothNormals, smoothing);
             if (LoftMeshes.TryGetValue(hash, out List<LoftMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -111,7 +121,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(profile, sections, subdivisions, smoothNormals))
+                    if (entry.Matches(profile, sections, subdivisions, smoothNormals, smoothing))
                         return entry.Mesh;
                 }
             }
@@ -123,18 +133,24 @@ namespace ShapeForge.LowPoly
 
             ForgeVector2[] points   = CopyProfile(profile);
             LoftSection[] loft      = CopySections(sections);
-            Mesh          mesh      = CreateProfileLoft(points, loft, subdivisions, smoothNormals);
-            entries.Add(new(points, loft, subdivisions, smoothNormals, mesh));
+            Mesh          mesh      = CreateProfileLoft(
+                SmoothProfile(points, smoothing, true),
+                loft,
+                subdivisions,
+                smoothNormals);
+            entries.Add(new(points, loft, subdivisions, smoothNormals, smoothing, mesh));
             return mesh;
         }
 
         public static Mesh GetLatheProfile(
             IList<ForgeVector2> profile,
             int                  radialSegments,
-            bool                 smoothNormals)
+            bool                 smoothNormals,
+            int                  smoothing)
         {
             ValidateLatheProfile(profile, radialSegments);
-            int hash = GetLatheHash(profile, radialSegments, smoothNormals);
+            ValidateSmoothing(smoothing);
+            int hash = GetLatheHash(profile, radialSegments, smoothNormals, smoothing);
             if (LatheMeshes.TryGetValue(hash, out List<LatheMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -146,7 +162,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(profile, radialSegments, smoothNormals))
+                    if (entry.Matches(profile, radialSegments, smoothNormals, smoothing))
                         return entry.Mesh;
                 }
             }
@@ -157,8 +173,11 @@ namespace ShapeForge.LowPoly
             }
 
             ForgeVector2[] points = CopyProfile(profile);
-            Mesh           mesh   = CreateLatheProfile(points, radialSegments, smoothNormals);
-            entries.Add(new(points, radialSegments, smoothNormals, mesh));
+            Mesh           mesh   = CreateLatheProfile(
+                SmoothProfile(points, smoothing, false),
+                radialSegments,
+                smoothNormals);
+            entries.Add(new(points, radialSegments, smoothNormals, smoothing, mesh));
             return mesh;
         }
 
@@ -186,9 +205,13 @@ namespace ShapeForge.LowPoly
             }
         }
 
-        private static int GetLatheHash(IList<ForgeVector2> profile, int radialSegments, bool smoothNormals)
+        private static int GetLatheHash(
+            IList<ForgeVector2> profile,
+            int                  radialSegments,
+            bool                 smoothNormals,
+            int                  smoothing)
         {
-            int hash = (GetProfileHash(profile, 0f, 0f, 1) * 397) ^ radialSegments;
+            int hash = (GetProfileHash(profile, 0f, 0f, 1, smoothing) * 397) ^ radialSegments;
             return (hash * 397) ^ smoothNormals.GetHashCode();
         }
 
@@ -220,10 +243,12 @@ namespace ShapeForge.LowPoly
             IList<ForgeVector2> profile,
             float                depth,
             float                bevel,
-            int                  bevelSegments)
+            int                  bevelSegments,
+            int                  smoothing)
         {
             int hash = (depth.GetHashCode() * 397) ^ bevel.GetHashCode();
             hash     = (hash * 397) ^ bevelSegments;
+            hash     = (hash * 397) ^ smoothing;
             for (int index = 0; index < profile.Count; index++)
                 hash = (hash * 397) ^ profile[index].GetHashCode();
 
@@ -239,13 +264,62 @@ namespace ShapeForge.LowPoly
             return points;
         }
 
+        private static void ValidateSmoothing(int smoothing)
+        {
+            if (smoothing < 0 || smoothing > 4)
+                throw new ArgumentOutOfRangeException(nameof(smoothing));
+        }
+
+        private static ForgeVector2[] SmoothProfile(
+            ForgeVector2[] points,
+            int            iterations,
+            bool           closed)
+        {
+            ForgeVector2[] result = points;
+            for (int iteration = 0; iteration < iterations; iteration++)
+                result = SmoothProfileOnce(result, closed);
+
+            return result;
+        }
+
+        private static ForgeVector2[] SmoothProfileOnce(ForgeVector2[] points, bool closed)
+        {
+            int            spanCount = closed ? points.Length : points.Length - 1;
+            int            offset    = closed ? 0 : 1;
+            ForgeVector2[] result    = new ForgeVector2[(spanCount * 2) + (offset * 2)];
+            int            write     = 0;
+            if (!closed)
+                result[write++] = points[0];
+
+            for (int index = 0; index < spanCount; index++)
+            {
+                ForgeVector2 current = points[index];
+                ForgeVector2 next    = points[(index + 1) % points.Length];
+                result[write++] = Lerp(current, next, 0.25f);
+                result[write++] = Lerp(current, next, 0.75f);
+            }
+
+            if (!closed)
+                result[write] = points[points.Length - 1];
+
+            return result;
+        }
+
+        private static ForgeVector2 Lerp(ForgeVector2 first, ForgeVector2 second, float time)
+        {
+            return new(
+                Mathf.Lerp(first.X, second.X, time),
+                Mathf.Lerp(first.Y, second.Y, time));
+        }
+
         private static int GetLoftHash(
             IList<ForgeVector2>       profile,
             IList<ShapeProfileSection> sections,
             int                        subdivisions,
-            bool                       smoothNormals)
+            bool                       smoothNormals,
+            int                        smoothing)
         {
-            int hash = (GetProfileHash(profile, 0f, 0f, 1) * 397) ^ subdivisions;
+            int hash = (GetProfileHash(profile, 0f, 0f, 1, smoothing) * 397) ^ subdivisions;
             hash     = (hash * 397) ^ smoothNormals.GetHashCode();
             foreach (ShapeProfileSection section in sections)
             {
@@ -845,17 +919,20 @@ namespace ShapeForge.LowPoly
             private readonly float depth;
             private readonly float bevel;
             private readonly int   bevelSegments;
+            private readonly int   smoothing;
 
             public ProfileMeshEntry(
                 ForgeVector2[] points,
                 float          depth,
                 float          bevel,
                 int            bevelSegments,
+                int            smoothing,
                 Mesh           mesh)
             {
                 this.depth         = depth;
                 this.bevel         = bevel;
                 this.bevelSegments = bevelSegments;
+                this.smoothing     = smoothing;
                 Points             = points;
                 Mesh               = mesh;
             }
@@ -868,11 +945,13 @@ namespace ShapeForge.LowPoly
                 IList<ForgeVector2> profile,
                 float                candidateDepth,
                 float                candidateBevel,
-                int                  candidateBevelSegments)
+                int                  candidateBevelSegments,
+                int                  candidateSmoothing)
             {
                 if (!depth.Equals(candidateDepth) ||
                     !bevel.Equals(candidateBevel) ||
                     bevelSegments != candidateBevelSegments ||
+                    smoothing != candidateSmoothing ||
                     Points.Length != profile.Count)
                     return false;
 
@@ -894,18 +973,21 @@ namespace ShapeForge.LowPoly
             private readonly LoftSection[] sections;
             private readonly int           subdivisions;
             private readonly bool          smoothNormals;
+            private readonly int           smoothing;
 
             public LoftMeshEntry(
                 ForgeVector2[] points,
                 LoftSection[] sections,
                 int           subdivisions,
                 bool          smoothNormals,
+                int           smoothing,
                 Mesh          mesh)
             {
                 Points              = points;
                 this.sections       = sections;
                 this.subdivisions   = subdivisions;
                 this.smoothNormals  = smoothNormals;
+                this.smoothing      = smoothing;
                 Mesh                = mesh;
             }
 
@@ -917,12 +999,16 @@ namespace ShapeForge.LowPoly
                 IList<ForgeVector2>       profile,
                 IList<ShapeProfileSection> candidateSections,
                 int                        candidateSubdivisions,
-                bool                       candidateSmoothNormals)
+                bool                       candidateSmoothNormals,
+                int                        candidateSmoothing)
             {
                 if (Points.Length != profile.Count ||
                     sections.Length != candidateSections.Count ||
                     subdivisions != candidateSubdivisions ||
                     smoothNormals != candidateSmoothNormals)
+                    return false;
+
+                if (smoothing != candidateSmoothing)
                     return false;
 
                 for (int index = 0; index < Points.Length; index++)
@@ -948,16 +1034,19 @@ namespace ShapeForge.LowPoly
         {
             private readonly int  radialSegments;
             private readonly bool smoothNormals;
+            private readonly int  smoothing;
 
             public LatheMeshEntry(
                 ForgeVector2[] points,
                 int            radialSegments,
                 bool           smoothNormals,
+                int            smoothing,
                 Mesh           mesh)
             {
                 Points              = points;
                 this.radialSegments = radialSegments;
                 this.smoothNormals  = smoothNormals;
+                this.smoothing      = smoothing;
                 Mesh                = mesh;
             }
 
@@ -968,11 +1057,13 @@ namespace ShapeForge.LowPoly
             public bool Matches(
                 IList<ForgeVector2> profile,
                 int                  candidateRadialSegments,
-                bool                 candidateSmoothNormals)
+                bool                 candidateSmoothNormals,
+                int                  candidateSmoothing)
             {
                 if (Points.Length != profile.Count ||
                     radialSegments != candidateRadialSegments ||
-                    smoothNormals != candidateSmoothNormals)
+                    smoothNormals != candidateSmoothNormals ||
+                    smoothing != candidateSmoothing)
                     return false;
 
                 for (int index = 0; index < Points.Length; index++)

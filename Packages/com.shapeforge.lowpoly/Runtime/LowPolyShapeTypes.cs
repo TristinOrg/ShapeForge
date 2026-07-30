@@ -85,5 +85,8 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Controls the number of radial faces around a lathed profile.</summary>
         public const string RadialSegments = "radialSegments";
+
+        /// <summary>Controls bounded corner-cutting iterations applied to a profile before meshing.</summary>
+        public const string ProfileSmoothing = "profileSmoothing";
     }
 }

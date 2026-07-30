@@ -217,6 +217,33 @@ namespace ShapeForge.LowPoly.Tests
             AssertDuplicateVerticesShareNormals(firstMesh);
         }
 
+        [Test]
+        public void GenerateSmoothsProfileControlPointsBeforeCachingMeshes()
+        {
+            ShapeNode first  = CreateLathe("smooth-a", "Smooth A", 12, true);
+            ShapeNode second = CreateLathe("smooth-b", "Smooth B", 12, true);
+            ShapeNode sharp  = CreateLathe("sharp", "Sharp", 12, true);
+            first.Parameters[LowPolyShapeParameters.ProfileSmoothing]  = 1f;
+            second.Parameters[LowPolyShapeParameters.ProfileSmoothing] = 1f;
+            ShapeNode root = new("smoothed", "Smoothed", ShapeTypes.Group);
+            root.Add(first).Add(second).Add(sharp);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Smoothed", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Smooth A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Smooth B").GetComponent<MeshFilter>().sharedMesh;
+            Mesh sharpMesh  = generatedRoot.transform.Find("Sharp").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(408));
+            Assert.That(firstMesh.bounds.min.y, Is.EqualTo(-0.5f).Within(0.0001f));
+            Assert.That(firstMesh.bounds.max.y, Is.EqualTo(0.5f).Within(0.0001f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+            Assert.That(firstMesh, Is.Not.SameAs(sharpMesh));
+        }
+
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
