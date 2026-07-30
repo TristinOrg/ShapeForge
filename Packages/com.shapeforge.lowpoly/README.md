@@ -8,7 +8,7 @@ Use `LowPolyModelGenerator` as the reusable runtime entry point for validated de
 
 For repeated models, call `ParseJson` once and pass the returned `ShapeDefinition` to `Generate`. `GenerateJson` is intended for one-off documents because it parses and validates on every call.
 
-For a large number of instances, create a `LowPolyGenerationBatch` and call `GenerateNext` from an existing update or loading scheduler. The caller owns the per-step model budget; ShapeForge creates no coroutine, iterator state machine, global runner, or hidden update loop.
+For a large number of instances, create a `LowPolyGenerationBatch` and call `GenerateNext` or `GenerateForMilliseconds` from an existing update or loading scheduler. The caller owns the count or elapsed-time budget; ShapeForge creates no coroutine, iterator state machine, global runner, or hidden update loop.
 
 Use `ShapeForge > Generate` in the Unity Editor to preview the articulated Sentinel Robot and detailed Inventor Workbench presets with full Undo support.
 

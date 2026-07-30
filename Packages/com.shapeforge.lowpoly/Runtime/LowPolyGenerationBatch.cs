@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly
@@ -52,13 +53,41 @@ namespace ShapeForge.LowPoly
 
             int stepCount = Math.Min(modelBudget, TotalCount - GeneratedCount);
             for (int index = 0; index < stepCount; index++)
-            {
-                GameObject generated = generator.Generate(definition, parent);
-                GeneratedCount++;
-                onGenerated?.Invoke(generated);
-            }
+                GenerateOne();
 
             return stepCount;
+        }
+
+        /// <summary>
+        /// Generates models until the supplied elapsed-time budget is reached.
+        /// </summary>
+        public int GenerateForMilliseconds(double millisecondBudget)
+        {
+            if (double.IsNaN(millisecondBudget) || millisecondBudget <= 0d)
+                throw new ArgumentOutOfRangeException(nameof(millisecondBudget));
+
+            long startedAt      = Stopwatch.GetTimestamp();
+            int  generatedCount = 0;
+
+            while (!IsCompleted)
+            {
+                GenerateOne();
+                generatedCount++;
+
+                double elapsedMilliseconds =
+                    (Stopwatch.GetTimestamp() - startedAt) * 1000d / Stopwatch.Frequency;
+                if (elapsedMilliseconds >= millisecondBudget)
+                    break;
+            }
+
+            return generatedCount;
+        }
+
+        private void GenerateOne()
+        {
+            GameObject generated = generator.Generate(definition, parent);
+            GeneratedCount++;
+            onGenerated?.Invoke(generated);
         }
     }
 }

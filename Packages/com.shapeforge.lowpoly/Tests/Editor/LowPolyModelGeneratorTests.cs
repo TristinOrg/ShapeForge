@@ -56,5 +56,20 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(batch.IsCompleted, Is.True);
             Assert.That(generatedRoot.transform.childCount, Is.EqualTo(5));
         }
+
+        [Test]
+        public void GenerateForMillisecondsCompletesWithinCallerControlledSteps()
+        {
+            generatedRoot = new("Timed Batch Root");
+            LowPolyModelGenerator  generator = new(new[] { LowPolyWorkbenchPreset.CreateStyle() });
+            LowPolyGenerationBatch batch     = generator.CreateBatch(
+                LowPolyWorkbenchPreset.CreateDefinition(),
+                3,
+                generatedRoot.transform);
+
+            Assert.That(batch.GenerateForMilliseconds(double.MaxValue), Is.EqualTo(3));
+            Assert.That(batch.IsCompleted, Is.True);
+            Assert.That(generatedRoot.transform.childCount, Is.EqualTo(3));
+        }
     }
 }
