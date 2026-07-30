@@ -36,6 +36,24 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Fitted Coat"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Boot"), Is.Not.Null);
 
+            MeshFilter coat = generatedRoot.transform
+                .Find("Pelvis Pivot/Spine Pivot/Fitted Coat")
+                .GetComponent<MeshFilter>();
+            MeshFilter jaw = generatedRoot.transform
+                .Find("Head Pivot/Jaw")
+                .GetComponent<MeshFilter>();
+            MeshFilter fringe = generatedRoot.transform
+                .Find("Head Pivot/Left Fringe")
+                .GetComponent<MeshFilter>();
+            MeshFilter boot = generatedRoot.transform
+                .Find("Left Hip Pivot/Left Knee Pivot/Left Boot")
+                .GetComponent<MeshFilter>();
+
+            Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
+            Assert.That(jaw.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
+            Assert.That(fringe.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
+            Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
+
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
             Assert.That(model.TryGetTarget("hero.spine.pivot", out _), Is.True);
             Assert.That(model.TryGetTarget("hero.head.pivot", out _), Is.True);
