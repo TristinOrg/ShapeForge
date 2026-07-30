@@ -83,5 +83,22 @@ namespace ShapeForge.LowPoly
 
             return builder;
         }
+
+        /// <summary>Configures interpolated rings and optional smooth normals for a profile loft.</summary>
+        public static ShapeNodeBuilder LoftQuality(
+            this ShapeNodeBuilder builder,
+            int                   subdivisions,
+            bool                  smoothNormals)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (subdivisions < 0 || subdivisions > 8)
+                throw new ArgumentOutOfRangeException(nameof(subdivisions));
+
+            return builder
+                .Parameter(LowPolyShapeParameters.LoftSubdivisions, subdivisions)
+                .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
+        }
     }
 }

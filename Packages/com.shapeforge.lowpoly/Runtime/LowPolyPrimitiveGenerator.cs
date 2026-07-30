@@ -74,7 +74,15 @@ namespace ShapeForge.LowPoly
             }
 
             if (node.Type == LowPolyShapeTypes.ProfileLoft)
-                return LowPolyProceduralMeshCache.GetProfileLoft(node.Profile, node.ProfileSections);
+            {
+                int  subdivisions = GetIntegerParameter(node, LowPolyShapeParameters.LoftSubdivisions, 0, 8);
+                bool smoothNormals = GetNonNegativeParameter(node, LowPolyShapeParameters.SmoothNormals, 0f) > 0f;
+                return LowPolyProceduralMeshCache.GetProfileLoft(
+                    node.Profile,
+                    node.ProfileSections,
+                    subdivisions,
+                    smoothNormals);
+            }
 
             if (node.Type != LowPolyShapeTypes.Frustum)
                 throw new ArgumentException($"Unsupported Low Poly shape type '{node.Type}'.", nameof(node));
@@ -106,6 +114,18 @@ namespace ShapeForge.LowPoly
                 throw new ArgumentOutOfRangeException(name, value, "Procedural dimensions cannot be negative.");
 
             return value;
+        }
+
+        private static int GetIntegerParameter(ShapeNode node, string name, int defaultValue, int maximum)
+        {
+            if (!node.Parameters.TryGetValue(name, out float value))
+                return defaultValue;
+
+            int result = Mathf.RoundToInt(value);
+            if (result < 0 || result > maximum || !Mathf.Approximately(value, result))
+                throw new ArgumentOutOfRangeException(name, value, $"Parameter must be an integer from 0 to {maximum}.");
+
+            return result;
         }
     }
 }

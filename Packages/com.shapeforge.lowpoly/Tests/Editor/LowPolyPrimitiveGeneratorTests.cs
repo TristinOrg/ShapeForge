@@ -185,9 +185,10 @@ namespace ShapeForge.LowPoly.Tests
             Mesh firstMesh  = generatedRoot.transform.Find("Loft A").GetComponent<MeshFilter>().sharedMesh;
             Mesh secondMesh = generatedRoot.transform.Find("Loft B").GetComponent<MeshFilter>().sharedMesh;
             Assert.That(firstMesh.name, Is.EqualTo("Low Poly Profile Loft"));
-            Assert.That(firstMesh.vertexCount, Is.EqualTo(58));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(138));
             Assert.That(firstMesh.bounds.size.z, Is.EqualTo(1f).Within(0.0001f));
             Assert.That(firstMesh, Is.SameAs(secondMesh));
+            AssertDuplicateVerticesShareNormals(firstMesh);
         }
 
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
@@ -214,6 +215,8 @@ namespace ShapeForge.LowPoly.Tests
         private static ShapeNode CreateLoft(string id, string name, ForgeVector2[] points)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.ProfileLoft);
+            node.Parameters[LowPolyShapeParameters.LoftSubdivisions] = 2f;
+            node.Parameters[LowPolyShapeParameters.SmoothNormals]    = 1f;
             foreach (ForgeVector2 point in points)
                 node.Profile.Add(point);
 
@@ -221,6 +224,26 @@ namespace ShapeForge.LowPoly.Tests
             node.ProfileSections.Add(new(0f, ForgeVector2.One, new(0f, 0.05f)));
             node.ProfileSections.Add(new(0.5f, new(0.8f, 0.9f), ForgeVector2.Zero));
             return node;
+        }
+
+        private static void AssertDuplicateVerticesShareNormals(Mesh mesh)
+        {
+            Vector3[] vertices = mesh.vertices;
+            Vector3[] normals  = mesh.normals;
+            bool      compared = false;
+            for (int first = 0; first < vertices.Length; first++)
+            {
+                for (int second = first + 1; second < vertices.Length; second++)
+                {
+                    if (vertices[first] != vertices[second])
+                        continue;
+
+                    Assert.That(Vector3.Distance(normals[first], normals[second]), Is.LessThan(0.0001f));
+                    compared = true;
+                }
+            }
+
+            Assert.That(compared, Is.True);
         }
     }
 }

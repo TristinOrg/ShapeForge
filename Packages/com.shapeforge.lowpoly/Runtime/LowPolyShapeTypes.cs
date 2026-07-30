@@ -68,5 +68,11 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Controls the normalized edge inset of an extruded profile.</summary>
         public const string ProfileBevel = "profileBevel";
+
+        /// <summary>Controls the number of interpolated rings between authored loft sections.</summary>
+        public const string LoftSubdivisions = "loftSubdivisions";
+
+        /// <summary>Enables averaged vertex normals on a profile loft when greater than zero.</summary>
+        public const string SmoothNormals = "smoothNormals";
     }
 }

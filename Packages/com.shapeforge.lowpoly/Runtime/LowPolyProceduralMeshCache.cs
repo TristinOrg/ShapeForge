@@ -77,7 +77,9 @@ namespace ShapeForge.LowPoly
 
         public static Mesh GetProfileLoft(
             IList<ForgeVector2>       profile,
-            IList<ShapeProfileSection> sections)
+            IList<ShapeProfileSection> sections,
+            int                        subdivisions,
+            bool                       smoothNormals)
         {
             if (profile == null)
                 throw new ArgumentNullException(nameof(profile));
@@ -86,7 +88,10 @@ namespace ShapeForge.LowPoly
                 throw new ArgumentException("Profile lofts require at least three points.", nameof(profile));
 
             ValidateLoftSections(sections);
-            int hash = GetLoftHash(profile, sections);
+            if (subdivisions < 0 || subdivisions > 8)
+                throw new ArgumentOutOfRangeException(nameof(subdivisions));
+
+            int hash = GetLoftHash(profile, sections, subdivisions, smoothNormals);
             if (LoftMeshes.TryGetValue(hash, out List<LoftMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -98,7 +103,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(profile, sections))
+                    if (entry.Matches(profile, sections, subdivisions, smoothNormals))
                         return entry.Mesh;
                 }
             }
@@ -110,8 +115,8 @@ namespace ShapeForge.LowPoly
 
             ForgeVector2[] points   = CopyProfile(profile);
             LoftSection[] loft      = CopySections(sections);
-            Mesh          mesh      = CreateProfileLoft(points, loft);
-            entries.Add(new(points, loft, mesh));
+            Mesh          mesh      = CreateProfileLoft(points, loft, subdivisions, smoothNormals);
+            entries.Add(new(points, loft, subdivisions, smoothNormals, mesh));
             return mesh;
         }
 
@@ -159,9 +164,12 @@ namespace ShapeForge.LowPoly
 
         private static int GetLoftHash(
             IList<ForgeVector2>       profile,
-            IList<ShapeProfileSection> sections)
+            IList<ShapeProfileSection> sections,
+            int                        subdivisions,
+            bool                       smoothNormals)
         {
-            int hash = GetProfileHash(profile, 0f, 0f);
+            int hash = (GetProfileHash(profile, 0f, 0f) * 397) ^ subdivisions;
+            hash     = (hash * 397) ^ smoothNormals.GetHashCode();
             foreach (ShapeProfileSection section in sections)
             {
                 hash = (hash * 397) ^ section.Z.GetHashCode();
@@ -309,9 +317,14 @@ namespace ShapeForge.LowPoly
             return builder.Build("Low Poly Extruded Profile");
         }
 
-        private static Mesh CreateProfileLoft(ForgeVector2[] profile, LoftSection[] sections)
+        private static Mesh CreateProfileLoft(
+            ForgeVector2[] profile,
+            LoftSection[] sections,
+            int           subdivisions,
+            bool          smoothNormals)
         {
             ForgeVector2[] points    = EnsureCounterClockwise(profile);
+            sections                 = InterpolateSections(sections, subdivisions);
             ForgeVector2[][] rings   = new ForgeVector2[sections.Length][];
             MeshBuilder    builder   = new();
             for (int sectionIndex = 0; sectionIndex < sections.Length; sectionIndex++)
@@ -354,7 +367,31 @@ namespace ShapeForge.LowPoly
                 }
             }
 
-            return builder.Build("Low Poly Profile Loft");
+            return builder.Build("Low Poly Profile Loft", smoothNormals);
+        }
+
+        private static LoftSection[] InterpolateSections(LoftSection[] sections, int subdivisions)
+        {
+            if (subdivisions == 0)
+                return sections;
+
+            int           stride = subdivisions + 1;
+            LoftSection[] result = new LoftSection[((sections.Length - 1) * stride) + 1];
+            int           write  = 0;
+            for (int index = 0; index < sections.Length - 1; index++)
+            {
+                LoftSection first  = sections[index];
+                LoftSection second = sections[index + 1];
+                for (int step = 0; step < stride; step++)
+                {
+                    float time       = step / (float)stride;
+                    float smoothTime = time * time * (3f - (2f * time));
+                    result[write++]  = LoftSection.Lerp(first, second, smoothTime);
+                }
+            }
+
+            result[write] = sections[sections.Length - 1];
+            return result;
         }
 
         private static void AddLoftCap(
@@ -556,14 +593,31 @@ namespace ShapeForge.LowPoly
                 triangles.Add(start + 3);
             }
 
-            public Mesh Build(string name)
+            public Mesh Build(string name, bool smoothNormals = false)
             {
                 Mesh mesh = new() { name = name };
+                if (smoothNormals)
+                    SmoothNormals();
+
                 mesh.SetVertices(vertices);
                 mesh.SetNormals(normals);
                 mesh.SetTriangles(triangles, 0, true);
                 mesh.RecalculateBounds();
                 return mesh;
+            }
+
+            private void SmoothNormals()
+            {
+                Dictionary<Vector3, Vector3> sums = new();
+                for (int index = 0; index < vertices.Count; index++)
+                {
+                    Vector3 vertex = vertices[index];
+                    sums.TryGetValue(vertex, out Vector3 sum);
+                    sums[vertex] = sum + normals[index];
+                }
+
+                for (int index = 0; index < vertices.Count; index++)
+                    normals[index] = sums[vertices[index]].normalized;
             }
         }
 
@@ -654,12 +708,21 @@ namespace ShapeForge.LowPoly
         private sealed class LoftMeshEntry
         {
             private readonly LoftSection[] sections;
+            private readonly int           subdivisions;
+            private readonly bool          smoothNormals;
 
-            public LoftMeshEntry(ForgeVector2[] points, LoftSection[] sections, Mesh mesh)
+            public LoftMeshEntry(
+                ForgeVector2[] points,
+                LoftSection[] sections,
+                int           subdivisions,
+                bool          smoothNormals,
+                Mesh          mesh)
             {
-                Points        = points;
-                this.sections = sections;
-                Mesh          = mesh;
+                Points              = points;
+                this.sections       = sections;
+                this.subdivisions   = subdivisions;
+                this.smoothNormals  = smoothNormals;
+                Mesh                = mesh;
             }
 
             public ForgeVector2[] Points { get; }
@@ -668,9 +731,14 @@ namespace ShapeForge.LowPoly
 
             public bool Matches(
                 IList<ForgeVector2>       profile,
-                IList<ShapeProfileSection> candidateSections)
+                IList<ShapeProfileSection> candidateSections,
+                int                        candidateSubdivisions,
+                bool                       candidateSmoothNormals)
             {
-                if (Points.Length != profile.Count || sections.Length != candidateSections.Count)
+                if (Points.Length != profile.Count ||
+                    sections.Length != candidateSections.Count ||
+                    subdivisions != candidateSubdivisions ||
+                    smoothNormals != candidateSmoothNormals)
                     return false;
 
                 for (int index = 0; index < Points.Length; index++)
@@ -721,6 +789,16 @@ namespace ShapeForge.LowPoly
                        ScaleY.Equals(section.Scale.Y) &&
                        OffsetX.Equals(section.Offset.X) &&
                        OffsetY.Equals(section.Offset.Y);
+            }
+
+            public static LoftSection Lerp(LoftSection first, LoftSection second, float time)
+            {
+                return new(
+                    Mathf.Lerp(first.Z, second.Z, time),
+                    Mathf.Lerp(first.ScaleX, second.ScaleX, time),
+                    Mathf.Lerp(first.ScaleY, second.ScaleY, time),
+                    Mathf.Lerp(first.OffsetX, second.OffsetX, time),
+                    Mathf.Lerp(first.OffsetY, second.OffsetY, time));
             }
         }
     }
