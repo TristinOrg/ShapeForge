@@ -58,9 +58,10 @@ Schema provides versioned engine-agnostic shape and style documents. Core provid
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Eighteen first-party EditMode tests cover fluent authoring, the JSON contract and runtime generation entry point, count- and time-budgeted batch generation, hierarchy adaptation, identity and color validation, lifecycle-safe color reapplication, shared material and primitive-mesh reuse, style resolution, LowPoly generation, furniture generation, and modular Robot pivots.
+- Nineteen first-party EditMode tests cover fluent authoring, the JSON contract and runtime generation entry point, prepared count- and time-budgeted batch generation, hierarchy adaptation, identity and color validation, lifecycle-safe color reapplication, shared material and primitive-mesh reuse, style resolution, LowPoly generation, furniture generation, and modular Robot pivots.
 - `ShapeForge > Diagnostics > Benchmark JSON Generation` measures 200 alternating Table and Robot JSON generations, managed heap growth, and shared render-resource counts without saving generated objects.
 - The benchmark reports JSON parsing and prepared-definition generation separately. Repeated runtime models should call `LowPolyModelGenerator.ParseJson` once and reuse the validated definition.
+- Prepared batches use `UnityShapeGenerationPlan` to validate an immutable definition once before repeated generation.
 - `LowPolyGenerationBatch` supports explicit model-count and elapsed-time step budgets without coroutines or global scheduling state.
 - No first-party PlayMode, CI, or build validation exists yet.
 

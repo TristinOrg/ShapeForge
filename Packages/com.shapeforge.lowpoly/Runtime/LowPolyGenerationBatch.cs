@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using ShapeForge.Unity;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly
@@ -9,20 +10,17 @@ namespace ShapeForge.LowPoly
     /// </summary>
     public sealed class LowPolyGenerationBatch
     {
-        private readonly LowPolyModelGenerator generator;
-        private readonly ShapeDefinition       definition;
-        private readonly Transform             parent;
-        private readonly Action<GameObject>    onGenerated;
+        private readonly UnityShapeGenerationPlan plan;
+        private readonly Transform                parent;
+        private readonly Action<GameObject>       onGenerated;
 
         internal LowPolyGenerationBatch(
-            LowPolyModelGenerator generator,
-            ShapeDefinition       definition,
-            int                   totalCount,
-            Transform             parent,
-            Action<GameObject>    onGenerated)
+            UnityShapeGenerationPlan plan,
+            int                      totalCount,
+            Transform                parent,
+            Action<GameObject>       onGenerated)
         {
-            this.generator   = generator;
-            this.definition  = definition;
+            this.plan        = plan;
             this.parent      = parent;
             this.onGenerated = onGenerated;
             TotalCount       = totalCount;
@@ -85,7 +83,7 @@ namespace ShapeForge.LowPoly
 
         private void GenerateOne()
         {
-            GameObject generated = generator.Generate(definition, parent);
+            GameObject generated = plan.Generate(parent);
             GeneratedCount++;
             onGenerated?.Invoke(generated);
         }

@@ -64,7 +64,8 @@ namespace ShapeForge.LowPoly
             if (totalCount <= 0)
                 throw new ArgumentOutOfRangeException(nameof(totalCount));
 
-            return new(this, definition, totalCount, parent, onGenerated);
+            UnityShapeGenerationPlan plan = modelGenerator.Prepare(definition);
+            return new(plan, totalCount, parent, onGenerated);
         }
 
         /// <summary>

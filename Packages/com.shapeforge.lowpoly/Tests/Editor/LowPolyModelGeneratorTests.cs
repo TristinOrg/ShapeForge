@@ -71,5 +71,15 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(batch.IsCompleted, Is.True);
             Assert.That(generatedRoot.transform.childCount, Is.EqualTo(3));
         }
+
+        [Test]
+        public void CreateBatchRejectsInvalidDefinitionBeforeGenerating()
+        {
+            ShapeNode root = new("duplicate", "Root", ShapeTypes.Group);
+            root.Add(new("duplicate", "Child", LowPolyShapeTypes.Cube));
+            LowPolyModelGenerator generator = new();
+
+            Assert.Throws<ShapeValidationException>(() => generator.CreateBatch(new("Invalid", root), 2));
+        }
     }
 }

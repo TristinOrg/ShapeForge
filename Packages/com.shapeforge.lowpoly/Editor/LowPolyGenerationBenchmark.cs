@@ -26,7 +26,7 @@ namespace ShapeForge.LowPoly.Editor
 
         public static LowPolyGenerationBenchmarkReport Run(int modelCount)
         {
-            if (modelCount <= 0)
+            if (modelCount < 2)
                 throw new ArgumentOutOfRangeException(nameof(modelCount));
 
             ShapeJsonSerializer  serializer = new();
@@ -47,16 +47,27 @@ namespace ShapeForge.LowPoly.Editor
             GameObject      container         = new("ShapeForge Benchmark");
             ShapeDefinition tableDefinition   = serializer.DeserializeShape(tableJson);
             ShapeDefinition robotDefinition   = serializer.DeserializeShape(robotJson);
+            double validationMilliseconds = MeasureValidation(
+                tableDefinition,
+                robotDefinition,
+                modelCount);
+            int             tableCount        = (modelCount + 1) / 2;
+            int             robotCount        = modelCount / 2;
+            LowPolyGenerationBatch tableBatch = generator.CreateBatch(
+                tableDefinition,
+                tableCount,
+                container.transform);
+            LowPolyGenerationBatch robotBatch = generator.CreateBatch(
+                robotDefinition,
+                robotCount,
+                container.transform);
             Stopwatch       stopwatch         = Stopwatch.StartNew();
             long            managedHeapBefore = Profiler.GetMonoUsedSizeLong();
 
             try
             {
-                for (int index = 0; index < modelCount; index++)
-                {
-                    ShapeDefinition definition = (index & 1) == 0 ? tableDefinition : robotDefinition;
-                    generator.Generate(definition, container.transform);
-                }
+                tableBatch.GenerateNext(tableCount);
+                robotBatch.GenerateNext(robotCount);
 
                 long managedHeapGrowthBytes = Profiler.GetMonoUsedSizeLong() - managedHeapBefore;
                 stopwatch.Stop();
@@ -64,6 +75,7 @@ namespace ShapeForge.LowPoly.Editor
                     container,
                     modelCount,
                     parsingMilliseconds,
+                    validationMilliseconds,
                     stopwatch.Elapsed.TotalMilliseconds,
                     managedHeapGrowthBytes);
             }
@@ -93,6 +105,24 @@ namespace ShapeForge.LowPoly.Editor
             return stopwatch.Elapsed.TotalMilliseconds;
         }
 
+        private static double MeasureValidation(
+            ShapeDefinition tableDefinition,
+            ShapeDefinition robotDefinition,
+            int             modelCount)
+        {
+            ShapeDefinitionValidator validator = new();
+            Stopwatch                stopwatch = Stopwatch.StartNew();
+
+            for (int index = 0; index < modelCount; index++)
+            {
+                ShapeDefinition definition = (index & 1) == 0 ? tableDefinition : robotDefinition;
+                validator.Validate(definition);
+            }
+
+            stopwatch.Stop();
+            return stopwatch.Elapsed.TotalMilliseconds;
+        }
+
         private static void WarmUp(LowPolyModelGenerator generator, string json)
         {
             GameObject warmUp = generator.GenerateJson(json);
@@ -103,6 +133,7 @@ namespace ShapeForge.LowPoly.Editor
             GameObject container,
             int        modelCount,
             double     parsingMilliseconds,
+            double     validationMilliseconds,
             double     generationMilliseconds,
             long       managedHeapGrowthBytes)
         {
@@ -123,6 +154,7 @@ namespace ShapeForge.LowPoly.Editor
                 uniqueMeshes.Count,
                 uniqueMaterials.Count,
                 parsingMilliseconds,
+                validationMilliseconds,
                 generationMilliseconds,
                 managedHeapGrowthBytes);
         }
@@ -139,6 +171,7 @@ namespace ShapeForge.LowPoly.Editor
             int    uniqueMeshCount,
             int    uniqueMaterialCount,
             double parsingMilliseconds,
+            double validationMilliseconds,
             double generationMilliseconds,
             long   managedHeapGrowthBytes)
         {
@@ -147,6 +180,7 @@ namespace ShapeForge.LowPoly.Editor
             UniqueMeshCount        = uniqueMeshCount;
             UniqueMaterialCount    = uniqueMaterialCount;
             ParsingMilliseconds    = parsingMilliseconds;
+            ValidationMilliseconds = validationMilliseconds;
             GenerationMilliseconds = generationMilliseconds;
             ManagedHeapGrowthBytes = managedHeapGrowthBytes;
         }
@@ -161,6 +195,8 @@ namespace ShapeForge.LowPoly.Editor
 
         public double ParsingMilliseconds { get; }
 
+        public double ValidationMilliseconds { get; }
+
         public double GenerationMilliseconds { get; }
 
         public long ManagedHeapGrowthBytes { get; }
@@ -168,13 +204,15 @@ namespace ShapeForge.LowPoly.Editor
         public override string ToString()
         {
             double parsingPerModel    = ParsingMilliseconds / ModelCount;
+            double validationPerModel = ValidationMilliseconds / ModelCount;
             double generationPerModel = GenerationMilliseconds / ModelCount;
             double heapBytesPerModel   = (double)ManagedHeapGrowthBytes / ModelCount;
 
             return
                 $"ShapeForge JSON benchmark: {ModelCount} models, {RendererCount} renderers, " +
                 $"parse {ParsingMilliseconds:F2} ms ({parsingPerModel:F3} ms/model), " +
-                $"generate {GenerationMilliseconds:F2} ms ({generationPerModel:F3} ms/model), " +
+                $"validate {ValidationMilliseconds:F2} ms ({validationPerModel:F3} ms/model), " +
+                $"prepared generate {GenerationMilliseconds:F2} ms ({generationPerModel:F3} ms/model), " +
                 $"{ManagedHeapGrowthBytes:N0} managed heap growth, {heapBytesPerModel:N0} bytes/model, " +
                 $"{UniqueMeshCount} unique meshes, {UniqueMaterialCount} unique materials.";
         }

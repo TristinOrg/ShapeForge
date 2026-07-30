@@ -43,7 +43,20 @@ namespace ShapeForge.Unity
         public GameObject Generate(ShapeDefinition definition, Transform parent = null)
         {
             validator.Validate(definition);
+            return GeneratePrepared(definition, parent);
+        }
 
+        /// <summary>
+        /// Validates an immutable definition once and creates a reusable generation plan.
+        /// </summary>
+        public UnityShapeGenerationPlan Prepare(ShapeDefinition definition)
+        {
+            validator.Validate(definition);
+            return new(this, definition);
+        }
+
+        internal GameObject GeneratePrepared(ShapeDefinition definition, Transform parent)
+        {
             ShapeGenerationContext  context    = new(definition, styleResolver);
             IUnityAppearanceSession appearance = appearanceBackend.Begin(context);
             GameObject              root       = GenerateNode(definition.Root, parent, context, appearance);
