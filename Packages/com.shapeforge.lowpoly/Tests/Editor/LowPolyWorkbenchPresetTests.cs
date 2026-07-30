@@ -39,6 +39,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(26));
             Assert.That(generatedRoot.transform.Find("Tool Board/Upper Shelf"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Task Lamp/Lamp Bulb"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Drawer/Drawer Face").localPosition.z, Is.LessThan(0f));
+            Assert.That(generatedRoot.transform.Find("Tool Board").localPosition.z, Is.GreaterThan(0f));
 
             Renderer renderer       = generatedRoot.transform.Find("Worktop").GetComponent<Renderer>();
             Renderer secondRenderer = secondGeneratedRoot.transform.Find("Worktop").GetComponent<Renderer>();
