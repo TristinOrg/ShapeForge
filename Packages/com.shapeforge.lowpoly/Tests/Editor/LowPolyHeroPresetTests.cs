@@ -31,8 +31,10 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Pocket Fantasy Hero"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(29));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(31));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Unified Polygon Hair Shell"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear (Mirror X)"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Cropped Jacket"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Long Black Shirt"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Fitted Tall Boot"), Is.Not.Null);
