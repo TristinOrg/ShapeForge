@@ -11,6 +11,7 @@ namespace ShapeForge
     {
         private readonly List<ShapeNode>                   children        = new();
         private readonly List<ForgeVector2>                profile         = new();
+        private readonly List<ForgeVector3>                path            = new();
         private readonly List<ShapeProfileSection>         profileSections = new();
         private readonly Dictionary<string, float>         parameters      = new(StringComparer.Ordinal);
 
@@ -72,6 +73,11 @@ namespace ShapeForge
         public IList<ForgeVector2> Profile => profile;
 
         /// <summary>
+        /// Gets the optional ordered three-dimensional path interpreted by path-based shape types.
+        /// </summary>
+        public IList<ForgeVector3> Path => path;
+
+        /// <summary>
         /// Gets the optional ordered depth sections used to form a profile loft.
         /// </summary>
         public IList<ShapeProfileSection> ProfileSections => profileSections;
@@ -101,6 +107,11 @@ namespace ShapeForge
         private bool ShouldSerializeProfile()
         {
             return profile.Count > 0;
+        }
+
+        private bool ShouldSerializePath()
+        {
+            return path.Count > 0;
         }
 
         private bool ShouldSerializeProfileSections()

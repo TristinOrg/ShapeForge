@@ -100,6 +100,21 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Replaces the ordered three-dimensional control path used by path-based shape implementations.
+        /// </summary>
+        public ShapeNodeBuilder Path(params ForgeVector3[] points)
+        {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            Node.Path.Clear();
+            foreach (ForgeVector3 point in points)
+                Node.Path.Add(point);
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds an ordered depth section used to scale and offset a profile loft.
         /// </summary>
         public ShapeNodeBuilder ProfileSection(

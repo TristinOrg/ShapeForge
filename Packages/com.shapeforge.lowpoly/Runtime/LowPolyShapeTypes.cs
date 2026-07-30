@@ -49,6 +49,11 @@ namespace ShapeForge.LowPoly
         /// Identifies a volume formed by revolving a radius-height profile around its local Y axis.
         /// </summary>
         public const string LatheProfile = "lowpoly/lathe-profile";
+
+        /// <summary>
+        /// Identifies a closed two-dimensional profile swept along a three-dimensional path.
+        /// </summary>
+        public const string ProfileSweep = "lowpoly/profile-sweep";
     }
 
     /// <summary>
@@ -88,5 +93,8 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Controls bounded corner-cutting iterations applied to a profile before meshing.</summary>
         public const string ProfileSmoothing = "profileSmoothing";
+
+        /// <summary>Controls bounded corner-cutting iterations applied to a sweep path.</summary>
+        public const string PathSmoothing = "pathSmoothing";
     }
 }

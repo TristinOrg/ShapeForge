@@ -75,6 +75,17 @@ namespace ShapeForge
                     throw new ShapeValidationException($"Shape node '{node.Id}' profile points must be finite.");
             }
 
+            if (node.Path == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a path collection.");
+
+            foreach (ForgeVector3 point in node.Path)
+            {
+                if (float.IsNaN(point.X) || float.IsInfinity(point.X) ||
+                    float.IsNaN(point.Y) || float.IsInfinity(point.Y) ||
+                    float.IsNaN(point.Z) || float.IsInfinity(point.Z))
+                    throw new ShapeValidationException($"Shape node '{node.Id}' path points must be finite.");
+            }
+
             if (node.ProfileSections == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile section collection.");
 

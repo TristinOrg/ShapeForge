@@ -244,6 +244,29 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(firstMesh, Is.Not.SameAs(sharpMesh));
         }
 
+        [Test]
+        public void GenerateBuildsAndCachesSmoothedProfileSweeps()
+        {
+            ShapeNode first  = CreateSweep("sweep-a", "Sweep A");
+            ShapeNode second = CreateSweep("sweep-b", "Sweep B");
+            ShapeNode root   = new("sweeps", "Sweeps", ShapeTypes.Group);
+            root.Add(first).Add(second);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Sweeps", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Sweep A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Sweep B").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.name, Is.EqualTo("Low Poly Profile Sweep"));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(260));
+            Assert.That(firstMesh.bounds.size.y, Is.GreaterThan(1.1f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+            AssertDuplicateVerticesShareNormals(firstMesh);
+        }
+
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
@@ -289,6 +312,23 @@ namespace ShapeForge.LowPoly.Tests
             node.Profile.Add(new(0.24f, 0.5f));
             node.Parameters[LowPolyShapeParameters.RadialSegments] = radialSegments;
             node.Parameters[LowPolyShapeParameters.SmoothNormals]  = smoothNormals ? 1f : 0f;
+            return node;
+        }
+
+        private static ShapeNode CreateSweep(string id, string name)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.ProfileSweep);
+            node.Profile.Add(new(-0.12f, -0.08f));
+            node.Profile.Add(new(0.12f, -0.08f));
+            node.Profile.Add(new(0.12f, 0.08f));
+            node.Profile.Add(new(-0.12f, 0.08f));
+            node.Path.Add(new(0f, 0f, 0f));
+            node.Path.Add(new(0f, 0.4f, 0.3f));
+            node.Path.Add(new(0.2f, 0.8f, 0.6f));
+            node.Path.Add(new(0f, 1.2f, 1f));
+            node.Parameters[LowPolyShapeParameters.ProfileSmoothing] = 1f;
+            node.Parameters[LowPolyShapeParameters.PathSmoothing]    = 1f;
+            node.Parameters[LowPolyShapeParameters.SmoothNormals]    = 1f;
             return node;
         }
 

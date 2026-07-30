@@ -143,5 +143,34 @@ namespace ShapeForge.LowPoly
 
             return builder.Parameter(LowPolyShapeParameters.ProfileSmoothing, iterations);
         }
+
+        /// <summary>Configures a closed profile swept along an ordered three-dimensional path.</summary>
+        public static ShapeNodeBuilder ProfileSweep(
+            this ShapeNodeBuilder builder,
+            ForgeVector2[]        profile,
+            ForgeVector3[]        path)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder.Profile(profile).Path(path);
+        }
+
+        /// <summary>Configures bounded path smoothing and averaged normals for a profile sweep.</summary>
+        public static ShapeNodeBuilder SweepQuality(
+            this ShapeNodeBuilder builder,
+            int                   pathSmoothing,
+            bool                  smoothNormals)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (pathSmoothing < 0 || pathSmoothing > 4)
+                throw new ArgumentOutOfRangeException(nameof(pathSmoothing));
+
+            return builder
+                .Parameter(LowPolyShapeParameters.PathSmoothing, pathSmoothing)
+                .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
+        }
     }
 }
