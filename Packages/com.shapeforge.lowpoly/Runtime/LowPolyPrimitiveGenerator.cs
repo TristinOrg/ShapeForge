@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ShapeForge.LowPoly
 {
     /// <summary>
-    /// Generates official Low Poly primitives from cached Unity render resources.
+    /// Generates official primitive and parameterized Low Poly shapes from cached render resources.
     /// </summary>
     public sealed class LowPolyPrimitiveGenerator : IUnityShapeGenerator
     {
@@ -21,7 +21,10 @@ namespace ShapeForge.LowPoly
         /// <inheritdoc />
         public bool CanGenerate(ShapeNode node)
         {
-            return node != null && PrimitiveTypes.ContainsKey(node.Type);
+            return node != null &&
+                   (PrimitiveTypes.ContainsKey(node.Type) ||
+                    node.Type == LowPolyShapeTypes.Wedge ||
+                    node.Type == LowPolyShapeTypes.Frustum);
         }
 
         /// <inheritdoc />
@@ -33,17 +36,53 @@ namespace ShapeForge.LowPoly
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (!PrimitiveTypes.TryGetValue(node.Type, out PrimitiveType primitiveType))
-                throw new ArgumentException($"Unsupported Low Poly shape type '{node.Type}'.", nameof(node));
+            Mesh             mesh;
+            Material         material;
+            if (PrimitiveTypes.TryGetValue(node.Type, out PrimitiveType primitiveType))
+            {
+                PrimitiveTemplate template = UnityPrimitiveTemplateCache.Get(primitiveType);
+                mesh     = template.Mesh;
+                material = template.Material;
+            }
+            else
+            {
+                mesh     = GetProceduralMesh(node);
+                material = UnityPrimitiveTemplateCache.Get(PrimitiveType.Cube).Material;
+            }
 
-            PrimitiveTemplate template     = UnityPrimitiveTemplateCache.Get(primitiveType);
             GameObject        generated    = new();
             MeshFilter        meshFilter   = generated.AddComponent<MeshFilter>();
             MeshRenderer      meshRenderer = generated.AddComponent<MeshRenderer>();
 
-            meshFilter.sharedMesh       = template.Mesh;
-            meshRenderer.sharedMaterial = template.Material;
+            meshFilter.sharedMesh       = mesh;
+            meshRenderer.sharedMaterial = material;
             return generated;
+        }
+
+        private static Mesh GetProceduralMesh(ShapeNode node)
+        {
+            if (node.Type == LowPolyShapeTypes.Wedge)
+                return LowPolyProceduralMeshCache.GetWedge();
+
+            if (node.Type != LowPolyShapeTypes.Frustum)
+                throw new ArgumentException($"Unsupported Low Poly shape type '{node.Type}'.", nameof(node));
+
+            float topWidth    = GetPositiveParameter(node, LowPolyShapeParameters.TopWidth, 0.65f);
+            float topDepth    = GetPositiveParameter(node, LowPolyShapeParameters.TopDepth, 0.65f);
+            float bottomWidth = GetPositiveParameter(node, LowPolyShapeParameters.BottomWidth, 1f);
+            float bottomDepth = GetPositiveParameter(node, LowPolyShapeParameters.BottomDepth, 1f);
+            return LowPolyProceduralMeshCache.GetFrustum(topWidth, topDepth, bottomWidth, bottomDepth);
+        }
+
+        private static float GetPositiveParameter(ShapeNode node, string name, float defaultValue)
+        {
+            if (!node.Parameters.TryGetValue(name, out float value))
+                return defaultValue;
+
+            if (value <= 0f)
+                throw new ArgumentOutOfRangeException(name, value, "Procedural dimensions must be positive.");
+
+            return value;
         }
     }
 }

@@ -46,6 +46,19 @@ namespace ShapeForge
             if (node.Appearance.HasColorOverride)
                 ForgeColorValidator.Validate(node.Appearance.Color, $"Shape node '{node.Id}'");
 
+            if (node.Parameters == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a parameter collection.");
+
+            foreach (KeyValuePair<string, float> parameter in node.Parameters)
+            {
+                if (string.IsNullOrWhiteSpace(parameter.Key))
+                    throw new ShapeValidationException($"Shape node '{node.Id}' has an empty parameter name.");
+
+                if (float.IsNaN(parameter.Value) || float.IsInfinity(parameter.Value))
+                    throw new ShapeValidationException(
+                        $"Shape node '{node.Id}' parameter '{parameter.Key}' must be finite.");
+            }
+
             foreach (ShapeNode child in node.Children)
                 ValidateNode(child, nodeIds);
         }

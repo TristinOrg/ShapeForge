@@ -9,7 +9,8 @@ namespace ShapeForge
     [Serializable]
     public sealed class ShapeNode
     {
-        private readonly List<ShapeNode> children = new List<ShapeNode>();
+        private readonly List<ShapeNode> children = new();
+        private readonly Dictionary<string, float> parameters = new(StringComparer.Ordinal);
 
         /// <summary>
         /// Initializes an empty group node for serialization.
@@ -54,6 +55,11 @@ namespace ShapeForge
         public ShapeAppearance Appearance { get; set; } = new ShapeAppearance();
 
         /// <summary>
+        /// Gets engine-agnostic numeric parameters interpreted by the selected shape type.
+        /// </summary>
+        public IDictionary<string, float> Parameters => parameters;
+
+        /// <summary>
         /// Gets the child shape definitions.
         /// </summary>
         public IList<ShapeNode> Children => children;
@@ -68,6 +74,11 @@ namespace ShapeForge
 
             children.Add(child);
             return this;
+        }
+
+        private bool ShouldSerializeParameters()
+        {
+            return parameters.Count > 0;
         }
     }
 }

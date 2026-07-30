@@ -61,6 +61,18 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Adds or replaces an engine-agnostic numeric shape parameter.
+        /// </summary>
+        public ShapeNodeBuilder Parameter(string name, float value)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Shape parameter names cannot be empty.", nameof(name));
+
+            Node.Parameters[name] = value;
+            return this;
+        }
+
+        /// <summary>
         /// Adds a non-rendering child group.
         /// </summary>
         public ShapeNodeBuilder Group(

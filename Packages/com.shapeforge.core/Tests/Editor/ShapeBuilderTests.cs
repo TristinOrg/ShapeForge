@@ -18,6 +18,7 @@ namespace ShapeForge.Tests
                         .Shape("front", "Front Wall", "example/cube", shape => shape
                             .Position(0f, 1f, 0f)
                             .Scale(4f, 2f, 0.2f)
+                            .Parameter("topWidth", 0.65f)
                             .ColorRole("wall"))))
                 .Build();
 
@@ -27,6 +28,7 @@ namespace ShapeForge.Tests
             Assert.That(wall.Id, Is.EqualTo("front"));
             Assert.That(wall.Transform.Position, Is.EqualTo(new ForgeVector3(0f, 1f, 0f)));
             Assert.That(wall.Appearance.ColorRole, Is.EqualTo("wall"));
+            Assert.That(wall.Parameters["topWidth"], Is.EqualTo(0.65f));
         }
 
         [Test]
@@ -49,6 +51,18 @@ namespace ShapeForge.Tests
                 .Root("root", "Root", root => root
                     .Shape("part", "Part", "example/cube", shape => shape
                         .Color(1.2f, 0f, 0f)));
+
+            Assert.Throws<ShapeValidationException>(() => builder.Build());
+        }
+
+        [Test]
+        public void BuildRejectsNonFiniteShapeParameter()
+        {
+            ShapeBuilder builder = ShapeBuilder
+                .Create("Invalid Parameter")
+                .Root("root", "Root", root => root
+                    .Shape("part", "Part", "example/frustum", shape => shape
+                        .Parameter("topWidth", float.NaN)));
 
             Assert.Throws<ShapeValidationException>(() => builder.Build());
         }

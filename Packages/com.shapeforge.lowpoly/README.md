@@ -2,7 +2,7 @@
 
 The first official ShapeForge implementation. It provides Low Poly geometry, palettes, styles, and reusable presets for characters, furniture, buildings, props, and other model categories through ShapeForge extension contracts.
 
-Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes and base materials without generating Collider components.
+Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes and base materials without generating Collider components. Parameterized Wedge and Frustum shapes use flat-shaded procedural meshes; equivalent parameter sets share one cached Mesh. Frustum parameters are `topWidth`, `topDepth`, `bottomWidth`, and `bottomDepth`.
 
 Use `LowPolyModelGenerator` as the reusable runtime entry point for validated definitions or external ShapeForge JSON. Register style documents once, then reuse the same pipeline for subsequent models.
 

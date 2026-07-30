@@ -77,5 +77,43 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.GetComponentsInChildren<Collider>().Length, Is.Zero);
             Assert.That(firstSphere.sharedMesh, Is.SameAs(secondSphere.sharedMesh));
         }
+
+        [Test]
+        public void GenerateSupportsCachedParameterizedMeshes()
+        {
+            ShapeNode root          = new("procedural", "Procedural Shapes", ShapeTypes.Group);
+            ShapeNode wedge         = new("wedge", "Wedge", LowPolyShapeTypes.Wedge);
+            ShapeNode firstFrustum  = CreateFrustum("frustum-a", "Frustum A", 0.45f);
+            ShapeNode secondFrustum = CreateFrustum("frustum-b", "Frustum B", 0.45f);
+            ShapeNode wideFrustum   = CreateFrustum("frustum-c", "Frustum C", 0.8f);
+            root.Add(wedge).Add(firstFrustum).Add(secondFrustum).Add(wideFrustum);
+
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Procedural Shapes", root));
+
+            Mesh wedgeMesh     = generatedRoot.transform.Find("Wedge").GetComponent<MeshFilter>().sharedMesh;
+            Mesh firstMesh     = generatedRoot.transform.Find("Frustum A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh    = generatedRoot.transform.Find("Frustum B").GetComponent<MeshFilter>().sharedMesh;
+            Mesh differentMesh = generatedRoot.transform.Find("Frustum C").GetComponent<MeshFilter>().sharedMesh;
+
+            Assert.That(wedgeMesh.vertexCount, Is.EqualTo(18));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(24));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+            Assert.That(firstMesh, Is.Not.SameAs(differentMesh));
+        }
+
+        private static ShapeNode CreateFrustum(string id, string name, float topWidth)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
+            node.Parameters[LowPolyShapeParameters.TopWidth]    = topWidth;
+            node.Parameters[LowPolyShapeParameters.TopDepth]    = 0.6f;
+            node.Parameters[LowPolyShapeParameters.BottomWidth] = 1f;
+            node.Parameters[LowPolyShapeParameters.BottomDepth] = 0.9f;
+            return node;
+        }
     }
 }

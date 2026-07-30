@@ -24,5 +24,33 @@ namespace ShapeForge.LowPoly
         /// Identifies a unit Low Poly capsule scaled by its shape transform.
         /// </summary>
         public const string Capsule = "lowpoly/capsule";
+
+        /// <summary>
+        /// Identifies a unit triangular wedge suitable for sloped silhouettes.
+        /// </summary>
+        public const string Wedge = "lowpoly/wedge";
+
+        /// <summary>
+        /// Identifies a centered tapered box controlled by top and bottom dimensions.
+        /// </summary>
+        public const string Frustum = "lowpoly/frustum";
+    }
+
+    /// <summary>
+    /// Defines numeric parameter names supported by official Low Poly procedural shapes.
+    /// </summary>
+    public static class LowPolyShapeParameters
+    {
+        /// <summary>Controls a frustum's top width relative to its transform scale.</summary>
+        public const string TopWidth = "topWidth";
+
+        /// <summary>Controls a frustum's top depth relative to its transform scale.</summary>
+        public const string TopDepth = "topDepth";
+
+        /// <summary>Controls a frustum's bottom width relative to its transform scale.</summary>
+        public const string BottomWidth = "bottomWidth";
+
+        /// <summary>Controls a frustum's bottom depth relative to its transform scale.</summary>
+        public const string BottomDepth = "bottomDepth";
     }
 }

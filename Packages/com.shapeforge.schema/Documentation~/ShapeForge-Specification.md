@@ -33,6 +33,13 @@ Adapters are responsible for converting these semantics to the native axes, hand
 - `core/group` creates hierarchy without requiring visible geometry.
 - Other type identifiers are owned by implementation packages.
 
+## Shape parameters
+
+- A node may contain a `parameters` object with finite numeric values.
+- Parameter names and meanings are owned by the node's shape type implementation.
+- Parameters must describe engine-independent geometry and must not contain native engine object references.
+- Readers must preserve unknown parameters so documents remain portable across adapters.
+
 ## Extensibility
 
 Shape and style documents are the portable contract. Engine adapters may expose language-specific interfaces, but must preserve document semantics and stable node identity.
