@@ -1,222 +1,248 @@
 namespace ShapeForge.LowPoly
 {
     /// <summary>
-    /// Provides a realistically proportioned fantasy hero with articulated human joints.
+    /// Provides a compact modern-fantasy character used as the humanoid generation benchmark.
     /// </summary>
     public static class LowPolyHeroPreset
     {
         /// <summary>Gets the style identifier used by the hero preset.</summary>
         public const string StyleId = "lowpoly/fantasy-hero";
 
-        /// <summary>Creates the engine-agnostic fantasy hero definition.</summary>
+        /// <summary>Creates the engine-agnostic pocket fantasy hero definition.</summary>
         public static ShapeDefinition CreateDefinition()
         {
             return ShapeBuilder
-                .Create("Low Poly Fantasy Hero")
+                .Create("Pocket Fantasy Hero")
                 .WithStyle(StyleId)
-                .Root("hero", "Fantasy Hero", hero =>
+                .Root("hero", "Pocket Fantasy Hero", hero =>
                 {
-                    hero.Group("hero.pelvis.pivot", "Pelvis Pivot", pelvis => pelvis
-                        .Position(0f, 1.02f, 0f)
-                        .Shape("hero.pelvis", "Pelvis", LowPolyShapeTypes.Frustum, shape => shape
-                            .Scale(0.5f, 0.3f, 0.3f)
-                            .Frustum(0.82f, 0.82f, 1f, 1f)
-                            .ColorRole("trousers"))
-                        .Group("hero.spine.pivot", "Spine Pivot", spine => spine
-                            .Position(0f, 0.18f, 0f)
-                            .Shape("hero.torso", "Fitted Coat", LowPolyShapeTypes.ProfileLoft, torso => torso
-                                .Position(0f, 0.43f, 0f)
-                                .Scale(0.9f, 0.82f, 0.5f)
-                                .ProfileLoft(
-                                    new ForgeVector2[]
-                                    {
-                                        new(-0.42f, 0.5f), new(0.42f, 0.5f), new(0.34f, -0.34f),
-                                        new(0.22f, -0.5f), new(-0.22f, -0.5f), new(-0.34f, -0.34f)
-                                    },
-                                    Section(-0.5f, 0.88f, 0.96f),
-                                    Section(0f, 1f, 1f),
-                                    Section(0.5f, 0.76f, 0.94f))
-                                .ColorRole("coat"))
-                            .Shape("hero.chest", "Chest Panel", LowPolyShapeTypes.Cube, chest => chest
-                                .Position(0f, 0.48f, -0.23f)
-                                .Scale(0.3f, 0.42f, 0.055f)
-                                .ColorRole("shirt"))
-                            .Shape("hero.belt", "Leather Belt", LowPolyShapeTypes.Cube, belt => belt
-                                .Position(0f, 0.08f, -0.03f)
-                                .Scale(0.56f, 0.1f, 0.32f)
-                                .ColorRole("leather"))
-                            .Shape("hero.belt.buckle", "Belt Buckle", LowPolyShapeTypes.Cube, buckle => buckle
-                                .Position(0f, 0.08f, -0.22f)
-                                .Scale(0.12f, 0.1f, 0.04f)
-                                .ColorRole("metal"))
-                            .Shape("hero.coat.tail.left", "Left Coat Tail", LowPolyShapeTypes.ExtrudedProfile, tail => tail
-                                .Position(-0.18f, -0.18f, -0.08f)
-                                .Rotation(0f, 0f, 4f)
-                                .Scale(0.34f, 0.62f, 1f)
-                                .ExtrudedProfile(0.14f, 0.035f,
-                                    new(-0.5f, 0.5f), new(0.48f, 0.5f), new(0.34f, -0.5f), new(-0.5f, -0.36f))
-                                .ColorRole("coat"))
-                            .Shape("hero.coat.tail.right", "Right Coat Tail", LowPolyShapeTypes.ExtrudedProfile, tail => tail
-                                .Position(0.18f, -0.18f, -0.08f)
-                                .Rotation(0f, 0f, -4f)
-                                .Scale(0.34f, 0.62f, 1f)
-                                .ExtrudedProfile(0.14f, 0.035f,
-                                    new(-0.48f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.36f), new(-0.34f, -0.5f))
-                                .ColorRole("coat"))
-                            .Shape("hero.shoulder.guard", "Shoulder Harness", LowPolyShapeTypes.Frustum, harness => harness
-                                .Position(0f, 0.73f, 0f)
-                                .Scale(0.82f, 0.12f, 0.34f)
-                                .Frustum(0.82f, 0.88f, 1f, 1f)
-                                .ColorRole("leather"))));
-
+                    AddBody(hero);
                     AddHead(hero);
-                    AddArm(hero, "left", "Left", -0.43f);
-                    AddArm(hero, "right", "Right", 0.43f);
-                    AddLeg(hero, "left", "Left", -0.2f);
-                    AddLeg(hero, "right", "Right", 0.2f);
+                    AddArm(hero, "left", "Left", -0.36f);
+                    AddArm(hero, "right", "Right", 0.36f);
+                    AddLeg(hero, "left", "Left", -0.17f);
+                    AddLeg(hero, "right", "Right", 0.17f);
                 })
                 .Build();
         }
 
-        /// <summary>Creates the engine-agnostic palette used by the hero preset.</summary>
+        /// <summary>Creates the dark modern-fantasy palette used by the benchmark character.</summary>
         public static ShapeStyleDefinition CreateStyle()
         {
             ShapeStyleDefinition style = new(StyleId);
             style.Palette
-                .Set("skin", new(0.74f, 0.48f, 0.34f))
-                .Set("skin.shadow", new(0.54f, 0.3f, 0.22f))
-                .Set("hair", new(0.055f, 0.065f, 0.085f))
-                .Set("coat", new(0.08f, 0.11f, 0.17f))
-                .Set("shirt", new(0.64f, 0.68f, 0.7f))
-                .Set("trousers", new(0.07f, 0.075f, 0.095f))
-                .Set("leather", new(0.2f, 0.09f, 0.045f))
-                .Set("metal", new(0.52f, 0.57f, 0.62f))
-                .Set("accent", new(0.48f, 0.08f, 0.075f))
-                .Set("eye", new(0.12f, 0.32f, 0.5f))
-                .Set("eye.white", new(0.82f, 0.84f, 0.8f));
+                .Set("skin", new(0.76f, 0.52f, 0.38f))
+                .Set("skin.shadow", new(0.58f, 0.34f, 0.24f))
+                .Set("hair", new(0.025f, 0.045f, 0.075f))
+                .Set("hair.highlight", new(0.055f, 0.085f, 0.13f))
+                .Set("shirt", new(0.012f, 0.014f, 0.018f))
+                .Set("jacket", new(0.035f, 0.04f, 0.05f))
+                .Set("jacket.highlight", new(0.075f, 0.08f, 0.09f))
+                .Set("trousers", new(0.045f, 0.05f, 0.06f))
+                .Set("glove", new(0.025f, 0.028f, 0.035f))
+                .Set("boot", new(0.018f, 0.022f, 0.028f))
+                .Set("eye", new(0.025f, 0.02f, 0.018f))
+                .Set("mouth", new(0.34f, 0.16f, 0.13f));
             return style;
+        }
+
+        private static void AddBody(ShapeNodeBuilder hero)
+        {
+            hero.Group("hero.pelvis.pivot", "Pelvis Pivot", pelvis => pelvis
+                .Position(0f, 0.98f, 0f)
+                .Shape("hero.pelvis", "Slim Waist", LowPolyShapeTypes.ProfileLoft, waist => waist
+                    .Scale(0.44f, 0.3f, 0.34f)
+                    .ProfileLoft(
+                        BoxProfile(),
+                        Section(-0.5f, 0.9f, 0.9f),
+                        Section(0f, 1f, 1f),
+                        Section(0.5f, 0.86f, 0.92f))
+                    .ColorRole("trousers"))
+                .Shape("hero.jacket.hem", "Overlapping Jacket Hem", LowPolyShapeTypes.Frustum, hem => hem
+                    .Position(0f, 0.14f, -0.01f).Scale(0.62f, 0.12f, 0.36f)
+                    .Frustum(0.92f, 0.94f, 1f, 1f).ColorRole("jacket"))
+                .Group("hero.spine.pivot", "Spine Pivot", spine => spine
+                    .Position(0f, 0.12f, 0f)
+                    .Shape("hero.torso", "Jacket Torso", LowPolyShapeTypes.ProfileLoft, torso => torso
+                        .Position(0f, 0.4f, 0f)
+                        .Scale(0.62f, 0.72f, 0.4f)
+                        .ProfileLoft(
+                            TorsoProfile(),
+                            Section(-0.5f, 0.94f, 0.98f),
+                            Section(0f, 1f, 1f),
+                            Section(0.5f, 0.84f, 0.94f))
+                        .ColorRole("jacket"))
+                    .Shape("hero.shirt", "Black Shirt", LowPolyShapeTypes.ExtrudedProfile, shirt => shirt
+                        .Position(0f, 0.38f, -0.225f).Scale(0.3f, 0.63f, 1f)
+                        .ExtrudedProfile(0.045f, 0.012f,
+                            new(-0.46f, 0.5f), new(0.46f, 0.5f), new(0.5f, -0.5f), new(-0.5f, -0.5f))
+                        .ColorRole("shirt"))
+                    .Shape("hero.jacket.left", "Left Open Jacket Panel", LowPolyShapeTypes.ExtrudedProfile, panel => panel
+                        .Position(-0.2f, 0.37f, -0.25f).Scale(0.25f, 0.68f, 1f)
+                        .ExtrudedProfile(0.05f, 0.014f,
+                            new(-0.5f, 0.5f), new(0.5f, 0.38f), new(0.28f, -0.5f), new(-0.5f, -0.42f))
+                        .ColorRole("jacket.highlight"))
+                    .Shape("hero.jacket.right", "Right Open Jacket Panel", LowPolyShapeTypes.ExtrudedProfile, panel => panel
+                        .Position(0.2f, 0.37f, -0.25f).Scale(0.25f, 0.68f, 1f)
+                        .ExtrudedProfile(0.05f, 0.014f,
+                            new(-0.5f, 0.38f), new(0.5f, 0.5f), new(0.5f, -0.42f), new(-0.28f, -0.5f))
+                        .ColorRole("jacket.highlight"))
+                    .Shape("hero.collar.left", "Left Raised Collar", LowPolyShapeTypes.ExtrudedProfile, collar => collar
+                        .Position(-0.16f, 0.76f, -0.14f).Rotation(0f, 0f, -16f).Scale(0.24f, 0.3f, 1f)
+                        .ExtrudedProfile(0.16f, 0.03f,
+                            new(-0.5f, -0.5f), new(0.48f, -0.34f), new(0.18f, 0.5f), new(-0.42f, 0.32f))
+                        .ColorRole("jacket"))
+                    .Shape("hero.collar.right", "Right Raised Collar", LowPolyShapeTypes.ExtrudedProfile, collar => collar
+                        .Position(0.16f, 0.76f, -0.14f).Rotation(0f, 0f, 16f).Scale(0.24f, 0.3f, 1f)
+                        .ExtrudedProfile(0.16f, 0.03f,
+                            new(-0.48f, -0.34f), new(0.5f, -0.5f), new(0.42f, 0.32f), new(-0.18f, 0.5f))
+                        .ColorRole("jacket"))
+                    .Shape("hero.pocket.left", "Left Chest Pocket", LowPolyShapeTypes.Cube, pocket => pocket
+                        .Position(-0.2f, 0.51f, -0.285f).Scale(0.17f, 0.1f, 0.025f).ColorRole("jacket"))
+                    .Shape("hero.pocket.right", "Right Chest Pocket", LowPolyShapeTypes.Cube, pocket => pocket
+                        .Position(0.2f, 0.51f, -0.285f).Scale(0.17f, 0.1f, 0.025f).ColorRole("jacket"))));
         }
 
         private static void AddHead(ShapeNodeBuilder hero)
         {
             hero.Group("hero.head.pivot", "Head Pivot", head => head
-                .Position(0f, 1.96f, 0f)
+                .Position(0f, 1.83f, 0f)
                 .Shape("hero.neck", "Neck", LowPolyShapeTypes.Cylinder, neck => neck
-                    .Position(0f, -0.12f, 0f).Scale(0.13f, 0.16f, 0.13f).ColorRole("skin.shadow"))
-                .Shape("hero.head", "Sculpted Head", LowPolyShapeTypes.ProfileLoft, face => face
-                    .Position(0f, 0.18f, 0f).Scale(0.62f, 0.72f, 0.56f)
+                    .Position(0f, -0.08f, 0f).Scale(0.12f, 0.18f, 0.12f).ColorRole("skin.shadow"))
+                .Shape("hero.head", "Rounded Face", LowPolyShapeTypes.ProfileLoft, face => face
+                    .Position(0f, 0.2f, 0f).Scale(0.58f, 0.62f, 0.52f)
                     .ProfileLoft(
-                        new ForgeVector2[]
-                        {
-                            new(-0.34f, 0.5f), new(0.34f, 0.5f), new(0.5f, 0.28f),
-                            new(0.46f, -0.24f), new(0.24f, -0.5f), new(-0.24f, -0.5f),
-                            new(-0.46f, -0.24f), new(-0.5f, 0.28f)
-                        },
-                        Section(-0.5f, 0.82f, 0.92f, 0f, -0.02f),
-                        Section(-0.15f, 0.98f, 1f),
-                        Section(0.25f, 1f, 1f),
-                        Section(0.5f, 0.84f, 0.92f))
+                        FaceProfile(),
+                        Section(-0.5f, 0.88f, 0.94f, 0f, -0.02f),
+                        Section(-0.1f, 1f, 1f),
+                        Section(0.3f, 0.98f, 1f),
+                        Section(0.5f, 0.82f, 0.92f))
                     .ColorRole("skin"))
-                .Shape("hero.ear.left", "Left Ear", LowPolyShapeTypes.Sphere, ear => ear
-                    .Position(-0.29f, 0.17f, 0f).Scale(0.055f, 0.09f, 0.045f).ColorRole("skin"))
-                .Shape("hero.ear.right", "Right Ear", LowPolyShapeTypes.Sphere, ear => ear
-                    .Position(0.29f, 0.17f, 0f).Scale(0.055f, 0.09f, 0.045f).ColorRole("skin"))
-                .Shape("hero.eye.left", "Left Eye White", LowPolyShapeTypes.Cube, eye => eye
-                    .Position(-0.095f, 0.22f, -0.275f).Scale(0.07f, 0.034f, 0.022f).ColorRole("eye.white"))
-                .Shape("hero.eye.right", "Right Eye White", LowPolyShapeTypes.Cube, eye => eye
-                    .Position(0.095f, 0.22f, -0.275f).Scale(0.07f, 0.034f, 0.022f).ColorRole("eye.white"))
-                .Shape("hero.eye.left.pupil", "Left Pupil", LowPolyShapeTypes.Sphere, eye => eye
-                    .Position(-0.095f, 0.22f, -0.3f).Scale(0.019f, 0.022f, 0.012f).ColorRole("eye"))
-                .Shape("hero.eye.right.pupil", "Right Pupil", LowPolyShapeTypes.Sphere, eye => eye
-                    .Position(0.095f, 0.22f, -0.3f).Scale(0.019f, 0.022f, 0.012f).ColorRole("eye"))
-                .Shape("hero.eyebrow.left", "Left Eyebrow", LowPolyShapeTypes.Cube, brow => brow
-                    .Position(-0.1f, 0.3f, -0.286f).Rotation(0f, 0f, -5f)
-                    .Scale(0.11f, 0.024f, 0.016f).ColorRole("hair"))
-                .Shape("hero.eyebrow.right", "Right Eyebrow", LowPolyShapeTypes.Cube, brow => brow
-                    .Position(0.1f, 0.3f, -0.286f).Rotation(0f, 0f, 5f)
-                    .Scale(0.11f, 0.024f, 0.016f).ColorRole("hair"))
-                .Shape("hero.nose", "Nose", LowPolyShapeTypes.Sphere, nose => nose
-                    .Position(0f, 0.12f, -0.286f).Scale(0.027f, 0.042f, 0.032f).ColorRole("skin.shadow"))
-                .Shape("hero.mouth", "Mouth", LowPolyShapeTypes.Cube, mouth => mouth
-                    .Position(0f, 0.015f, -0.274f).Scale(0.085f, 0.014f, 0.014f).ColorRole("accent"))
-                .Shape("hero.hair.crown", "Layered Hair Crown", LowPolyShapeTypes.Sphere, hair => hair
-                    .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair"))
-                .Shape("hero.hair.back", "Layered Back Hair", LowPolyShapeTypes.ExtrudedProfile, hair => hair
-                    .Position(0f, 0.2f, 0.292f).Scale(0.66f, 0.72f, 1f)
-                    .ExtrudedProfile(0.055f, 0.016f,
-                        new(-0.34f, 0.5f), new(0.34f, 0.5f), new(0.5f, 0.26f), new(0.44f, -0.34f),
-                        new(0.28f, -0.5f), new(0.08f, -0.34f), new(-0.1f, -0.5f),
-                        new(-0.3f, -0.34f), new(-0.46f, -0.42f), new(-0.5f, 0.26f))
+                .Shape("hero.eye.left", "Left Eye", LowPolyShapeTypes.Cube, eye => eye
+                    .Position(-0.095f, 0.18f, -0.274f).Scale(0.04f, 0.018f, 0.012f).ColorRole("eye"))
+                .Shape("hero.eye.right", "Right Eye", LowPolyShapeTypes.Cube, eye => eye
+                    .Position(0.095f, 0.18f, -0.274f).Scale(0.04f, 0.018f, 0.012f).ColorRole("eye"))
+                .Shape("hero.mouth", "Subtle Mouth", LowPolyShapeTypes.Cube, mouth => mouth
+                    .Position(0f, 0.06f, -0.272f).Scale(0.055f, 0.01f, 0.01f).ColorRole("mouth"))
+                .Shape("hero.hair.cap", "Full Layered Hair", LowPolyShapeTypes.ProfileLoft, hair => hair
+                    .Position(0f, 0.39f, 0f).Scale(0.72f, 0.64f, 0.66f)
+                    .ProfileLoft(
+                        HairProfile(),
+                        Section(-0.5f, 0.9f, 0.94f),
+                        Section(-0.12f, 1f, 1f),
+                        Section(0.25f, 0.98f, 1f),
+                        Section(0.5f, 0.84f, 0.94f))
                     .ColorRole("hair"))
-                .Shape("hero.hair.front", "Layered Front Hair", LowPolyShapeTypes.ExtrudedProfile, hair => hair
-                    .Position(0f, 0.34f, -0.292f).Scale(0.64f, 0.43f, 1f)
-                    .ExtrudedProfile(0.06f, 0.018f,
-                        new(-0.5f, 0.38f), new(-0.34f, 0.5f), new(0.08f, 0.48f), new(0.48f, 0.32f),
-                        new(0.5f, -0.08f), new(0.32f, -0.42f), new(0.18f, -0.08f), new(0.04f, -0.5f),
-                        new(-0.08f, -0.1f), new(-0.28f, -0.4f), new(-0.24f, -0.04f), new(-0.5f, -0.22f))
-                    .ColorRole("hair"))
-                .Shape("hero.hair.lock.left", "Left Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
-                    .Position(-0.26f, 0.16f, -0.285f).Rotation(0f, 0f, 8f).Scale(0.16f, 0.48f, 1f)
-                    .ExtrudedProfile(0.055f, 0.016f,
-                        new(-0.46f, 0.5f), new(0.5f, 0.4f), new(0.2f, -0.5f), new(-0.5f, -0.2f))
-                    .ColorRole("hair"))
-                .Shape("hero.hair.lock.right", "Right Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
-                    .Position(0.26f, 0.16f, -0.285f).Rotation(0f, 0f, -8f).Scale(0.16f, 0.48f, 1f)
-                    .ExtrudedProfile(0.055f, 0.016f,
-                        new(-0.5f, 0.4f), new(0.46f, 0.5f), new(0.5f, -0.2f), new(-0.2f, -0.5f))
-                    .ColorRole("hair")));
+                .Shape("hero.hair.lock.left", "Left Long Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(-0.29f, 0.14f, -0.255f).Rotation(0f, 0f, 6f).Scale(0.15f, 0.54f, 1f)
+                    .ExtrudedProfile(0.07f, 0.018f,
+                        new(-0.5f, 0.5f), new(0.5f, 0.38f), new(0.12f, -0.5f), new(-0.46f, -0.16f))
+                    .ColorRole("hair.highlight"))
+                .Shape("hero.hair.lock.right", "Right Long Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(0.29f, 0.14f, -0.255f).Rotation(0f, 0f, -6f).Scale(0.15f, 0.54f, 1f)
+                    .ExtrudedProfile(0.07f, 0.018f,
+                        new(-0.5f, 0.38f), new(0.5f, 0.5f), new(0.46f, -0.16f), new(-0.12f, -0.5f))
+                    .ColorRole("hair.highlight")));
         }
 
         private static void AddArm(ShapeNodeBuilder hero, string side, string label, float x)
         {
             string prefix = $"hero.arm.{side}";
             hero.Group($"{prefix}.shoulder.pivot", $"{label} Shoulder Pivot", shoulder => shoulder
-                .Position(x, 1.7f, 0f)
-                .Shape($"{prefix}.upper", $"{label} Upper Arm", LowPolyShapeTypes.Frustum, upper => upper
-                    .Position(0f, -0.3f, 0f).Scale(0.25f, 0.56f, 0.25f)
-                    .Frustum(1f, 1f, 0.72f, 0.72f).ColorRole("coat"))
-                .Shape($"{prefix}.guard", $"{label} Shoulder Guard", LowPolyShapeTypes.Wedge, guard => guard
-                    .Position(0f, -0.02f, -0.02f).Rotation(0f, 180f, 0f)
-                    .Scale(0.3f, 0.22f, 0.3f).ColorRole("leather"))
+                .Position(x, 1.53f, 0f)
+                .Shape($"{prefix}.upper", $"{label} Jacket Sleeve", LowPolyShapeTypes.Frustum, sleeve => sleeve
+                    .Position(0f, -0.2f, 0f).Scale(0.22f, 0.4f, 0.24f)
+                    .Frustum(1f, 1f, 0.78f, 0.8f).ColorRole("jacket"))
                 .Group($"{prefix}.elbow.pivot", $"{label} Elbow Pivot", elbow => elbow
-                    .Position(0f, -0.59f, 0f)
-                    .Shape($"{prefix}.forearm", $"{label} Forearm", LowPolyShapeTypes.Frustum, forearm => forearm
-                        .Position(0f, -0.27f, 0f).Scale(0.23f, 0.5f, 0.23f)
-                        .Frustum(1f, 1f, 0.68f, 0.68f).ColorRole("coat"))
-                    .Shape($"{prefix}.glove", $"{label} Glove", LowPolyShapeTypes.Frustum, glove => glove
-                        .Position(0f, -0.55f, -0.01f).Scale(0.18f, 0.2f, 0.16f)
-                        .Frustum(0.82f, 0.82f, 1f, 1f).ColorRole("leather"))));
+                    .Position(0f, -0.42f, 0f)
+                    .Shape($"{prefix}.forearm", $"{label} Bare Forearm", LowPolyShapeTypes.Frustum, arm => arm
+                        .Position(0f, -0.2f, 0f).Scale(0.16f, 0.38f, 0.17f)
+                        .Frustum(1f, 1f, 0.78f, 0.8f).ColorRole("skin"))
+                    .Shape($"{prefix}.glove", $"{label} Fingerless Glove", LowPolyShapeTypes.Frustum, glove => glove
+                        .Position(0f, -0.42f, 0f).Scale(0.18f, 0.2f, 0.18f)
+                        .Frustum(1f, 1f, 0.82f, 0.82f).ColorRole("glove"))
+                    .Shape($"{prefix}.hand", $"{label} Hand", LowPolyShapeTypes.Capsule, hand => hand
+                        .Position(0f, -0.56f, -0.01f).Scale(0.09f, 0.15f, 0.08f).ColorRole("skin"))));
         }
 
         private static void AddLeg(ShapeNodeBuilder hero, string side, string label, float x)
         {
             string prefix = $"hero.leg.{side}";
             hero.Group($"{prefix}.hip.pivot", $"{label} Hip Pivot", hip => hip
-                .Position(x, 0.98f, 0f)
-                .Shape($"{prefix}.thigh", $"{label} Thigh", LowPolyShapeTypes.Frustum, thigh => thigh
-                    .Position(0f, -0.36f, 0f).Scale(0.3f, 0.68f, 0.32f)
-                    .Frustum(1f, 1f, 0.68f, 0.72f).ColorRole("trousers"))
+                .Position(x, 0.95f, 0f)
+                .Shape($"{prefix}.thigh", $"{label} Baggy Shorts", LowPolyShapeTypes.ProfileLoft, shorts => shorts
+                    .Position(0f, -0.3f, 0f).Scale(0.34f, 0.56f, 0.38f)
+                    .ProfileLoft(
+                        BaggyLegProfile(),
+                        Section(-0.5f, 0.92f, 0.96f),
+                        Section(0f, 1f, 1f),
+                        Section(0.5f, 0.82f, 0.92f))
+                    .ColorRole("trousers"))
                 .Group($"{prefix}.knee.pivot", $"{label} Knee Pivot", knee => knee
-                    .Position(0f, -0.72f, 0f)
-                    .Shape($"{prefix}.knee", $"{label} Knee", LowPolyShapeTypes.Sphere, joint => joint
-                        .Scale(0.15f, 0.14f, 0.16f).ColorRole("trousers"))
-                    .Shape($"{prefix}.shin", $"{label} Shin", LowPolyShapeTypes.Frustum, shin => shin
-                        .Position(0f, -0.32f, 0f).Scale(0.27f, 0.6f, 0.28f)
-                        .Frustum(1f, 1f, 0.66f, 0.7f).ColorRole("trousers"))
-                    .Shape($"{prefix}.boot", $"{label} Boot", LowPolyShapeTypes.ProfileLoft, boot => boot
-                        .Position(0f, -0.66f, -0.1f).Scale(0.36f, 0.3f, 0.65f)
+                    .Position(0f, -0.6f, 0f)
+                    .Shape($"{prefix}.knee", $"{label} Exposed Knee", LowPolyShapeTypes.Sphere, joint => joint
+                        .Position(0f, -0.02f, -0.01f).Scale(0.1f, 0.08f, 0.11f).ColorRole("skin"))
+                    .Shape($"{prefix}.boot.shaft", $"{label} Tall Boot", LowPolyShapeTypes.ProfileLoft, boot => boot
+                        .Position(0f, -0.31f, 0f).Scale(0.24f, 0.55f, 0.28f)
                         .ProfileLoft(
-                            new ForgeVector2[]
-                            {
-                                new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.46f, -0.5f), new(-0.46f, -0.5f)
-                            },
-                            Section(-0.5f, 1f, 0.72f, 0f, -0.12f),
+                            BoxProfile(),
+                            Section(-0.5f, 0.9f, 1f),
+                            Section(0f, 1f, 0.92f),
+                            Section(0.5f, 0.78f, 0.82f))
+                        .ColorRole("boot"))
+                    .Shape($"{prefix}.boot", $"{label} Boot Foot", LowPolyShapeTypes.ProfileLoft, boot => boot
+                        .Position(0f, -0.63f, -0.11f).Scale(0.28f, 0.22f, 0.48f)
+                        .ProfileLoft(
+                            BoxProfile(),
+                            Section(-0.5f, 1f, 0.78f, 0f, -0.08f),
                             Section(0.05f, 0.88f, 1f),
-                            Section(0.5f, 0.76f, 0.88f, 0f, 0.04f))
-                        .ColorRole("leather"))
-                    .Shape($"{prefix}.boot.cuff", $"{label} Boot Cuff", LowPolyShapeTypes.Frustum, cuff => cuff
-                        .Position(0f, -0.49f, 0f).Scale(0.3f, 0.18f, 0.31f)
-                        .Frustum(1f, 1f, 0.8f, 0.82f).ColorRole("accent"))));
+                            Section(0.5f, 0.72f, 0.84f))
+                        .ColorRole("boot"))));
+        }
+
+        private static ForgeVector2[] BoxProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.5f), new(-0.5f, -0.5f)
+            };
+        }
+
+        private static ForgeVector2[] TorsoProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.46f, 0.5f), new(0.46f, 0.5f), new(0.36f, -0.5f), new(-0.36f, -0.5f)
+            };
+        }
+
+        private static ForgeVector2[] FaceProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.34f, 0.5f), new(0.34f, 0.5f), new(0.5f, 0.28f), new(0.46f, -0.24f),
+                new(0.24f, -0.5f), new(-0.24f, -0.5f), new(-0.46f, -0.24f), new(-0.5f, 0.28f)
+            };
+        }
+
+        private static ForgeVector2[] HairProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.5f, -0.02f), new(-0.48f, 0.3f), new(-0.3f, 0.5f), new(0.08f, 0.55f),
+                new(0.4f, 0.42f), new(0.5f, 0.14f), new(0.4f, -0.12f), new(0.26f, -0.04f),
+                new(0.16f, -0.3f), new(0.02f, -0.08f), new(-0.12f, -0.34f),
+                new(-0.2f, -0.06f), new(-0.36f, -0.27f), new(-0.32f, -0.02f)
+            };
+        }
+
+        private static ForgeVector2[] BaggyLegProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.4f, 0.5f), new(0.4f, 0.5f), new(0.5f, 0.08f), new(0.34f, -0.5f),
+                new(-0.34f, -0.5f), new(-0.5f, 0.08f)
+            };
         }
 
         private static ShapeProfileSection Section(
