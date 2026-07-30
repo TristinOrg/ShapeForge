@@ -10,6 +10,6 @@ For repeated models, call `ParseJson` once and pass the returned `ShapeDefinitio
 
 For a large number of instances, create a `LowPolyGenerationBatch` and call `GenerateNext` from an existing update or loading scheduler. The caller owns the per-step model budget; ShapeForge creates no coroutine, iterator state machine, global runner, or hidden update loop.
 
-Use `ShapeForge > Generate` in the Unity Editor to preview the official Table and Robot presets with full Undo support.
+Use `ShapeForge > Generate` in the Unity Editor to preview the articulated Sentinel Robot and detailed Inventor Workbench presets with full Undo support.
 
 Use `ShapeForge > Diagnostics > Benchmark JSON Generation` to measure the end-to-end JSON generation path, managed heap growth, and shared render resources on the current Editor machine. Treat results as a local baseline, not a cross-platform guarantee.

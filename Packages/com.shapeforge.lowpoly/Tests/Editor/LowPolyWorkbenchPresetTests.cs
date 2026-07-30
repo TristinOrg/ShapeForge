@@ -7,7 +7,7 @@ namespace ShapeForge.LowPoly.Tests
     /// <summary>
     /// Verifies a non-character furniture model through the complete generation pipeline.
     /// </summary>
-    public sealed class LowPolyTablePresetTests
+    public sealed class LowPolyWorkbenchPresetTests
     {
         private GameObject generatedRoot;
         private GameObject secondGeneratedRoot;
@@ -25,8 +25,8 @@ namespace ShapeForge.LowPoly.Tests
         [Test]
         public void GenerateCreatesColoredEditableFurnitureHierarchy()
         {
-            ShapeDefinition          definition = LowPolyTablePreset.CreateDefinition();
-            ShapeStyleDefinition     style      = LowPolyTablePreset.CreateStyle();
+            ShapeDefinition          definition = LowPolyWorkbenchPreset.CreateDefinition();
+            ShapeStyleDefinition     style      = LowPolyWorkbenchPreset.CreateStyle();
             ShapeStyleResolver       resolver   = new(new[] { style });
             UnityShapeModelGenerator generator  = new(
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
@@ -35,22 +35,23 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
             secondGeneratedRoot = generator.Generate(definition);
 
-            Assert.That(generatedRoot.name, Is.EqualTo("Table"));
-            Assert.That(generatedRoot.transform.childCount, Is.EqualTo(5));
-            Assert.That(generatedRoot.transform.Find("Top"), Is.Not.Null);
+            Assert.That(generatedRoot.name, Is.EqualTo("Inventor Workbench"));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(26));
+            Assert.That(generatedRoot.transform.Find("Tool Board/Upper Shelf"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Task Lamp/Lamp Bulb"), Is.Not.Null);
 
-            Renderer renderer       = generatedRoot.transform.Find("Top").GetComponent<Renderer>();
-            Renderer secondRenderer = secondGeneratedRoot.transform.Find("Top").GetComponent<Renderer>();
+            Renderer renderer       = generatedRoot.transform.Find("Worktop").GetComponent<Renderer>();
+            Renderer secondRenderer = secondGeneratedRoot.transform.Find("Worktop").GetComponent<Renderer>();
             Color    color          = renderer.sharedMaterial.color;
 
-            Assert.That(color.r, Is.EqualTo(0.45f).Within(0.0001f));
-            Assert.That(color.g, Is.EqualTo(0.22f).Within(0.0001f));
-            Assert.That(color.b, Is.EqualTo(0.08f).Within(0.0001f));
+            Assert.That(color.r, Is.EqualTo(0.5f).Within(0.0001f));
+            Assert.That(color.g, Is.EqualTo(0.24f).Within(0.0001f));
+            Assert.That(color.b, Is.EqualTo(0.07f).Within(0.0001f));
             Assert.That(color.a, Is.EqualTo(1f).Within(0.0001f));
             Assert.That(renderer.HasPropertyBlock(), Is.False);
             Assert.That(renderer.sharedMaterial, Is.SameAs(secondRenderer.sharedMaterial));
             Assert.That(generatedRoot.GetComponentsInChildren<UnityShapeAppearanceManifest>().Length, Is.EqualTo(1));
-            Assert.That(generatedRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(5));
+            Assert.That(generatedRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(26));
 
             renderer.sharedMaterial = null;
             generatedRoot.GetComponent<UnityShapeAppearanceManifest>().Apply();

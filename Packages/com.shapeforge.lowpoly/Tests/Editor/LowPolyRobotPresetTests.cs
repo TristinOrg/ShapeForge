@@ -23,14 +23,14 @@ namespace ShapeForge.LowPoly.Tests
         {
             ShapeDefinition definition = LowPolyRobotPreset.CreateDefinition();
 
-            ShapeNode leftShoulder = FindNode(definition.Root, "robot.arm.left.pivot");
-            ShapeNode leftArm      = FindNode(definition.Root, "robot.arm.left");
+            ShapeNode leftShoulder = FindNode(definition.Root, "robot.arm.left.shoulder.pivot");
+            ShapeNode leftArm      = FindNode(definition.Root, "robot.arm.left.upper");
 
             Assert.That(leftShoulder, Is.Not.Null);
             Assert.That(leftArm, Is.Not.Null);
             Assert.That(leftShoulder.Type, Is.EqualTo(ShapeTypes.Group));
-            Assert.That(leftShoulder.Children[0], Is.SameAs(leftArm));
-            Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.Cube));
+            Assert.That(FindNode(leftShoulder, leftArm.Id), Is.SameAs(leftArm));
+            Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.Capsule));
         }
 
         [Test]
@@ -45,9 +45,12 @@ namespace ShapeForge.LowPoly.Tests
 
             generatedRoot = generator.Generate(definition);
 
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(7));
-            Assert.That(generatedRoot.transform.Find("Left Shoulder Pivot/Left Arm"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Right Hip Pivot/Right Leg"), Is.Not.Null);
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(27));
+            Assert.That(generatedRoot.transform.Find("Left Shoulder Pivot/Left Elbow Pivot/Left Hand"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Right Hip Pivot/Right Knee Pivot/Right Foot"), Is.Not.Null);
+
+            UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
+            Assert.That(model.TryGetTarget("robot.arm.left.elbow.pivot", out _), Is.True);
         }
 
         private static ShapeNode FindNode(ShapeNode node, string id)

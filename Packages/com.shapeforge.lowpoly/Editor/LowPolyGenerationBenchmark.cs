@@ -31,10 +31,10 @@ namespace ShapeForge.LowPoly.Editor
 
             ShapeJsonSerializer  serializer = new();
             LowPolyModelGenerator generator  = new();
-            string                tableJson  = serializer.Serialize(LowPolyTablePreset.CreateDefinition());
+            string                tableJson  = serializer.Serialize(LowPolyWorkbenchPreset.CreateDefinition());
             string                robotJson  = serializer.Serialize(LowPolyRobotPreset.CreateDefinition());
 
-            generator.SetStyle(LowPolyTablePreset.CreateStyle());
+            generator.SetStyle(LowPolyWorkbenchPreset.CreateStyle());
             generator.SetStyle(LowPolyRobotPreset.CreateStyle());
             WarmUp(generator, tableJson);
 

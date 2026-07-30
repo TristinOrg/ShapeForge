@@ -9,12 +9,12 @@ namespace ShapeForge.LowPoly.Editor
     /// </summary>
     internal static class LowPolyPresetMenu
     {
-        [MenuItem("ShapeForge/Generate/Low Poly Table", false, 10)]
-        private static void GenerateTable()
+        [MenuItem("ShapeForge/Generate/Inventor Workbench", false, 10)]
+        private static void GenerateWorkbench()
         {
             Generate(
-                LowPolyTablePreset.CreateDefinition(),
-                LowPolyTablePreset.CreateStyle());
+                LowPolyWorkbenchPreset.CreateDefinition(),
+                LowPolyWorkbenchPreset.CreateStyle());
         }
 
         [MenuItem("ShapeForge/Generate/Low Poly Robot", false, 11)]
