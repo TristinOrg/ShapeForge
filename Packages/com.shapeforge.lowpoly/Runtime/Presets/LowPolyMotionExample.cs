@@ -14,6 +14,7 @@ namespace ShapeForge.LowPoly
     {
         [SerializeField] private LowPolyMotionPreset preset;
         [SerializeField] private float               duration = 3f;
+        [SerializeField] private float               walkSpeed = 0.8f;
 
         private readonly List<TargetPose> targets = new();
 
@@ -34,7 +35,7 @@ namespace ShapeForge.LowPoly
             float phase = Mathf.Repeat(normalizedTime, 1f);
 
             if (preset == LowPolyMotionPreset.RobotShowcase)
-                EvaluateRobot(phase);
+                EvaluateRobot(phase, phase * walkSpeed * duration);
             else
                 EvaluateWorkbench(phase);
         }
@@ -42,12 +43,19 @@ namespace ShapeForge.LowPoly
         private void Update()
         {
             elapsedTime += Time.deltaTime;
-            Evaluate(elapsedTime / duration);
+            EnsureBindings();
+            float phase = Mathf.Repeat(elapsedTime / duration, 1f);
+
+            if (preset == LowPolyMotionPreset.RobotShowcase)
+                EvaluateRobot(phase, elapsedTime * walkSpeed);
+            else
+                EvaluateWorkbench(phase);
         }
 
         private void OnValidate()
         {
             duration = Mathf.Max(0.01f, duration);
+            walkSpeed = Mathf.Max(0f, walkSpeed);
         }
 
         private void OnDisable()
@@ -56,15 +64,23 @@ namespace ShapeForge.LowPoly
             elapsedTime = 0f;
         }
 
-        private void EvaluateRobot(float phase)
+        private void EvaluateRobot(float phase, float distance)
         {
-            float wave = Mathf.Sin(phase * Mathf.PI * 2f);
-            SetPositionOffset(0, new(0f, wave * 0.06f, 0f));
-            SetRotationOffset(1, new(0f, wave * 25f, 0f));
-            SetRotationOffset(2, new(0f, 0f, wave * 28f));
-            SetRotationOffset(3, new(0f, 0f, -wave * 28f));
-            SetRotationOffset(4, new(18f + (wave * 12f), 0f, 0f));
-            SetRotationOffset(5, new(18f - (wave * 12f), 0f, 0f));
+            float wave      = Mathf.Sin(phase * Mathf.PI * 2f);
+            float stepLift  = Mathf.Abs(wave) * 0.045f;
+            float leftKnee  = Mathf.Max(0f, wave) * 42f;
+            float rightKnee = Mathf.Max(0f, -wave) * 42f;
+
+            SetPositionOffset(0, new(0f, stepLift, -distance));
+            SetRotationOffset(1, new(0f, -wave * 4f, 0f));
+            SetRotationOffset(2, new(-wave * 24f, 0f, 0f));
+            SetRotationOffset(3, new(wave * 24f, 0f, 0f));
+            SetRotationOffset(4, new(14f + (Mathf.Max(0f, wave) * 10f), 0f, 0f));
+            SetRotationOffset(5, new(14f + (Mathf.Max(0f, -wave) * 10f), 0f, 0f));
+            SetRotationOffset(6, new(wave * 30f, 0f, 0f));
+            SetRotationOffset(7, new(-wave * 30f, 0f, 0f));
+            SetRotationOffset(8, new(-leftKnee, 0f, 0f));
+            SetRotationOffset(9, new(-rightKnee, 0f, 0f));
         }
 
         private void EvaluateWorkbench(float phase)
@@ -93,6 +109,10 @@ namespace ShapeForge.LowPoly
                 Bind("robot.arm.right.shoulder.pivot");
                 Bind("robot.arm.left.elbow.pivot");
                 Bind("robot.arm.right.elbow.pivot");
+                Bind("robot.leg.left.hip.pivot");
+                Bind("robot.leg.right.hip.pivot");
+                Bind("robot.leg.left.knee.pivot");
+                Bind("robot.leg.right.knee.pivot");
                 return;
             }
 

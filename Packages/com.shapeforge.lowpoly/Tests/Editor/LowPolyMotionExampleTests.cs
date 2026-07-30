@@ -19,22 +19,26 @@ namespace ShapeForge.LowPoly.Tests
         }
 
         [Test]
-        public void RobotExampleAnimatesArticulatedTargets()
+        public void RobotExampleWalksForwardWithOpposingLimbs()
         {
             generatedRoot = Generate(
                 LowPolyRobotPreset.CreateDefinition(),
                 LowPolyRobotPreset.CreateStyle());
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
             model.TryGetTarget("robot.arm.left.shoulder.pivot", out IShapeTransformTarget shoulder);
-            ForgeVector3 initialRotation = shoulder.LocalEulerAngles;
+            model.TryGetTarget("robot.leg.left.hip.pivot", out IShapeTransformTarget leftHip);
+            model.TryGetTarget("robot.leg.right.hip.pivot", out IShapeTransformTarget rightHip);
+            model.TryGetTarget("robot", out IShapeTransformTarget root);
+            ForgeVector3 initialPosition = root.LocalPosition;
 
             LowPolyMotionExample motion = generatedRoot.AddComponent<LowPolyMotionExample>();
             motion.Configure(LowPolyMotionPreset.RobotShowcase);
             motion.Evaluate(0.25f);
 
-            Assert.That(
-                Mathf.Abs(shoulder.LocalEulerAngles.Z - initialRotation.Z),
-                Is.GreaterThan(0.01f));
+            Assert.That(root.LocalPosition.Z, Is.LessThan(initialPosition.Z));
+            Assert.That(shoulder.LocalEulerAngles.X, Is.GreaterThan(180f));
+            Assert.That(leftHip.LocalEulerAngles.X, Is.GreaterThan(0f));
+            Assert.That(rightHip.LocalEulerAngles.X, Is.GreaterThan(180f));
         }
 
         [Test]
