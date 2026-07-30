@@ -1,4 +1,3 @@
-using System.Collections;
 using NUnit.Framework;
 using ShapeForge.Unity;
 using UnityEngine;
@@ -39,7 +38,7 @@ namespace ShapeForge.LowPoly.Tests
         }
 
         [Test]
-        public void GenerateOverFramesHonorsPerFrameModelBudget()
+        public void GenerateNextHonorsPerStepModelBudget()
         {
             generatedRoot = new("Batch Root");
             LowPolyModelGenerator  generator  = new(new[] { LowPolyTablePreset.CreateStyle() });
@@ -47,14 +46,13 @@ namespace ShapeForge.LowPoly.Tests
                 LowPolyTablePreset.CreateDefinition(),
                 5,
                 generatedRoot.transform);
-            IEnumerator            frames     = batch.GenerateOverFrames(2);
-
-            Assert.That(frames.MoveNext(), Is.True);
+            Assert.That(batch.GenerateNext(2), Is.EqualTo(2));
             Assert.That(batch.GeneratedCount, Is.EqualTo(2));
-            Assert.That(frames.MoveNext(), Is.True);
+            Assert.That(batch.GenerateNext(2), Is.EqualTo(2));
             Assert.That(batch.GeneratedCount, Is.EqualTo(4));
-            Assert.That(frames.MoveNext(), Is.False);
+            Assert.That(batch.GenerateNext(2), Is.EqualTo(1));
             Assert.That(batch.GeneratedCount, Is.EqualTo(5));
+            Assert.That(batch.GenerateNext(2), Is.Zero);
             Assert.That(batch.IsCompleted, Is.True);
             Assert.That(generatedRoot.transform.childCount, Is.EqualTo(5));
         }

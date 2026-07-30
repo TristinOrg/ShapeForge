@@ -8,7 +8,7 @@ Use `LowPolyModelGenerator` as the reusable runtime entry point for validated de
 
 For repeated models, call `ParseJson` once and pass the returned `ShapeDefinition` to `Generate`. `GenerateJson` is intended for one-off documents because it parses and validates on every call.
 
-For a large number of instances, create a `LowPolyGenerationBatch` and start its `GenerateOverFrames` enumerator as a coroutine. The caller selects `modelsPerFrame`; no global runner or hidden update loop is installed.
+For a large number of instances, create a `LowPolyGenerationBatch` and call `GenerateNext` from an existing update or loading scheduler. The caller owns the per-step model budget; ShapeForge creates no coroutine, iterator state machine, global runner, or hidden update loop.
 
 Use `ShapeForge > Generate` in the Unity Editor to preview the official Table and Robot presets with full Undo support.
 

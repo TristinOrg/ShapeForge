@@ -61,7 +61,7 @@ Schema provides versioned engine-agnostic shape and style documents. Core provid
 - Seventeen first-party EditMode tests cover fluent authoring, the JSON contract and runtime generation entry point, budgeted batch generation, hierarchy adaptation, identity and color validation, lifecycle-safe color reapplication, shared material and primitive-mesh reuse, style resolution, LowPoly generation, furniture generation, and modular Robot pivots.
 - `ShapeForge > Diagnostics > Benchmark JSON Generation` measures 200 alternating Table and Robot JSON generations, managed heap growth, and shared render-resource counts without saving generated objects.
 - The benchmark reports JSON parsing and prepared-definition generation separately. Repeated runtime models should call `LowPolyModelGenerator.ParseJson` once and reuse the validated definition.
-- `LowPolyGenerationBatch` supports explicit step budgets and coroutine-based per-frame generation without global scheduling state.
+- `LowPolyGenerationBatch` supports allocation-free explicit step budgets without coroutines or global scheduling state.
 - No first-party PlayMode, CI, or build validation exists yet.
 
 ## Available Unity Tooling

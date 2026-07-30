@@ -1,11 +1,10 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly
 {
     /// <summary>
-    /// Spreads repeated model generation across caller-controlled steps or Unity frames.
+    /// Spreads repeated model generation across caller-controlled steps without scheduler allocations.
     /// </summary>
     public sealed class LowPolyGenerationBatch
     {
@@ -60,19 +59,6 @@ namespace ShapeForge.LowPoly
             }
 
             return stepCount;
-        }
-
-        /// <summary>
-        /// Generates one budgeted step per Unity frame until the batch completes.
-        /// </summary>
-        public IEnumerator GenerateOverFrames(int modelsPerFrame)
-        {
-            while (!IsCompleted)
-            {
-                GenerateNext(modelsPerFrame);
-                if (!IsCompleted)
-                    yield return null;
-            }
         }
     }
 }
