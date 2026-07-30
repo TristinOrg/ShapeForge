@@ -38,5 +38,21 @@ namespace ShapeForge.LowPoly
                 .Profile(points)
                 .Parameter(LowPolyShapeParameters.ProfileDepth, depth);
         }
+
+        /// <summary>Configures a normalized outline, depth, and single-segment edge bevel.</summary>
+        public static ShapeNodeBuilder ExtrudedProfile(
+            this ShapeNodeBuilder builder,
+            float                 depth,
+            float                 bevel,
+            params ForgeVector2[] points)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder
+                .Profile(points)
+                .Parameter(LowPolyShapeParameters.ProfileDepth, depth)
+                .Parameter(LowPolyShapeParameters.ProfileBevel, bevel);
+        }
     }
 }

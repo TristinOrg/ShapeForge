@@ -60,5 +60,8 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Controls an extruded profile's normalized depth.</summary>
         public const string ProfileDepth = "profileDepth";
+
+        /// <summary>Controls the normalized edge inset of an extruded profile.</summary>
+        public const string ProfileBevel = "profileBevel";
     }
 }

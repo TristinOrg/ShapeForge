@@ -68,7 +68,8 @@ namespace ShapeForge.LowPoly
             if (node.Type == LowPolyShapeTypes.ExtrudedProfile)
             {
                 float depth = GetPositiveParameter(node, LowPolyShapeParameters.ProfileDepth, 0.2f);
-                return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth);
+                float bevel = GetNonNegativeParameter(node, LowPolyShapeParameters.ProfileBevel, 0f);
+                return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth, bevel);
             }
 
             if (node.Type != LowPolyShapeTypes.Frustum)
@@ -88,6 +89,17 @@ namespace ShapeForge.LowPoly
 
             if (value <= 0f)
                 throw new ArgumentOutOfRangeException(name, value, "Procedural dimensions must be positive.");
+
+            return value;
+        }
+
+        private static float GetNonNegativeParameter(ShapeNode node, string name, float defaultValue)
+        {
+            if (!node.Parameters.TryGetValue(name, out float value))
+                return defaultValue;
+
+            if (value < 0f)
+                throw new ArgumentOutOfRangeException(name, value, "Procedural dimensions cannot be negative.");
 
             return value;
         }
