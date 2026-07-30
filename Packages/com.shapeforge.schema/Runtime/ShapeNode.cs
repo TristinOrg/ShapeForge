@@ -57,6 +57,11 @@ namespace ShapeForge
         public ShapeAppearance Appearance { get; set; } = new ShapeAppearance();
 
         /// <summary>
+        /// Gets or sets the optional parent-space axis used to generate a mirrored instance.
+        /// </summary>
+        public ShapeMirrorAxis MirrorAxis { get; set; }
+
+        /// <summary>
         /// Gets engine-agnostic numeric parameters interpreted by the selected shape type.
         /// </summary>
         public IDictionary<string, float> Parameters => parameters;
@@ -101,6 +106,11 @@ namespace ShapeForge
         private bool ShouldSerializeProfileSections()
         {
             return profileSections.Count > 0;
+        }
+
+        private bool ShouldSerializeMirrorAxis()
+        {
+            return MirrorAxis != ShapeMirrorAxis.None;
         }
     }
 }

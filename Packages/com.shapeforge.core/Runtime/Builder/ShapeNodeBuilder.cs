@@ -42,6 +42,18 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Generates a second instance reflected across the selected local parent-space axis.
+        /// </summary>
+        public ShapeNodeBuilder Mirror(ShapeMirrorAxis axis)
+        {
+            if (!Enum.IsDefined(typeof(ShapeMirrorAxis), axis))
+                throw new ArgumentOutOfRangeException(nameof(axis));
+
+            Node.MirrorAxis = axis;
+            return this;
+        }
+
+        /// <summary>
         /// Selects a semantic color role from the active style palette.
         /// </summary>
         public ShapeNodeBuilder ColorRole(string role)

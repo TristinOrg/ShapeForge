@@ -1,5 +1,6 @@
 using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace ShapeForge.Unity
@@ -13,7 +14,8 @@ namespace ShapeForge.Unity
         {
             ContractResolver  = new CamelCasePropertyNamesContractResolver(),
             Formatting        = Formatting.None,
-            TypeNameHandling  = TypeNameHandling.None
+            TypeNameHandling  = TypeNameHandling.None,
+            Converters        = { new StringEnumConverter(new CamelCaseNamingStrategy()) }
         };
         private readonly ShapeDefinitionValidator      shapeValidator = new ShapeDefinitionValidator();
         private readonly ShapeStyleDefinitionValidator styleValidator = new ShapeStyleDefinitionValidator();

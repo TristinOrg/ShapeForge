@@ -44,6 +44,20 @@ namespace ShapeForge.Tests
         }
 
         [Test]
+        public void BuildStoresEngineAgnosticMirrorAxis()
+        {
+            ShapeDefinition definition = ShapeBuilder
+                .Create("Mirrored")
+                .Root("root", "Root", root => root
+                    .Shape("arm-left", "Left Arm", "example/cube", arm => arm
+                        .Position(-0.75f, 0f, 0f)
+                        .Mirror(ShapeMirrorAxis.X)))
+                .Build();
+
+            Assert.That(definition.Root.Children[0].MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
+        }
+
+        [Test]
         public void BuildRejectsColorOutsideSpecificationRange()
         {
             ShapeBuilder builder = ShapeBuilder

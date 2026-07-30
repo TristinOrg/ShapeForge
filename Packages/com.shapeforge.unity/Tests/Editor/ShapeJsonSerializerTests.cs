@@ -13,6 +13,7 @@ namespace ShapeForge.Unity.Tests
             ShapeNode root  = new ShapeNode("robot", "Robot", ShapeTypes.Group);
             ShapeNode child = new ShapeNode("body", "Body", "example/cube");
             child.Transform.Position          = new ForgeVector3(1f, 2f, 3f);
+            child.MirrorAxis                  = ShapeMirrorAxis.X;
             child.Appearance.ColorRole        = "primary";
             child.Appearance.HasColorOverride = true;
             child.Appearance.Color            = new ForgeColor(1f, 0f, 0f);
@@ -37,12 +38,14 @@ namespace ShapeForge.Unity.Tests
             Assert.That(json, Does.Contain("\"parameters\":{\"topWidth\":0.6"));
             Assert.That(json, Does.Contain("\"profile\":[{\"x\":-0.5,\"y\":0.5}"));
             Assert.That(json, Does.Contain("\"profileSections\":[{\"z\":-0.5"));
+            Assert.That(json, Does.Contain("\"mirrorAxis\":\"x\""));
             Assert.That(result.Root.Children, Has.Count.EqualTo(1));
             Assert.That(result.Root.Children[0].Transform.Position, Is.EqualTo(new ForgeVector3(1f, 2f, 3f)));
             Assert.That(result.Root.Children[0].Appearance.Color, Is.EqualTo(new ForgeColor(1f, 0f, 0f)));
             Assert.That(result.Root.Children[0].Parameters["topWidth"], Is.EqualTo(0.6f));
             Assert.That(result.Root.Children[0].Profile[1], Is.EqualTo(new ForgeVector2(0.5f, -0.5f)));
             Assert.That(result.Root.Children[0].ProfileSections[1].Offset, Is.EqualTo(new ForgeVector2(0f, 0.1f)));
+            Assert.That(result.Root.Children[0].MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
         }
 
         [Test]

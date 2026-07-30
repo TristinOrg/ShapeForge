@@ -63,6 +63,37 @@ namespace ShapeForge.Unity.Tests
             Assert.That(GameObject.Find("Root"), Is.Null);
         }
 
+        [Test]
+        public void GenerateCreatesMirroredHierarchyWithStableBindings()
+        {
+            ShapeNode root  = new("character", "Character", ShapeTypes.Group);
+            ShapeNode child = new("arm-left", "Left Arm", TestGenerator.Type)
+            {
+                MirrorAxis = ShapeMirrorAxis.X
+            };
+            child.Transform.Position    = new(-0.75f, 0.25f, 0.1f);
+            child.Transform.EulerAngles = new(10f, 20f, 30f);
+            root.Add(child);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new TestGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Character", root));
+
+            Transform original = generatedRoot.transform.Find("Left Arm");
+            Transform mirrored = generatedRoot.transform.Find("Left Arm (Mirror X)");
+            Assert.That(original, Is.Not.Null);
+            Assert.That(mirrored, Is.Not.Null);
+            Assert.That(mirrored.localPosition, Is.EqualTo(new Vector3(0.75f, 0.25f, 0.1f)));
+            Assert.That(mirrored.localScale, Is.EqualTo(new Vector3(-1f, 1f, 1f)));
+
+            UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
+            Assert.That(model.BindingCount, Is.EqualTo(3));
+            Assert.That(model.TryGetTarget("arm-left", out _), Is.True);
+            Assert.That(model.TryGetTarget("arm-left.mirror-x", out _), Is.True);
+        }
+
         private sealed class TestGenerator : IUnityShapeGenerator
         {
             public const string Type = "test/shape";

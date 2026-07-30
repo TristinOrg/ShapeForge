@@ -78,7 +78,49 @@ namespace ShapeForge.Unity
             Transform              parent,
             ShapeGenerationContext context,
             IUnityAppearanceSession appearance,
-            UnityShapeModel         model = null)
+            UnityShapeModel         model    = null,
+            string                  idSuffix = "")
+        {
+            GameObject primary = GenerateNodeInstance(
+                node,
+                parent,
+                context,
+                appearance,
+                model,
+                idSuffix,
+                ShapeMirrorAxis.None);
+
+            try
+            {
+                if (node.MirrorAxis != ShapeMirrorAxis.None)
+                {
+                    GenerateNodeInstance(
+                        node,
+                        parent,
+                        context,
+                        appearance,
+                        model,
+                        idSuffix + GetMirrorIdSuffix(node.MirrorAxis),
+                        node.MirrorAxis);
+                }
+
+                return primary;
+            }
+            catch
+            {
+                DestroyGeneratedObject(primary);
+                throw;
+            }
+        }
+
+        private GameObject GenerateNodeInstance(
+            ShapeNode               node,
+            Transform               parent,
+            ShapeGenerationContext  context,
+            IUnityAppearanceSession appearance,
+            UnityShapeModel          model,
+            string                   idSuffix,
+            ShapeMirrorAxis          mirrorAxis)
         {
             GameObject generated = node.Type == ShapeTypes.Group
                 ? new(node.Name)
@@ -87,9 +129,12 @@ namespace ShapeForge.Unity
             if (generated == null)
                 throw new UnityShapeGenerationException($"Generator returned null for node '{node.Id}'.");
 
-            generated.name = node.Name;
+            generated.name = mirrorAxis == ShapeMirrorAxis.None
+                ? node.Name
+                : $"{node.Name} (Mirror {mirrorAxis})";
             generated.transform.SetParent(parent, false);
             node.Transform.ApplyTo(generated.transform);
+            ApplyMirror(generated.transform, mirrorAxis);
 
             if (model == null)
             {
@@ -97,7 +142,7 @@ namespace ShapeForge.Unity
                 appearance.Attach(generated);
             }
 
-            model.AddBinding(node.Id, generated.transform);
+            model.AddBinding(node.Id + idSuffix, generated.transform);
 
             Renderer renderer = generated.GetComponent<Renderer>();
             if (renderer != null)
@@ -106,7 +151,7 @@ namespace ShapeForge.Unity
             try
             {
                 foreach (ShapeNode child in node.Children)
-                    GenerateNode(child, generated.transform, context, appearance, model);
+                    GenerateNode(child, generated.transform, context, appearance, model, idSuffix);
             }
             catch
             {
@@ -115,6 +160,49 @@ namespace ShapeForge.Unity
             }
 
             return generated;
+        }
+
+        private static string GetMirrorIdSuffix(ShapeMirrorAxis axis)
+        {
+            return axis switch
+            {
+                ShapeMirrorAxis.X => ".mirror-x",
+                ShapeMirrorAxis.Y => ".mirror-y",
+                ShapeMirrorAxis.Z => ".mirror-z",
+                _                 => string.Empty
+            };
+        }
+
+        private static void ApplyMirror(Transform target, ShapeMirrorAxis axis)
+        {
+            if (axis == ShapeMirrorAxis.None)
+                return;
+
+            Vector3    position = target.localPosition;
+            Quaternion rotation = target.localRotation;
+            Vector3    scale    = target.localScale;
+            switch (axis)
+            {
+                case ShapeMirrorAxis.X:
+                    position.x *= -1f;
+                    rotation    = new(rotation.x, -rotation.y, -rotation.z, rotation.w);
+                    scale.x    *= -1f;
+                    break;
+                case ShapeMirrorAxis.Y:
+                    position.y *= -1f;
+                    rotation    = new(-rotation.x, rotation.y, -rotation.z, rotation.w);
+                    scale.y    *= -1f;
+                    break;
+                case ShapeMirrorAxis.Z:
+                    position.z *= -1f;
+                    rotation    = new(-rotation.x, -rotation.y, rotation.z, rotation.w);
+                    scale.z    *= -1f;
+                    break;
+            }
+
+            target.localPosition = position;
+            target.localRotation = rotation;
+            target.localScale    = scale;
         }
 
         private GameObject GenerateGeometry(ShapeNode node, ShapeGenerationContext context)

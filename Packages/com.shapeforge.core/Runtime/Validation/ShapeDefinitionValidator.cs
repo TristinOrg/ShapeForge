@@ -19,6 +19,9 @@ namespace ShapeForge
             if (!string.Equals(definition.Schema, ShapeDefinition.CurrentSchema, StringComparison.Ordinal))
                 throw new ShapeValidationException($"Unsupported shape schema '{definition.Schema}'.");
 
+            if (definition.Root != null && definition.Root.MirrorAxis != ShapeMirrorAxis.None)
+                throw new ShapeValidationException("The root node cannot create a mirrored sibling.");
+
             HashSet<string> nodeIds = new HashSet<string>(StringComparer.Ordinal);
             ValidateNode(definition.Root, nodeIds);
         }
@@ -42,6 +45,9 @@ namespace ShapeForge
 
             if (node.Appearance == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires appearance data.");
+
+            if (!Enum.IsDefined(typeof(ShapeMirrorAxis), node.MirrorAxis))
+                throw new ShapeValidationException($"Shape node '{node.Id}' has an unsupported mirror axis.");
 
             if (node.Appearance.HasColorOverride)
                 ForgeColorValidator.Validate(node.Appearance.Color, $"Shape node '{node.Id}'");
