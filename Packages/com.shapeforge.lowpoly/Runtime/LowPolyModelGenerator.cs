@@ -50,6 +50,24 @@ namespace ShapeForge.LowPoly
         }
 
         /// <summary>
+        /// Creates a caller-controlled batch for repeated generation without a single-frame spike.
+        /// </summary>
+        public LowPolyGenerationBatch CreateBatch(
+            ShapeDefinition    definition,
+            int                totalCount,
+            Transform          parent      = null,
+            Action<GameObject> onGenerated = null)
+        {
+            if (definition == null)
+                throw new ArgumentNullException(nameof(definition));
+
+            if (totalCount <= 0)
+                throw new ArgumentOutOfRangeException(nameof(totalCount));
+
+            return new(this, definition, totalCount, parent, onGenerated);
+        }
+
+        /// <summary>
         /// Parses and validates JSON once for efficient repeated model generation.
         /// </summary>
         public ShapeDefinition ParseJson(string json)
