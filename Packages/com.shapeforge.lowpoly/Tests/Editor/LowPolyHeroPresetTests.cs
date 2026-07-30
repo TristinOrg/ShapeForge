@@ -31,29 +31,31 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Pocket Fantasy Hero"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(34));
-            Assert.That(generatedRoot.transform.Find("Head Pivot/Full Layered Hair"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Head Pivot/Left Long Side Lock"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Open Jacket Panel"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Black Shirt"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Overlapping Jacket Hem"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Tall Boot"), Is.Not.Null);
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(29));
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Unified Polygon Hair Shell"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Cropped Jacket"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Long Black Shirt"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Fitted Tall Boot"), Is.Not.Null);
 
             MeshFilter coat = generatedRoot.transform
-                .Find("Pelvis Pivot/Spine Pivot/Jacket Torso")
+                .Find("Pelvis Pivot/Spine Pivot/Long Black Shirt")
                 .GetComponent<MeshFilter>();
             MeshFilter head = generatedRoot.transform
-                .Find("Head Pivot/Rounded Face")
+                .Find("Head Pivot/Sculpted Human Head")
+                .GetComponent<MeshFilter>();
+            MeshFilter hairMesh = generatedRoot.transform
+                .Find("Head Pivot/Unified Polygon Hair Shell")
                 .GetComponent<MeshFilter>();
             MeshFilter jacketPanel = generatedRoot.transform
-                .Find("Pelvis Pivot/Spine Pivot/Left Open Jacket Panel")
+                .Find("Pelvis Pivot/Spine Pivot/Left Cropped Jacket")
                 .GetComponent<MeshFilter>();
             MeshFilter boot = generatedRoot.transform
-                .Find("Left Hip Pivot/Left Knee Pivot/Left Boot Foot")
+                .Find("Left Hip Pivot/Left Knee Pivot/Left Tapered Boot")
                 .GetComponent<MeshFilter>();
 
             Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
-            Assert.That(head.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
+            Assert.That(head.sharedMesh.name, Is.EqualTo("Low Poly Lathe Profile"));
+            Assert.That(hairMesh.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
             Assert.That(jacketPanel.sharedMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
             Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
 
