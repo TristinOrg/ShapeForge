@@ -73,6 +73,21 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Replaces the normalized two-dimensional outline used by profile-based shape implementations.
+        /// </summary>
+        public ShapeNodeBuilder Profile(params ForgeVector2[] points)
+        {
+            if (points == null)
+                throw new ArgumentNullException(nameof(points));
+
+            Node.Profile.Clear();
+            foreach (ForgeVector2 point in points)
+                Node.Profile.Add(point);
+
+            return this;
+        }
+
+        /// <summary>
         /// Adds a non-rendering child group.
         /// </summary>
         public ShapeNodeBuilder Group(

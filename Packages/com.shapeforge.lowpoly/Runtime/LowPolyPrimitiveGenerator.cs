@@ -24,7 +24,8 @@ namespace ShapeForge.LowPoly
             return node != null &&
                    (PrimitiveTypes.ContainsKey(node.Type) ||
                     node.Type == LowPolyShapeTypes.Wedge ||
-                    node.Type == LowPolyShapeTypes.Frustum);
+                    node.Type == LowPolyShapeTypes.Frustum ||
+                    node.Type == LowPolyShapeTypes.ExtrudedProfile);
         }
 
         /// <inheritdoc />
@@ -63,6 +64,12 @@ namespace ShapeForge.LowPoly
         {
             if (node.Type == LowPolyShapeTypes.Wedge)
                 return LowPolyProceduralMeshCache.GetWedge();
+
+            if (node.Type == LowPolyShapeTypes.ExtrudedProfile)
+            {
+                float depth = GetPositiveParameter(node, LowPolyShapeParameters.ProfileDepth, 0.2f);
+                return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth);
+            }
 
             if (node.Type != LowPolyShapeTypes.Frustum)
                 throw new ArgumentException($"Unsupported Low Poly shape type '{node.Type}'.", nameof(node));

@@ -24,5 +24,19 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.BottomWidth, bottomWidth)
                 .Parameter(LowPolyShapeParameters.BottomDepth, bottomDepth);
         }
+
+        /// <summary>Configures a normalized outline and depth for an extruded-profile node.</summary>
+        public static ShapeNodeBuilder ExtrudedProfile(
+            this ShapeNodeBuilder builder,
+            float                 depth,
+            params ForgeVector2[] points)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            return builder
+                .Profile(points)
+                .Parameter(LowPolyShapeParameters.ProfileDepth, depth);
+        }
     }
 }

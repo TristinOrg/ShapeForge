@@ -31,8 +31,9 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Fantasy Hero"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(40));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(43));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Hair Crown"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Front Hair"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Pupil"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Nose"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Mouth"), Is.Not.Null);
@@ -54,7 +55,7 @@ namespace ShapeForge.LowPoly.Tests
 
             Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
             Assert.That(jaw.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
-            Assert.That(coatTail.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
+            Assert.That(coatTail.sharedMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
             Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
 
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();

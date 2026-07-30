@@ -41,15 +41,19 @@ namespace ShapeForge.LowPoly
                                 .Position(0f, 0.08f, -0.22f)
                                 .Scale(0.12f, 0.1f, 0.04f)
                                 .ColorRole("metal"))
-                            .Shape("hero.coat.tail.left", "Left Coat Tail", LowPolyShapeTypes.Wedge, tail => tail
-                                .Position(-0.18f, -0.18f, 0.06f)
-                                .Rotation(-8f, 90f, 4f)
-                                .Scale(0.25f, 0.62f, 0.16f)
+                            .Shape("hero.coat.tail.left", "Left Coat Tail", LowPolyShapeTypes.ExtrudedProfile, tail => tail
+                                .Position(-0.18f, -0.18f, -0.08f)
+                                .Rotation(0f, 0f, 4f)
+                                .Scale(0.34f, 0.62f, 1f)
+                                .ExtrudedProfile(0.14f,
+                                    new(-0.5f, 0.5f), new(0.48f, 0.5f), new(0.34f, -0.5f), new(-0.5f, -0.36f))
                                 .ColorRole("coat"))
-                            .Shape("hero.coat.tail.right", "Right Coat Tail", LowPolyShapeTypes.Wedge, tail => tail
-                                .Position(0.18f, -0.18f, 0.06f)
-                                .Rotation(-8f, -90f, -4f)
-                                .Scale(0.25f, 0.62f, 0.16f)
+                            .Shape("hero.coat.tail.right", "Right Coat Tail", LowPolyShapeTypes.ExtrudedProfile, tail => tail
+                                .Position(0.18f, -0.18f, -0.08f)
+                                .Rotation(0f, 0f, -4f)
+                                .Scale(0.34f, 0.62f, 1f)
+                                .ExtrudedProfile(0.14f,
+                                    new(-0.48f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.36f), new(-0.34f, -0.5f))
                                 .ColorRole("coat"))
                             .Shape("hero.shoulder.guard", "Shoulder Harness", LowPolyShapeTypes.Frustum, harness => harness
                                 .Position(0f, 0.73f, 0f)
@@ -119,7 +123,24 @@ namespace ShapeForge.LowPoly
                 .Shape("hero.mouth", "Mouth", LowPolyShapeTypes.Cube, mouth => mouth
                     .Position(0f, 0.015f, -0.274f).Scale(0.085f, 0.014f, 0.014f).ColorRole("accent"))
                 .Shape("hero.hair.crown", "Layered Hair Crown", LowPolyShapeTypes.Sphere, hair => hair
-                    .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair")));
+                    .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair"))
+                .Shape("hero.hair.front", "Layered Front Hair", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(0f, 0.34f, -0.292f).Scale(0.64f, 0.43f, 1f)
+                    .ExtrudedProfile(0.06f,
+                        new(-0.5f, 0.38f), new(-0.34f, 0.5f), new(0.08f, 0.48f), new(0.48f, 0.32f),
+                        new(0.5f, -0.08f), new(0.32f, -0.42f), new(0.18f, -0.08f), new(0.04f, -0.5f),
+                        new(-0.08f, -0.1f), new(-0.28f, -0.4f), new(-0.24f, -0.04f), new(-0.5f, -0.22f))
+                    .ColorRole("hair"))
+                .Shape("hero.hair.lock.left", "Left Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(-0.26f, 0.16f, -0.285f).Rotation(0f, 0f, 8f).Scale(0.16f, 0.48f, 1f)
+                    .ExtrudedProfile(0.055f,
+                        new(-0.46f, 0.5f), new(0.5f, 0.4f), new(0.2f, -0.5f), new(-0.5f, -0.2f))
+                    .ColorRole("hair"))
+                .Shape("hero.hair.lock.right", "Right Side Lock", LowPolyShapeTypes.ExtrudedProfile, hair => hair
+                    .Position(0.26f, 0.16f, -0.285f).Rotation(0f, 0f, -8f).Scale(0.16f, 0.48f, 1f)
+                    .ExtrudedProfile(0.055f,
+                        new(-0.5f, 0.4f), new(0.46f, 0.5f), new(0.5f, -0.2f), new(-0.2f, -0.5f))
+                    .ColorRole("hair")));
         }
 
         private static void AddArm(ShapeNodeBuilder hero, string side, string label, float x)

@@ -59,6 +59,16 @@ namespace ShapeForge
                         $"Shape node '{node.Id}' parameter '{parameter.Key}' must be finite.");
             }
 
+            if (node.Profile == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile collection.");
+
+            foreach (ForgeVector2 point in node.Profile)
+            {
+                if (float.IsNaN(point.X) || float.IsInfinity(point.X) ||
+                    float.IsNaN(point.Y) || float.IsInfinity(point.Y))
+                    throw new ShapeValidationException($"Shape node '{node.Id}' profile points must be finite.");
+            }
+
             foreach (ShapeNode child in node.Children)
                 ValidateNode(child, nodeIds);
         }

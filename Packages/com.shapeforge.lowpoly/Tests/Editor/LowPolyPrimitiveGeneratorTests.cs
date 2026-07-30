@@ -109,6 +109,34 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(firstMesh, Is.Not.SameAs(differentMesh));
         }
 
+        [Test]
+        public void GenerateTriangulatesAndCachesConcaveExtrudedProfiles()
+        {
+            ForgeVector2[] points =
+            {
+                new(-0.5f, 0.5f), new(0.5f, 0.5f), new(0.5f, -0.5f),
+                new(0f, -0.15f), new(-0.5f, -0.5f)
+            };
+            ShapeNode first  = CreateProfile("profile-a", "Profile A", points);
+            ShapeNode second = CreateProfile("profile-b", "Profile B", points);
+            ShapeNode root   = new("profiles", "Profiles", ShapeTypes.Group);
+            root.Add(first).Add(second);
+
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Profiles", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Profile A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Profile B").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(38));
+            Assert.That(firstMesh.bounds.size.z, Is.EqualTo(0.2f).Within(0.0001f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+        }
+
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
@@ -116,6 +144,16 @@ namespace ShapeForge.LowPoly.Tests
             node.Parameters[LowPolyShapeParameters.TopDepth]    = 0.6f;
             node.Parameters[LowPolyShapeParameters.BottomWidth] = 1f;
             node.Parameters[LowPolyShapeParameters.BottomDepth] = 0.9f;
+            return node;
+        }
+
+        private static ShapeNode CreateProfile(string id, string name, ForgeVector2[] points)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.ExtrudedProfile);
+            node.Parameters[LowPolyShapeParameters.ProfileDepth] = 0.2f;
+            foreach (ForgeVector2 point in points)
+                node.Profile.Add(point);
+
             return node;
         }
     }

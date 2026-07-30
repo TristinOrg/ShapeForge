@@ -34,6 +34,11 @@ namespace ShapeForge.LowPoly
         /// Identifies a centered tapered box controlled by top and bottom dimensions.
         /// </summary>
         public const string Frustum = "lowpoly/frustum";
+
+        /// <summary>
+        /// Identifies a flat-shaded mesh extruded from a normalized two-dimensional outline.
+        /// </summary>
+        public const string ExtrudedProfile = "lowpoly/extruded-profile";
     }
 
     /// <summary>
@@ -52,5 +57,8 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Controls a frustum's bottom depth relative to its transform scale.</summary>
         public const string BottomDepth = "bottomDepth";
+
+        /// <summary>Controls an extruded profile's normalized depth.</summary>
+        public const string ProfileDepth = "profileDepth";
     }
 }

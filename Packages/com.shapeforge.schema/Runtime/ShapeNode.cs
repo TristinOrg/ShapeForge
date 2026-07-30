@@ -10,6 +10,7 @@ namespace ShapeForge
     public sealed class ShapeNode
     {
         private readonly List<ShapeNode> children = new();
+        private readonly List<ForgeVector2> profile = new();
         private readonly Dictionary<string, float> parameters = new(StringComparer.Ordinal);
 
         /// <summary>
@@ -60,6 +61,11 @@ namespace ShapeForge
         public IDictionary<string, float> Parameters => parameters;
 
         /// <summary>
+        /// Gets the optional normalized two-dimensional outline interpreted by the selected shape type.
+        /// </summary>
+        public IList<ForgeVector2> Profile => profile;
+
+        /// <summary>
         /// Gets the child shape definitions.
         /// </summary>
         public IList<ShapeNode> Children => children;
@@ -79,6 +85,11 @@ namespace ShapeForge
         private bool ShouldSerializeParameters()
         {
             return parameters.Count > 0;
+        }
+
+        private bool ShouldSerializeProfile()
+        {
+            return profile.Count > 0;
         }
     }
 }
