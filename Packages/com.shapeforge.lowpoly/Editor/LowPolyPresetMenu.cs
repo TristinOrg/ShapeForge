@@ -25,15 +25,40 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyRobotPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
+        private static void GenerateAnimatedWorkbench()
+        {
+            Generate(
+                LowPolyWorkbenchPreset.CreateDefinition(),
+                LowPolyWorkbenchPreset.CreateStyle(),
+                LowPolyMotionPreset.WorkbenchShowcase);
+        }
+
+        [MenuItem("ShapeForge/Generate/Animated Low Poly Robot", false, 21)]
+        private static void GenerateAnimatedRobot()
+        {
+            Generate(
+                LowPolyRobotPreset.CreateDefinition(),
+                LowPolyRobotPreset.CreateStyle(),
+                LowPolyMotionPreset.RobotShowcase);
+        }
+
         private static void Generate(
             ShapeDefinition      definition,
-            ShapeStyleDefinition style)
+            ShapeStyleDefinition style,
+            LowPolyMotionPreset? motionPreset = null)
         {
             ShapeStyleResolver       resolver  = new(new[] { style });
             UnityShapeModelGenerator generator = new(
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
             GameObject generated = generator.Generate(definition);
+
+            if (motionPreset.HasValue)
+            {
+                LowPolyMotionExample motion = generated.AddComponent<LowPolyMotionExample>();
+                motion.Configure(motionPreset.Value);
+            }
 
             Undo.RegisterCreatedObjectUndo(generated, $"Generate {generated.name}");
             Selection.activeGameObject = generated;
