@@ -55,6 +55,18 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.ProfileBevel, bevel);
         }
 
+        /// <summary>Configures the curved ring count of an extruded profile bevel.</summary>
+        public static ShapeNodeBuilder BevelSegments(this ShapeNodeBuilder builder, int bevelSegments)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (bevelSegments < 1 || bevelSegments > 8)
+                throw new ArgumentOutOfRangeException(nameof(bevelSegments));
+
+            return builder.Parameter(LowPolyShapeParameters.ProfileBevelSegments, bevelSegments);
+        }
+
         /// <summary>Configures an outline and ordered depth sections for a profile-loft node.</summary>
         public static ShapeNodeBuilder ProfileLoft(
             this ShapeNodeBuilder        builder,

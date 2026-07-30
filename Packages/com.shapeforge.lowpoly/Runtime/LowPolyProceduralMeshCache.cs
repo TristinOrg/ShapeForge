@@ -30,7 +30,11 @@ namespace ShapeForge.LowPoly
             return GetOrCreate(key, () => CreateFrustum(topWidth, topDepth, bottomWidth, bottomDepth));
         }
 
-        public static Mesh GetExtrudedProfile(IList<ForgeVector2> profile, float depth, float bevel)
+        public static Mesh GetExtrudedProfile(
+            IList<ForgeVector2> profile,
+            float                depth,
+            float                bevel,
+            int                  bevelSegments)
         {
             if (profile == null)
                 throw new ArgumentNullException(nameof(profile));
@@ -47,7 +51,10 @@ namespace ShapeForge.LowPoly
                     bevel,
                     "Profile bevel must be non-negative and less than half the profile depth.");
 
-            int hash = GetProfileHash(profile, depth, bevel);
+            if (bevelSegments < 1 || bevelSegments > 8)
+                throw new ArgumentOutOfRangeException(nameof(bevelSegments));
+
+            int hash = GetProfileHash(profile, depth, bevel, bevelSegments);
             if (ProfileMeshes.TryGetValue(hash, out List<ProfileMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -59,7 +66,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(profile, depth, bevel))
+                    if (entry.Matches(profile, depth, bevel, bevelSegments))
                         return entry.Mesh;
                 }
             }
@@ -70,8 +77,8 @@ namespace ShapeForge.LowPoly
             }
 
             ForgeVector2[] points = CopyProfile(profile);
-            Mesh           mesh   = CreateExtrudedProfile(points, depth, bevel);
-            entries.Add(new(points, depth, bevel, mesh));
+            Mesh           mesh   = CreateExtrudedProfile(points, depth, bevel, bevelSegments);
+            entries.Add(new(points, depth, bevel, bevelSegments, mesh));
             return mesh;
         }
 
@@ -144,9 +151,14 @@ namespace ShapeForge.LowPoly
             }
         }
 
-        private static int GetProfileHash(IList<ForgeVector2> profile, float depth, float bevel)
+        private static int GetProfileHash(
+            IList<ForgeVector2> profile,
+            float                depth,
+            float                bevel,
+            int                  bevelSegments)
         {
             int hash = (depth.GetHashCode() * 397) ^ bevel.GetHashCode();
+            hash     = (hash * 397) ^ bevelSegments;
             for (int index = 0; index < profile.Count; index++)
                 hash = (hash * 397) ^ profile[index].GetHashCode();
 
@@ -168,7 +180,7 @@ namespace ShapeForge.LowPoly
             int                        subdivisions,
             bool                       smoothNormals)
         {
-            int hash = (GetProfileHash(profile, 0f, 0f) * 397) ^ subdivisions;
+            int hash = (GetProfileHash(profile, 0f, 0f, 1) * 397) ^ subdivisions;
             hash     = (hash * 397) ^ smoothNormals.GetHashCode();
             foreach (ShapeProfileSection section in sections)
             {
@@ -267,15 +279,19 @@ namespace ShapeForge.LowPoly
             return builder.Build("Low Poly Frustum");
         }
 
-        private static Mesh CreateExtrudedProfile(ForgeVector2[] profile, float depth, float bevel)
+        private static Mesh CreateExtrudedProfile(
+            ForgeVector2[] profile,
+            float          depth,
+            float          bevel,
+            int            bevelSegments)
         {
-            ForgeVector2[] points      = EnsureCounterClockwise(profile);
-            ForgeVector2[] facePoints  = bevel > 0f ? InsetProfile(points, bevel) : points;
-            List<int>     triangles    = Triangulate(facePoints);
-            float         halfDepth    = depth * 0.5f;
-            float         frontRim     = -halfDepth + bevel;
-            float         backRim      = halfDepth - bevel;
-            MeshBuilder   builder      = new();
+            ForgeVector2[] points       = EnsureCounterClockwise(profile);
+            ForgeVector2[] facePoints   = bevel > 0f ? InsetProfile(points, bevel) : points;
+            List<int>     triangles     = Triangulate(facePoints);
+            float         halfDepth     = depth * 0.5f;
+            float         frontRim      = -halfDepth + bevel;
+            float         backRim       = halfDepth - bevel;
+            MeshBuilder   builder       = new();
 
             for (int index = 0; index < triangles.Count; index += 3)
             {
@@ -290,23 +306,12 @@ namespace ShapeForge.LowPoly
                 builder.AddTriangle(first, second, third);
             }
 
+            if (bevel > 0f)
+                AddRoundedBevel(builder, points, halfDepth, bevel, bevelSegments);
+
             for (int index = 0; index < points.Length; index++)
             {
                 int next = (index + 1) % points.Length;
-                if (bevel > 0f)
-                {
-                    builder.AddQuad(
-                        ToVector3(facePoints[index], -halfDepth),
-                        ToVector3(facePoints[next], -halfDepth),
-                        ToVector3(points[next], frontRim),
-                        ToVector3(points[index], frontRim));
-                    builder.AddQuad(
-                        ToVector3(points[index], backRim),
-                        ToVector3(points[next], backRim),
-                        ToVector3(facePoints[next], halfDepth),
-                        ToVector3(facePoints[index], halfDepth));
-                }
-
                 builder.AddQuad(
                     ToVector3(points[index], frontRim),
                     ToVector3(points[next], frontRim),
@@ -315,6 +320,48 @@ namespace ShapeForge.LowPoly
             }
 
             return builder.Build("Low Poly Extruded Profile");
+        }
+
+        private static void AddRoundedBevel(
+            MeshBuilder   builder,
+            ForgeVector2[] points,
+            float         halfDepth,
+            float         bevel,
+            int           segments)
+        {
+            ForgeVector2[][] rings = new ForgeVector2[segments + 1][];
+            float[]         offsets = new float[segments + 1];
+            for (int ringIndex = 0; ringIndex <= segments; ringIndex++)
+            {
+                float angle       = ringIndex * Mathf.PI * 0.5f / segments;
+                float inset       = bevel * Mathf.Cos(angle);
+                offsets[ringIndex] = bevel * Mathf.Sin(angle);
+                rings[ringIndex]   = inset > 0.00001f ? InsetProfile(points, inset) : points;
+            }
+
+            for (int ringIndex = 0; ringIndex < segments; ringIndex++)
+            {
+                ForgeVector2[] inner = rings[ringIndex];
+                ForgeVector2[] outer = rings[ringIndex + 1];
+                float frontInnerZ    = -halfDepth + offsets[ringIndex];
+                float frontOuterZ    = -halfDepth + offsets[ringIndex + 1];
+                float backInnerZ     = halfDepth - offsets[ringIndex];
+                float backOuterZ     = halfDepth - offsets[ringIndex + 1];
+                for (int pointIndex = 0; pointIndex < points.Length; pointIndex++)
+                {
+                    int next = (pointIndex + 1) % points.Length;
+                    builder.AddQuad(
+                        ToVector3(inner[pointIndex], frontInnerZ),
+                        ToVector3(inner[next], frontInnerZ),
+                        ToVector3(outer[next], frontOuterZ),
+                        ToVector3(outer[pointIndex], frontOuterZ));
+                    builder.AddQuad(
+                        ToVector3(outer[pointIndex], backOuterZ),
+                        ToVector3(outer[next], backOuterZ),
+                        ToVector3(inner[next], backInnerZ),
+                        ToVector3(inner[pointIndex], backInnerZ));
+                }
+            }
         }
 
         private static Mesh CreateProfileLoft(
@@ -672,23 +719,35 @@ namespace ShapeForge.LowPoly
         {
             private readonly float depth;
             private readonly float bevel;
+            private readonly int   bevelSegments;
 
-            public ProfileMeshEntry(ForgeVector2[] points, float depth, float bevel, Mesh mesh)
+            public ProfileMeshEntry(
+                ForgeVector2[] points,
+                float          depth,
+                float          bevel,
+                int            bevelSegments,
+                Mesh           mesh)
             {
-                this.depth = depth;
-                this.bevel = bevel;
-                Points     = points;
-                Mesh       = mesh;
+                this.depth         = depth;
+                this.bevel         = bevel;
+                this.bevelSegments = bevelSegments;
+                Points             = points;
+                Mesh               = mesh;
             }
 
             public ForgeVector2[] Points { get; }
 
             public Mesh Mesh { get; }
 
-            public bool Matches(IList<ForgeVector2> profile, float candidateDepth, float candidateBevel)
+            public bool Matches(
+                IList<ForgeVector2> profile,
+                float                candidateDepth,
+                float                candidateBevel,
+                int                  candidateBevelSegments)
             {
                 if (!depth.Equals(candidateDepth) ||
                     !bevel.Equals(candidateBevel) ||
+                    bevelSegments != candidateBevelSegments ||
                     Points.Length != profile.Count)
                     return false;
 

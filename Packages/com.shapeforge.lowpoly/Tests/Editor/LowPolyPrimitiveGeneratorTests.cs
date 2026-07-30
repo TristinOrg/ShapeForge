@@ -132,7 +132,7 @@ namespace ShapeForge.LowPoly.Tests
             Mesh firstMesh  = generatedRoot.transform.Find("Profile A").GetComponent<MeshFilter>().sharedMesh;
             Mesh secondMesh = generatedRoot.transform.Find("Profile B").GetComponent<MeshFilter>().sharedMesh;
             Assert.That(firstMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
-            Assert.That(firstMesh.vertexCount, Is.EqualTo(78));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(158));
             Assert.That(firstMesh.bounds.size.z, Is.EqualTo(0.2f).Within(0.0001f));
             Assert.That(firstMesh, Is.SameAs(secondMesh));
         }
@@ -204,8 +204,9 @@ namespace ShapeForge.LowPoly.Tests
         private static ShapeNode CreateProfile(string id, string name, ForgeVector2[] points)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.ExtrudedProfile);
-            node.Parameters[LowPolyShapeParameters.ProfileDepth] = 0.2f;
-            node.Parameters[LowPolyShapeParameters.ProfileBevel] = 0.03f;
+            node.Parameters[LowPolyShapeParameters.ProfileDepth]         = 0.2f;
+            node.Parameters[LowPolyShapeParameters.ProfileBevel]         = 0.03f;
+            node.Parameters[LowPolyShapeParameters.ProfileBevelSegments] = 3f;
             foreach (ForgeVector2 point in points)
                 node.Profile.Add(point);
 

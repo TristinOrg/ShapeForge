@@ -68,9 +68,10 @@ namespace ShapeForge.LowPoly
 
             if (node.Type == LowPolyShapeTypes.ExtrudedProfile)
             {
-                float depth = GetPositiveParameter(node, LowPolyShapeParameters.ProfileDepth, 0.2f);
-                float bevel = GetNonNegativeParameter(node, LowPolyShapeParameters.ProfileBevel, 0f);
-                return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth, bevel);
+                float depth         = GetPositiveParameter(node, LowPolyShapeParameters.ProfileDepth, 0.2f);
+                float bevel         = GetNonNegativeParameter(node, LowPolyShapeParameters.ProfileBevel, 0f);
+                int   bevelSegments = GetIntegerParameter(node, LowPolyShapeParameters.ProfileBevelSegments, 1, 8);
+                return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth, bevel, bevelSegments);
             }
 
             if (node.Type == LowPolyShapeTypes.ProfileLoft)
