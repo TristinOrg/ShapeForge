@@ -19,6 +19,11 @@ namespace ShapeForge.Unity
     public interface IUnityAppearanceSession
     {
         /// <summary>
+        /// Attaches the session to the generated model root before applying node appearance.
+        /// </summary>
+        void Attach(GameObject root);
+
+        /// <summary>
         /// Applies the appearance for one generated renderer.
         /// </summary>
         void Apply(Renderer renderer, ShapeNode node);

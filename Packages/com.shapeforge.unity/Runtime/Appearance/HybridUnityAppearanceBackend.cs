@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace ShapeForge.Unity
@@ -17,13 +16,21 @@ namespace ShapeForge.Unity
 
         private sealed class Session : IUnityAppearanceSession
         {
-            private readonly List<UnityShapeAppearanceBinding> bindings =
-                new List<UnityShapeAppearanceBinding>();
             private readonly ShapeGenerationContext context;
+
+            private GameObject                   root;
+            private UnityShapeAppearanceManifest manifest;
 
             public Session(ShapeGenerationContext context)
             {
                 this.context = context ?? throw new ArgumentNullException(nameof(context));
+            }
+
+            public void Attach(GameObject root)
+            {
+                this.root = root != null
+                    ? root
+                    : throw new ArgumentNullException(nameof(root));
             }
 
             public void Apply(Renderer renderer, ShapeNode node)
@@ -34,31 +41,28 @@ namespace ShapeForge.Unity
                 if (node == null)
                     throw new ArgumentNullException(nameof(node));
 
+                if (root == null)
+                    throw new InvalidOperationException("Appearance session must be attached before use.");
+
                 if (!context.TryResolveColor(node, out ForgeColor color))
                     return;
 
-                UnityShapeAppearanceBinding binding = new UnityShapeAppearanceBinding(
+                if (manifest == null)
+                    manifest = root.AddComponent<UnityShapeAppearanceManifest>();
+
+                manifest.AddBinding(
                     renderer,
                     renderer.sharedMaterial,
                     color.ToUnity(),
                     node.Appearance.HasColorOverride
                         ? UnityShapeAppearanceMode.PropertyBlock
                         : UnityShapeAppearanceMode.SharedMaterial);
-
-                bindings.Add(binding);
-                UnityShapeAppearanceManifest.Apply(binding);
             }
 
             public void Complete(GameObject root)
             {
-                if (root == null)
-                    throw new ArgumentNullException(nameof(root));
-
-                if (bindings.Count == 0)
-                    return;
-
-                UnityShapeAppearanceManifest manifest = root.AddComponent<UnityShapeAppearanceManifest>();
-                manifest.Configure(bindings);
+                if (root != this.root)
+                    throw new ArgumentException("Appearance session completed with a different root.", nameof(root));
             }
         }
     }

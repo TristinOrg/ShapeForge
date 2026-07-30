@@ -5,7 +5,7 @@ using UnityEngine;
 namespace ShapeForge.Unity
 {
     /// <summary>
-    /// Persists and restores all renderer appearance bindings for one generated model.
+    /// Persists and restores compact renderer appearance data for one generated model.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class UnityShapeAppearanceManifest : MonoBehaviour
@@ -15,8 +15,7 @@ namespace ShapeForge.Unity
 
         private static MaterialPropertyBlock sharedProperties;
 
-        [SerializeField] private List<UnityShapeAppearanceBinding> bindings =
-            new List<UnityShapeAppearanceBinding>();
+        [SerializeField] private List<AppearanceBinding> bindings = new();
 
         /// <summary>
         /// Gets the number of persisted renderer bindings.
@@ -24,28 +23,26 @@ namespace ShapeForge.Unity
         public int BindingCount => bindings.Count;
 
         /// <summary>
-        /// Replaces the persisted renderer bindings and applies them immediately.
-        /// </summary>
-        public void Configure(IEnumerable<UnityShapeAppearanceBinding> newBindings)
-        {
-            if (newBindings == null)
-                throw new ArgumentNullException(nameof(newBindings));
-
-            bindings.Clear();
-            bindings.AddRange(newBindings);
-            Apply();
-        }
-
-        /// <summary>
         /// Restores all shared-material and property-block appearance state.
         /// </summary>
         public void Apply()
         {
-            foreach (UnityShapeAppearanceBinding binding in bindings)
-                Apply(binding);
+            for (int index = 0; index < bindings.Count; index++)
+                Apply(bindings[index]);
         }
 
-        internal static void Apply(UnityShapeAppearanceBinding binding)
+        internal void AddBinding(
+            Renderer                 renderer,
+            Material                 baseMaterial,
+            Color                    color,
+            UnityShapeAppearanceMode mode)
+        {
+            AppearanceBinding binding = new(renderer, baseMaterial, color, mode);
+            bindings.Add(binding);
+            Apply(binding);
+        }
+
+        private static void Apply(AppearanceBinding binding)
         {
             Renderer renderer = binding.Renderer;
             if (renderer == null)
@@ -60,14 +57,41 @@ namespace ShapeForge.Unity
                 return;
             }
 
-            if (sharedProperties == null)
-                sharedProperties = new MaterialPropertyBlock();
-
+            sharedProperties ??= new();
             sharedProperties.Clear();
             renderer.GetPropertyBlock(sharedProperties);
             sharedProperties.SetColor(ColorProperty, binding.Color);
             sharedProperties.SetColor(BaseColorProperty, binding.Color);
             renderer.SetPropertyBlock(sharedProperties);
+        }
+
+        [Serializable]
+        private struct AppearanceBinding
+        {
+            [SerializeField] private Renderer                 renderer;
+            [SerializeField] private Material                 baseMaterial;
+            [SerializeField] private Color                    color;
+            [SerializeField] private UnityShapeAppearanceMode mode;
+
+            public AppearanceBinding(
+                Renderer                 renderer,
+                Material                 baseMaterial,
+                Color                    color,
+                UnityShapeAppearanceMode mode)
+            {
+                this.renderer     = renderer;
+                this.baseMaterial = baseMaterial;
+                this.color        = color;
+                this.mode         = mode;
+            }
+
+            public Renderer Renderer => renderer;
+
+            public Material BaseMaterial => baseMaterial;
+
+            public Color Color => color;
+
+            public UnityShapeAppearanceMode Mode => mode;
         }
 
         private void OnEnable()
@@ -88,52 +112,5 @@ namespace ShapeForge.Unity
     {
         SharedMaterial = 0,
         PropertyBlock  = 1
-    }
-
-    /// <summary>
-    /// Stores one renderer's resolved appearance without owning transient render resources.
-    /// </summary>
-    [Serializable]
-    public sealed class UnityShapeAppearanceBinding
-    {
-        [SerializeField] private Renderer                 renderer;
-        [SerializeField] private Material                 baseMaterial;
-        [SerializeField] private Color                    color;
-        [SerializeField] private UnityShapeAppearanceMode mode;
-
-        /// <summary>
-        /// Initializes a serialized appearance binding.
-        /// </summary>
-        public UnityShapeAppearanceBinding(
-            Renderer                 renderer,
-            Material                 baseMaterial,
-            Color                    color,
-            UnityShapeAppearanceMode mode)
-        {
-            this.renderer     = renderer;
-            this.baseMaterial = baseMaterial;
-            this.color        = color;
-            this.mode         = mode;
-        }
-
-        /// <summary>
-        /// Gets the target renderer.
-        /// </summary>
-        public Renderer Renderer => renderer;
-
-        /// <summary>
-        /// Gets the unmodified source material.
-        /// </summary>
-        public Material BaseMaterial => baseMaterial;
-
-        /// <summary>
-        /// Gets the resolved Unity color.
-        /// </summary>
-        public Color Color => color;
-
-        /// <summary>
-        /// Gets the selected rendering path.
-        /// </summary>
-        public UnityShapeAppearanceMode Mode => mode;
     }
 }

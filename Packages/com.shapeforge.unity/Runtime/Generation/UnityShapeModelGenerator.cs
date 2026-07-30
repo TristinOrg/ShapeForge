@@ -92,7 +92,10 @@ namespace ShapeForge.Unity
             node.Transform.ApplyTo(generated.transform);
 
             if (model == null)
+            {
                 model = generated.AddComponent<UnityShapeModel>();
+                appearance.Attach(generated);
+            }
 
             model.AddBinding(node.Id, generated.transform);
 
