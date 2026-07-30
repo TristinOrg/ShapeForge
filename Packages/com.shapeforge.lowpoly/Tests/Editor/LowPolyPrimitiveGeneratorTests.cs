@@ -101,7 +101,10 @@ namespace ShapeForge.LowPoly.Tests
             Mesh differentMesh = generatedRoot.transform.Find("Frustum C").GetComponent<MeshFilter>().sharedMesh;
 
             Assert.That(wedgeMesh.vertexCount, Is.EqualTo(18));
+            Assert.That(wedgeMesh.hideFlags, Is.EqualTo(HideFlags.None));
+            Assert.That(wedgeMesh.normals[0].y, Is.LessThan(-0.99f));
             Assert.That(firstMesh.vertexCount, Is.EqualTo(24));
+            Assert.That(firstMesh.normals[0].y, Is.LessThan(-0.99f));
             Assert.That(firstMesh, Is.SameAs(secondMesh));
             Assert.That(firstMesh, Is.Not.SameAs(differentMesh));
         }

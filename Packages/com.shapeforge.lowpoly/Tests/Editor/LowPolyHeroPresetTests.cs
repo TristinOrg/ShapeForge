@@ -31,8 +31,11 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Fantasy Hero"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(35));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(40));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Layered Hair Crown"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Left Pupil"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Nose"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Mouth"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Fitted Coat"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Boot"), Is.Not.Null);
 
@@ -42,8 +45,8 @@ namespace ShapeForge.LowPoly.Tests
             MeshFilter jaw = generatedRoot.transform
                 .Find("Head Pivot/Jaw")
                 .GetComponent<MeshFilter>();
-            MeshFilter fringe = generatedRoot.transform
-                .Find("Head Pivot/Left Fringe")
+            MeshFilter coatTail = generatedRoot.transform
+                .Find("Pelvis Pivot/Spine Pivot/Left Coat Tail")
                 .GetComponent<MeshFilter>();
             MeshFilter boot = generatedRoot.transform
                 .Find("Left Hip Pivot/Left Knee Pivot/Left Boot")
@@ -51,7 +54,7 @@ namespace ShapeForge.LowPoly.Tests
 
             Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
             Assert.That(jaw.sharedMesh.name, Is.EqualTo("Low Poly Frustum"));
-            Assert.That(fringe.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
+            Assert.That(coatTail.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
             Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Wedge"));
 
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();

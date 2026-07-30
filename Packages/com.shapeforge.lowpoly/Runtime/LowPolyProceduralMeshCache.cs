@@ -34,7 +34,6 @@ namespace ShapeForge.LowPoly
                 return mesh;
 
             mesh = create();
-            mesh.hideFlags = HideFlags.HideAndDontSave;
             Meshes.Add(key, mesh);
             return mesh;
         }
@@ -98,6 +97,7 @@ namespace ShapeForge.LowPoly
         private sealed class MeshBuilder
         {
             private readonly List<Vector3> vertices  = new();
+            private readonly List<Vector3> normals   = new();
             private readonly List<int>     triangles = new();
 
             public void AddTriangle(Vector3 first, Vector3 second, Vector3 third)
@@ -106,9 +106,13 @@ namespace ShapeForge.LowPoly
                 vertices.Add(first);
                 vertices.Add(second);
                 vertices.Add(third);
+                Vector3 normal = Vector3.Cross(second - first, third - first).normalized;
+                normals.Add(normal);
+                normals.Add(normal);
+                normals.Add(normal);
                 triangles.Add(start);
-                triangles.Add(start + 1);
                 triangles.Add(start + 2);
+                triangles.Add(start + 1);
             }
 
             public void AddQuad(Vector3 first, Vector3 second, Vector3 third, Vector3 fourth)
@@ -118,20 +122,25 @@ namespace ShapeForge.LowPoly
                 vertices.Add(second);
                 vertices.Add(third);
                 vertices.Add(fourth);
+                Vector3 normal = Vector3.Cross(second - first, third - first).normalized;
+                normals.Add(normal);
+                normals.Add(normal);
+                normals.Add(normal);
+                normals.Add(normal);
                 triangles.Add(start);
+                triangles.Add(start + 2);
                 triangles.Add(start + 1);
-                triangles.Add(start + 2);
                 triangles.Add(start);
-                triangles.Add(start + 2);
                 triangles.Add(start + 3);
+                triangles.Add(start + 2);
             }
 
             public Mesh Build(string name)
             {
                 Mesh mesh = new() { name = name };
                 mesh.SetVertices(vertices);
+                mesh.SetNormals(normals);
                 mesh.SetTriangles(triangles, 0, true);
-                mesh.RecalculateNormals();
                 mesh.RecalculateBounds();
                 return mesh;
             }

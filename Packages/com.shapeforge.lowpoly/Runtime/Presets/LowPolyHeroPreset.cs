@@ -31,7 +31,7 @@ namespace ShapeForge.LowPoly
                                 .ColorRole("coat"))
                             .Shape("hero.chest", "Chest Panel", LowPolyShapeTypes.Cube, chest => chest
                                 .Position(0f, 0.48f, -0.23f)
-                                .Scale(0.46f, 0.5f, 0.08f)
+                                .Scale(0.3f, 0.42f, 0.055f)
                                 .ColorRole("shirt"))
                             .Shape("hero.belt", "Leather Belt", LowPolyShapeTypes.Cube, belt => belt
                                 .Position(0f, 0.08f, -0.03f)
@@ -80,7 +80,8 @@ namespace ShapeForge.LowPoly
                 .Set("leather", new(0.2f, 0.09f, 0.045f))
                 .Set("metal", new(0.52f, 0.57f, 0.62f))
                 .Set("accent", new(0.48f, 0.08f, 0.075f))
-                .Set("eye", new(0.18f, 0.48f, 0.62f));
+                .Set("eye", new(0.12f, 0.32f, 0.5f))
+                .Set("eye.white", new(0.82f, 0.84f, 0.8f));
             return style;
         }
 
@@ -95,18 +96,30 @@ namespace ShapeForge.LowPoly
                 .Shape("hero.face.jaw", "Jaw", LowPolyShapeTypes.Frustum, jaw => jaw
                     .Position(0f, 0.05f, -0.12f).Scale(0.28f, 0.24f, 0.24f)
                     .Frustum(1f, 0.9f, 0.68f, 0.72f).ColorRole("skin"))
-                .Shape("hero.eye.left", "Left Eye", LowPolyShapeTypes.Sphere, eye => eye
-                    .Position(-0.1f, 0.23f, -0.255f).Scale(0.035f, 0.025f, 0.02f).ColorRole("eye"))
-                .Shape("hero.eye.right", "Right Eye", LowPolyShapeTypes.Sphere, eye => eye
-                    .Position(0.1f, 0.23f, -0.255f).Scale(0.035f, 0.025f, 0.02f).ColorRole("eye"))
+                .Shape("hero.ear.left", "Left Ear", LowPolyShapeTypes.Sphere, ear => ear
+                    .Position(-0.29f, 0.17f, 0f).Scale(0.055f, 0.09f, 0.045f).ColorRole("skin"))
+                .Shape("hero.ear.right", "Right Ear", LowPolyShapeTypes.Sphere, ear => ear
+                    .Position(0.29f, 0.17f, 0f).Scale(0.055f, 0.09f, 0.045f).ColorRole("skin"))
+                .Shape("hero.eye.left", "Left Eye White", LowPolyShapeTypes.Cube, eye => eye
+                    .Position(-0.095f, 0.22f, -0.275f).Scale(0.07f, 0.034f, 0.022f).ColorRole("eye.white"))
+                .Shape("hero.eye.right", "Right Eye White", LowPolyShapeTypes.Cube, eye => eye
+                    .Position(0.095f, 0.22f, -0.275f).Scale(0.07f, 0.034f, 0.022f).ColorRole("eye.white"))
+                .Shape("hero.eye.left.pupil", "Left Pupil", LowPolyShapeTypes.Sphere, eye => eye
+                    .Position(-0.095f, 0.22f, -0.3f).Scale(0.019f, 0.022f, 0.012f).ColorRole("eye"))
+                .Shape("hero.eye.right.pupil", "Right Pupil", LowPolyShapeTypes.Sphere, eye => eye
+                    .Position(0.095f, 0.22f, -0.3f).Scale(0.019f, 0.022f, 0.012f).ColorRole("eye"))
+                .Shape("hero.eyebrow.left", "Left Eyebrow", LowPolyShapeTypes.Cube, brow => brow
+                    .Position(-0.1f, 0.3f, -0.286f).Rotation(0f, 0f, -5f)
+                    .Scale(0.11f, 0.024f, 0.016f).ColorRole("hair"))
+                .Shape("hero.eyebrow.right", "Right Eyebrow", LowPolyShapeTypes.Cube, brow => brow
+                    .Position(0.1f, 0.3f, -0.286f).Rotation(0f, 0f, 5f)
+                    .Scale(0.11f, 0.024f, 0.016f).ColorRole("hair"))
+                .Shape("hero.nose", "Nose", LowPolyShapeTypes.Sphere, nose => nose
+                    .Position(0f, 0.12f, -0.286f).Scale(0.027f, 0.042f, 0.032f).ColorRole("skin.shadow"))
+                .Shape("hero.mouth", "Mouth", LowPolyShapeTypes.Cube, mouth => mouth
+                    .Position(0f, 0.015f, -0.274f).Scale(0.085f, 0.014f, 0.014f).ColorRole("accent"))
                 .Shape("hero.hair.crown", "Layered Hair Crown", LowPolyShapeTypes.Sphere, hair => hair
-                    .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair"))
-                .Shape("hero.hair.fringe.left", "Left Fringe", LowPolyShapeTypes.Wedge, hair => hair
-                    .Position(-0.12f, 0.31f, -0.27f).Rotation(0f, -12f, 24f).Scale(0.13f, 0.3f, 0.1f).ColorRole("hair"))
-                .Shape("hero.hair.fringe.right", "Right Fringe", LowPolyShapeTypes.Wedge, hair => hair
-                    .Position(0.1f, 0.33f, -0.275f).Rotation(0f, 14f, -18f).Scale(0.12f, 0.27f, 0.1f).ColorRole("hair"))
-                .Shape("hero.hair.back", "Back Hair", LowPolyShapeTypes.Wedge, hair => hair
-                    .Position(0f, 0.24f, 0.23f).Rotation(0f, 180f, 0f).Scale(0.34f, 0.42f, 0.16f).ColorRole("hair")));
+                    .Position(0f, 0.43f, 0.02f).Scale(0.34f, 0.24f, 0.32f).ColorRole("hair")));
         }
 
         private static void AddArm(ShapeNodeBuilder hero, string side, string label, float x)
