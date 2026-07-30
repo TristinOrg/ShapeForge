@@ -25,6 +25,14 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyRobotPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Japanese Town", false, 12)]
+        private static void GenerateJapaneseTown()
+        {
+            Generate(
+                LowPolyJapaneseTownPreset.CreateDefinition(),
+                LowPolyJapaneseTownPreset.CreateStyle());
+        }
+
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
         private static void GenerateAnimatedWorkbench()
         {
