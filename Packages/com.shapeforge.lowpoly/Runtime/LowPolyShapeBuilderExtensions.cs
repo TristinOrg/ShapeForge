@@ -112,5 +112,24 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.LoftSubdivisions, subdivisions)
                 .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
         }
+
+        /// <summary>Configures a radius-height profile revolved around the local Y axis.</summary>
+        public static ShapeNodeBuilder LatheProfile(
+            this ShapeNodeBuilder builder,
+            int                   radialSegments,
+            bool                  smoothNormals,
+            params ForgeVector2[] profile)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (radialSegments < 3 || radialSegments > 64)
+                throw new ArgumentOutOfRangeException(nameof(radialSegments));
+
+            return builder
+                .Profile(profile)
+                .Parameter(LowPolyShapeParameters.RadialSegments, radialSegments)
+                .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
+        }
     }
 }

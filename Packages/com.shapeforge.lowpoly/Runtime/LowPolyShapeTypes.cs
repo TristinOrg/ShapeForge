@@ -44,6 +44,11 @@ namespace ShapeForge.LowPoly
         /// Identifies a volume formed by scaling and offsetting one profile across ordered depth sections.
         /// </summary>
         public const string ProfileLoft = "lowpoly/profile-loft";
+
+        /// <summary>
+        /// Identifies a volume formed by revolving a radius-height profile around its local Y axis.
+        /// </summary>
+        public const string LatheProfile = "lowpoly/lathe-profile";
     }
 
     /// <summary>
@@ -77,5 +82,8 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Enables averaged vertex normals on a profile loft when greater than zero.</summary>
         public const string SmoothNormals = "smoothNormals";
+
+        /// <summary>Controls the number of radial faces around a lathed profile.</summary>
+        public const string RadialSegments = "radialSegments";
     }
 }

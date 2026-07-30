@@ -191,6 +191,32 @@ namespace ShapeForge.LowPoly.Tests
             AssertDuplicateVerticesShareNormals(firstMesh);
         }
 
+        [Test]
+        public void GenerateBuildsAndCachesSmoothLatheProfiles()
+        {
+            ShapeNode first     = CreateLathe("lathe-a", "Lathe A", 12, true);
+            ShapeNode second    = CreateLathe("lathe-b", "Lathe B", 12, true);
+            ShapeNode lowDetail = CreateLathe("lathe-c", "Lathe C", 8, false);
+            ShapeNode root      = new("lathes", "Lathes", ShapeTypes.Group);
+            root.Add(first).Add(second).Add(lowDetail);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Lathes", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Lathe A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Lathe B").GetComponent<MeshFilter>().sharedMesh;
+            Mesh detailMesh = generatedRoot.transform.Find("Lathe C").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.name, Is.EqualTo("Low Poly Lathe Profile"));
+            Assert.That(firstMesh.vertexCount, Is.EqualTo(216));
+            Assert.That(firstMesh.bounds.size.y, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+            Assert.That(firstMesh, Is.Not.SameAs(detailMesh));
+            AssertDuplicateVerticesShareNormals(firstMesh);
+        }
+
         private static ShapeNode CreateFrustum(string id, string name, float topWidth)
         {
             ShapeNode node = new(id, name, LowPolyShapeTypes.Frustum);
@@ -224,6 +250,18 @@ namespace ShapeForge.LowPoly.Tests
             node.ProfileSections.Add(new(-0.5f, new(0.75f, 0.8f), ForgeVector2.Zero));
             node.ProfileSections.Add(new(0f, ForgeVector2.One, new(0f, 0.05f)));
             node.ProfileSections.Add(new(0.5f, new(0.8f, 0.9f), ForgeVector2.Zero));
+            return node;
+        }
+
+        private static ShapeNode CreateLathe(string id, string name, int radialSegments, bool smoothNormals)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.LatheProfile);
+            node.Profile.Add(new(0.28f, -0.5f));
+            node.Profile.Add(new(0.5f, -0.18f));
+            node.Profile.Add(new(0.42f, 0.28f));
+            node.Profile.Add(new(0.24f, 0.5f));
+            node.Parameters[LowPolyShapeParameters.RadialSegments] = radialSegments;
+            node.Parameters[LowPolyShapeParameters.SmoothNormals]  = smoothNormals ? 1f : 0f;
             return node;
         }
 

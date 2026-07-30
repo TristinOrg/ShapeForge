@@ -12,6 +12,7 @@ namespace ShapeForge.LowPoly
         private static readonly Dictionary<MeshKey, Mesh>                    Meshes        = new();
         private static readonly Dictionary<int, List<ProfileMeshEntry>>      ProfileMeshes = new();
         private static readonly Dictionary<int, List<LoftMeshEntry>>         LoftMeshes    = new();
+        private static readonly Dictionary<int, List<LatheMeshEntry>>        LatheMeshes   = new();
 
         public static Mesh GetWedge()
         {
@@ -127,6 +128,70 @@ namespace ShapeForge.LowPoly
             return mesh;
         }
 
+        public static Mesh GetLatheProfile(
+            IList<ForgeVector2> profile,
+            int                  radialSegments,
+            bool                 smoothNormals)
+        {
+            ValidateLatheProfile(profile, radialSegments);
+            int hash = GetLatheHash(profile, radialSegments, smoothNormals);
+            if (LatheMeshes.TryGetValue(hash, out List<LatheMeshEntry> entries))
+            {
+                for (int index = entries.Count - 1; index >= 0; index--)
+                {
+                    LatheMeshEntry entry = entries[index];
+                    if (entry.Mesh == null)
+                    {
+                        entries.RemoveAt(index);
+                        continue;
+                    }
+
+                    if (entry.Matches(profile, radialSegments, smoothNormals))
+                        return entry.Mesh;
+                }
+            }
+            else
+            {
+                entries = new();
+                LatheMeshes.Add(hash, entries);
+            }
+
+            ForgeVector2[] points = CopyProfile(profile);
+            Mesh           mesh   = CreateLatheProfile(points, radialSegments, smoothNormals);
+            entries.Add(new(points, radialSegments, smoothNormals, mesh));
+            return mesh;
+        }
+
+        private static void ValidateLatheProfile(IList<ForgeVector2> profile, int radialSegments)
+        {
+            if (profile == null)
+                throw new ArgumentNullException(nameof(profile));
+
+            if (profile.Count < 2)
+                throw new ArgumentException("Lathe profiles require at least two radius-height points.", nameof(profile));
+
+            if (radialSegments < 3 || radialSegments > 64)
+                throw new ArgumentOutOfRangeException(nameof(radialSegments));
+
+            float previousHeight = float.NegativeInfinity;
+            foreach (ForgeVector2 point in profile)
+            {
+                if (point.X < 0f)
+                    throw new ArgumentOutOfRangeException(nameof(profile), "Lathe profile radii cannot be negative.");
+
+                if (point.Y <= previousHeight)
+                    throw new ArgumentException("Lathe profile heights must be strictly increasing.", nameof(profile));
+
+                previousHeight = point.Y;
+            }
+        }
+
+        private static int GetLatheHash(IList<ForgeVector2> profile, int radialSegments, bool smoothNormals)
+        {
+            int hash = (GetProfileHash(profile, 0f, 0f, 1) * 397) ^ radialSegments;
+            return (hash * 397) ^ smoothNormals.GetHashCode();
+        }
+
         private static void ValidateLoftSections(IList<ShapeProfileSection> sections)
         {
             if (sections == null)
@@ -230,6 +295,7 @@ namespace ShapeForge.LowPoly
             Meshes.Clear();
             ProfileMeshes.Clear();
             LoftMeshes.Clear();
+            LatheMeshes.Clear();
         }
 
         private static Mesh CreateWedge()
@@ -415,6 +481,65 @@ namespace ShapeForge.LowPoly
             }
 
             return builder.Build("Low Poly Profile Loft", smoothNormals);
+        }
+
+        private static Mesh CreateLatheProfile(
+            ForgeVector2[] profile,
+            int            radialSegments,
+            bool           smoothNormals)
+        {
+            MeshBuilder builder = new();
+            for (int profileIndex = 0; profileIndex < profile.Length - 1; profileIndex++)
+            {
+                ForgeVector2 lower = profile[profileIndex];
+                ForgeVector2 upper = profile[profileIndex + 1];
+                for (int segment = 0; segment < radialSegments; segment++)
+                {
+                    int     next         = (segment + 1) % radialSegments;
+                    Vector3 lowerCurrent = Revolve(lower, segment, radialSegments);
+                    Vector3 lowerNext    = Revolve(lower, next, radialSegments);
+                    Vector3 upperCurrent = Revolve(upper, segment, radialSegments);
+                    Vector3 upperNext    = Revolve(upper, next, radialSegments);
+                    if (Mathf.Approximately(lower.X, 0f))
+                        builder.AddTriangle(lowerCurrent, upperCurrent, upperNext);
+                    else if (Mathf.Approximately(upper.X, 0f))
+                        builder.AddTriangle(lowerCurrent, upperCurrent, lowerNext);
+                    else
+                        builder.AddQuad(lowerNext, lowerCurrent, upperCurrent, upperNext);
+                }
+            }
+
+            AddLatheCap(builder, profile[0], radialSegments, false);
+            AddLatheCap(builder, profile[profile.Length - 1], radialSegments, true);
+            return builder.Build("Low Poly Lathe Profile", smoothNormals);
+        }
+
+        private static Vector3 Revolve(ForgeVector2 point, int segment, int radialSegments)
+        {
+            float angle = segment * Mathf.PI * 2f / radialSegments;
+            return new(point.X * Mathf.Cos(angle), point.Y, point.X * Mathf.Sin(angle));
+        }
+
+        private static void AddLatheCap(
+            MeshBuilder  builder,
+            ForgeVector2 point,
+            int          radialSegments,
+            bool         top)
+        {
+            if (Mathf.Approximately(point.X, 0f))
+                return;
+
+            Vector3 center = new(0f, point.Y, 0f);
+            for (int segment = 0; segment < radialSegments; segment++)
+            {
+                int     next      = (segment + 1) % radialSegments;
+                Vector3 current   = Revolve(point, segment, radialSegments);
+                Vector3 following = Revolve(point, next, radialSegments);
+                if (top)
+                    builder.AddTriangle(center, following, current);
+                else
+                    builder.AddTriangle(center, current, following);
+            }
         }
 
         private static LoftSection[] InterpolateSections(LoftSection[] sections, int subdivisions)
@@ -809,6 +934,50 @@ namespace ShapeForge.LowPoly
                 for (int index = 0; index < sections.Length; index++)
                 {
                     if (!sections[index].Matches(candidateSections[index]))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Owns immutable lathe-profile data and its generated Unity mesh.
+        /// </summary>
+        private sealed class LatheMeshEntry
+        {
+            private readonly int  radialSegments;
+            private readonly bool smoothNormals;
+
+            public LatheMeshEntry(
+                ForgeVector2[] points,
+                int            radialSegments,
+                bool           smoothNormals,
+                Mesh           mesh)
+            {
+                Points              = points;
+                this.radialSegments = radialSegments;
+                this.smoothNormals  = smoothNormals;
+                Mesh                = mesh;
+            }
+
+            public ForgeVector2[] Points { get; }
+
+            public Mesh Mesh { get; }
+
+            public bool Matches(
+                IList<ForgeVector2> profile,
+                int                  candidateRadialSegments,
+                bool                 candidateSmoothNormals)
+            {
+                if (Points.Length != profile.Count ||
+                    radialSegments != candidateRadialSegments ||
+                    smoothNormals != candidateSmoothNormals)
+                    return false;
+
+                for (int index = 0; index < Points.Length; index++)
+                {
+                    if (!Points[index].Equals(profile[index]))
                         return false;
                 }
 

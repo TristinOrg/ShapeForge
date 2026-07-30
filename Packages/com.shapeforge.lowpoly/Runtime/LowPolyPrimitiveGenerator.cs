@@ -26,7 +26,8 @@ namespace ShapeForge.LowPoly
                     node.Type == LowPolyShapeTypes.Wedge ||
                     node.Type == LowPolyShapeTypes.Frustum ||
                     node.Type == LowPolyShapeTypes.ExtrudedProfile ||
-                    node.Type == LowPolyShapeTypes.ProfileLoft);
+                    node.Type == LowPolyShapeTypes.ProfileLoft ||
+                    node.Type == LowPolyShapeTypes.LatheProfile);
         }
 
         /// <inheritdoc />
@@ -70,19 +71,26 @@ namespace ShapeForge.LowPoly
             {
                 float depth         = GetPositiveParameter(node, LowPolyShapeParameters.ProfileDepth, 0.2f);
                 float bevel         = GetNonNegativeParameter(node, LowPolyShapeParameters.ProfileBevel, 0f);
-                int   bevelSegments = GetIntegerParameter(node, LowPolyShapeParameters.ProfileBevelSegments, 1, 8);
+                int   bevelSegments = GetIntegerParameter(node, LowPolyShapeParameters.ProfileBevelSegments, 1, 1, 8);
                 return LowPolyProceduralMeshCache.GetExtrudedProfile(node.Profile, depth, bevel, bevelSegments);
             }
 
             if (node.Type == LowPolyShapeTypes.ProfileLoft)
             {
-                int  subdivisions = GetIntegerParameter(node, LowPolyShapeParameters.LoftSubdivisions, 0, 8);
+                int  subdivisions = GetIntegerParameter(node, LowPolyShapeParameters.LoftSubdivisions, 0, 0, 8);
                 bool smoothNormals = GetNonNegativeParameter(node, LowPolyShapeParameters.SmoothNormals, 0f) > 0f;
                 return LowPolyProceduralMeshCache.GetProfileLoft(
                     node.Profile,
                     node.ProfileSections,
                     subdivisions,
                     smoothNormals);
+            }
+
+            if (node.Type == LowPolyShapeTypes.LatheProfile)
+            {
+                int  radialSegments = GetIntegerParameter(node, LowPolyShapeParameters.RadialSegments, 12, 3, 64);
+                bool smoothNormals  = GetNonNegativeParameter(node, LowPolyShapeParameters.SmoothNormals, 0f) > 0f;
+                return LowPolyProceduralMeshCache.GetLatheProfile(node.Profile, radialSegments, smoothNormals);
             }
 
             if (node.Type != LowPolyShapeTypes.Frustum)
@@ -117,14 +125,22 @@ namespace ShapeForge.LowPoly
             return value;
         }
 
-        private static int GetIntegerParameter(ShapeNode node, string name, int defaultValue, int maximum)
+        private static int GetIntegerParameter(
+            ShapeNode node,
+            string    name,
+            int       defaultValue,
+            int       minimum,
+            int       maximum)
         {
             if (!node.Parameters.TryGetValue(name, out float value))
                 return defaultValue;
 
             int result = Mathf.RoundToInt(value);
-            if (result < 0 || result > maximum || !Mathf.Approximately(value, result))
-                throw new ArgumentOutOfRangeException(name, value, $"Parameter must be an integer from 0 to {maximum}.");
+            if (result < minimum || result > maximum || !Mathf.Approximately(value, result))
+                throw new ArgumentOutOfRangeException(
+                    name,
+                    value,
+                    $"Parameter must be an integer from {minimum} to {maximum}.");
 
             return result;
         }
