@@ -4,6 +4,8 @@ The first official ShapeForge implementation. It provides Low Poly geometry, pal
 
 Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes and base materials without generating Collider components. Parameterized Wedge and Frustum shapes use flat-shaded procedural meshes; equivalent parameter sets share one cached Mesh. Frustum parameters are `topWidth`, `topDepth`, `bottomWidth`, and `bottomDepth`.
 
+Use `LowPolyShapeCapabilityCatalog.Instance` to query all ten supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
+
 Use `LowPolyModelGenerator` as the reusable runtime entry point for validated definitions or external ShapeForge JSON. Register style documents once, then reuse the same pipeline for subsequent models.
 
 For repeated models, call `ParseJson` once and pass the returned `ShapeDefinition` to `Generate`. `GenerateJson` is intended for one-off documents because it parses and validates on every call.

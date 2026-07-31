@@ -23,6 +23,8 @@ External AI integrations remain outside the schema and core packages. They produ
 
 Draft 2020-12 JSON Schema documents and minimal prompt examples live in `Packages/com.shapeforge.schema/Documentation~`. External tools should validate generated documents against the matching versioned schema before passing them to an engine adapter.
 
+Generation backends expose their supported geometry through the engine-agnostic `IShapeCapabilityCatalog`. External AI can inspect exact shape IDs, suitable uses, limitations, required profile/path data, numeric ranges, and generation-cost behavior before authoring a model.
+
 ## Initial scope
 
 - An engine-agnostic schema package with versioned shape and style documents.
