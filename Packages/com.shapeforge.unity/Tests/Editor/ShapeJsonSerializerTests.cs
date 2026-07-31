@@ -71,5 +71,29 @@ namespace ShapeForge.Unity.Tests
             Assert.That(result.Palette.TryGetColor("primary", out ForgeColor color), Is.True);
             Assert.That(color, Is.EqualTo(new ForgeColor(0f, 0f, 1f)));
         }
+
+        [Test]
+        public void TemplateCatalogSerializesReadableDiscoveryData()
+        {
+            ShapeTemplateDescriptor descriptor = new(
+                "example/character/1.0",
+                "Builds a semantic character.",
+                "character",
+                "example.character/1.0",
+                new[] { "example/body" },
+                "human",
+                "stylized");
+            ShapeTemplateCatalogDocument document = new(
+                "example/templates",
+                new[] { descriptor });
+            ShapeJsonSerializer serializer = new();
+
+            string json = serializer.Serialize(document);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.templates/1.0\""));
+            Assert.That(json, Does.Contain("\"specificationSchema\":\"example.character/1.0\""));
+            Assert.That(json, Does.Contain("\"requiredShapeTypes\":[\"example/body\"]"));
+            Assert.That(json, Does.Contain("\"tags\":[\"human\",\"stylized\"]"));
+        }
     }
 }

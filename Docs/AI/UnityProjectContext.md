@@ -47,7 +47,7 @@ Schema and Core use assemblies with no UnityEngine references. Unity adapts Sche
 
 ## Architecture
 
-Schema provides versioned engine-agnostic shape and style documents with optional base-style references, published Draft 2020-12 JSON Schema contracts, and minimal external-tool examples. Core provides validation, cached style inheritance, fluent authoring, engine-neutral transform contracts, and backend-independent shape capability catalogs without UnityEngine. The Unity Adapter owns JSON, GameObject generation, lifecycle-safe serialized appearance, capability-document export, and a root model manifest that resolves stable node IDs without hierarchy traversal. LowPoly supplies a cached ten-shape capability catalog, reusable definition/JSON generation pipeline, cached primitive and procedural render resources, showcase presets, plus undoable Editor preview commands.
+Schema provides versioned engine-agnostic shape and style documents with optional base-style references, published Draft 2020-12 JSON Schema contracts, and minimal external-tool examples. Core provides validation, cached style inheritance, fluent authoring, engine-neutral transform contracts, backend-independent shape capabilities, and generic semantic-template compilation/discovery without UnityEngine. The Unity Adapter owns JSON, GameObject generation, lifecycle-safe serialized appearance, capability/template discovery export, and a root model manifest that resolves stable node IDs without hierarchy traversal. LowPoly supplies a cached ten-shape capability catalog, reusable definition/JSON generation pipeline, cached primitive and procedural render resources, showcase presets, plus undoable Editor preview commands.
 
 ## Coding Conventions
 
@@ -58,7 +58,7 @@ Schema provides versioned engine-agnostic shape and style documents with optiona
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Forty-four first-party EditMode tests cover fluent authoring, published JSON contracts and examples, cached style inheritance, validated capability discovery/export, runtime generation, prepared count- and time-budgeted batches, hierarchy adaptation, validation, lifecycle-safe appearance, shared render resources, procedural geometry, presets, and motion-ready pivots.
+- Forty-nine first-party EditMode tests cover fluent authoring, published JSON contracts and examples, cached style inheritance, validated capability and semantic-template discovery/export, runtime generation, prepared count- and time-budgeted batches, hierarchy adaptation, validation, lifecycle-safe appearance, shared render resources, procedural geometry, presets, and motion-ready pivots.
 - `ShapeForge > Diagnostics > Benchmark JSON Generation` measures 200 alternating Table and Robot JSON generations, managed heap growth, and shared render-resource counts without saving generated objects.
 - The benchmark reports JSON parsing and prepared-definition generation separately. Repeated runtime models should call `LowPolyModelGenerator.ParseJson` once and reuse the validated definition.
 - Prepared batches use `UnityShapeGenerationPlan` to validate an immutable definition once before repeated generation.

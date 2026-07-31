@@ -68,6 +68,17 @@ namespace ShapeForge.Unity
         }
 
         /// <summary>
+        /// Serializes versioned semantic-template discovery data for external authoring tools.
+        /// </summary>
+        public string Serialize(ShapeTemplateCatalogDocument document)
+        {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
+
+            return JsonConvert.SerializeObject(document, Settings);
+        }
+
+        /// <summary>
         /// Deserializes a versioned ShapeForge style document.
         /// </summary>
         public ShapeStyleDefinition DeserializeStyle(string json)

@@ -25,6 +25,8 @@ Draft 2020-12 JSON Schema documents and minimal prompt examples live in `Package
 
 Generation backends expose their supported geometry through the engine-agnostic `IShapeCapabilityCatalog`. External AI can inspect exact shape IDs, suitable uses, limitations, required profile/path data, numeric ranges, and generation-cost behavior before authoring a model.
 
+Semantic authoring remains optional and engine-agnostic through `ShapeTemplate<TSpecification>`. Templates compile readable domain specifications into ordinary `ShapeDefinition` documents; `ShapeTemplateCatalog` provides cached discovery without making characters, buildings, furniture, or any other asset category part of Core.
+
 ## Initial scope
 
 - An engine-agnostic schema package with versioned shape and style documents.
