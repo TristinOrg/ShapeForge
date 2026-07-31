@@ -27,6 +27,7 @@ namespace ShapeForge.LowPoly
                     AddLantern(town, "left-rear", -1.35f, 1.7f);
                     AddLantern(town, "right-rear", 1.35f, 1.7f);
                     AddCherryTree(town);
+                    AddStreetDetails(town);
                 })
                 .Build();
         }
@@ -38,6 +39,7 @@ namespace ShapeForge.LowPoly
             style.Palette
                 .Set("ground", new(0.22f, 0.28f, 0.2f))
                 .Set("stone", new(0.34f, 0.37f, 0.38f))
+                .Set("stone.dark", new(0.19f, 0.22f, 0.23f))
                 .Set("plaster", new(0.82f, 0.76f, 0.62f))
                 .Set("timber", new(0.22f, 0.1f, 0.045f))
                 .Set("roof", new(0.08f, 0.12f, 0.15f))
@@ -116,6 +118,26 @@ namespace ShapeForge.LowPoly
                     .Position(0.7f, 1.18f, -0.93f)
                     .Scale(0.38f, 0.58f, 0.04f)
                     .ColorRole("paper"))
+                .Shape($"{prefix}.window.rail.horizontal", "Window Horizontal Lattice", LowPolyShapeTypes.Cube, rail => rail
+                    .Position(0f, 1.18f, -0.965f)
+                    .Scale(1.72f, 0.055f, 0.035f)
+                    .ColorRole("timber"))
+                .Shape($"{prefix}.window.rail.left", "Left Window Lattice", LowPolyShapeTypes.Cube, rail => rail
+                    .Position(-0.7f, 1.18f, -0.97f)
+                    .Scale(0.045f, 0.62f, 0.035f)
+                    .ColorRole("timber"))
+                .Shape($"{prefix}.window.rail.right", "Right Window Lattice", LowPolyShapeTypes.Cube, rail => rail
+                    .Position(0.7f, 1.18f, -0.97f)
+                    .Scale(0.045f, 0.62f, 0.035f)
+                    .ColorRole("timber"))
+                .Shape($"{prefix}.sign", "Hanging Shop Sign", LowPolyShapeTypes.ExtrudedProfile, sign => sign
+                    .Position(0.68f, 1.72f, -1.16f)
+                    .Scale(0.42f, 0.58f, 1f)
+                    .ExtrudedProfile(0.055f, 0.018f,
+                        new(-0.42f, 0.5f), new(0.42f, 0.5f), new(0.5f, 0.4f),
+                        new(0.5f, -0.4f), new(0.42f, -0.5f), new(-0.42f, -0.5f),
+                        new(-0.5f, -0.4f), new(-0.5f, 0.4f))
+                    .ColorRole(fabricRole))
                 .Shape($"{prefix}.awning", "Shop Awning", LowPolyShapeTypes.Cube, awning => awning
                     .Position(0f, 1.72f, -1.05f)
                     .Rotation(-12f, 0f, 0f)
@@ -132,7 +154,22 @@ namespace ShapeForge.LowPoly
                         .Position(0f, 0f, 0.42f)
                         .Rotation(18f, 0f, 0f)
                         .Scale(2.75f, 0.15f, 1.25f)
-                        .ColorRole("roof"))));
+                        .ColorRole("roof"))
+                    .Shape($"{prefix}.roof.ridge", "Ceramic Ridge", LowPolyShapeTypes.Cylinder, ridge => ridge
+                        .Position(0f, 0.34f, 0f)
+                        .Rotation(0f, 0f, 90f)
+                        .Scale(0.12f, 1.42f, 0.12f)
+                        .ColorRole("stone.dark"))
+                    .Shape($"{prefix}.roof.eave.front", "Front Eave", LowPolyShapeTypes.Cylinder, eave => eave
+                        .Position(0f, -0.15f, -1.02f)
+                        .Rotation(0f, 0f, 90f)
+                        .Scale(0.1f, 1.42f, 0.1f)
+                        .ColorRole("stone.dark"))
+                    .Shape($"{prefix}.roof.eave.back", "Back Eave", LowPolyShapeTypes.Cylinder, eave => eave
+                        .Position(0f, -0.15f, 1.02f)
+                        .Rotation(0f, 0f, 90f)
+                        .Scale(0.1f, 1.42f, 0.1f)
+                        .ColorRole("stone.dark"))));
         }
 
         private static void AddTorii(ShapeNodeBuilder town)
@@ -192,8 +229,13 @@ namespace ShapeForge.LowPoly
                 .Position(x, 0f, z)
                 .Shape($"{prefix}.post", "Lantern Post", LowPolyShapeTypes.Cylinder, post => post
                     .Position(0f, 0.68f, 0f).Scale(0.07f, 0.68f, 0.07f).ColorRole("roof"))
-                .Shape($"{prefix}.light", "Paper Lantern", LowPolyShapeTypes.Sphere, light => light
-                    .Position(0f, 1.42f, 0f).Scale(0.25f, 0.34f, 0.25f).ColorRole("lantern"))
+                .Shape($"{prefix}.light", "Paper Lantern", LowPolyShapeTypes.LatheProfile, light => light
+                    .Position(0f, 1.42f, 0f)
+                    .LatheProfile(12, true,
+                        new(0.12f, -0.34f), new(0.23f, -0.26f), new(0.26f, 0f),
+                        new(0.23f, 0.26f), new(0.12f, 0.34f))
+                    .ProfileSmoothing(1)
+                    .ColorRole("lantern"))
                 .Shape($"{prefix}.cap", "Lantern Cap", LowPolyShapeTypes.Cylinder, cap => cap
                     .Position(0f, 1.76f, 0f).Scale(0.18f, 0.06f, 0.18f).ColorRole("roof")));
         }
@@ -214,6 +256,45 @@ namespace ShapeForge.LowPoly
                     .Position(-0.72f, 1.95f, 0.05f).Scale(0.75f, 0.62f, 0.72f).ColorRole("blossom"))
                 .Shape("town.tree.cherry.crown.right", "Right Blossoms", LowPolyShapeTypes.Sphere, crown => crown
                     .Position(0.72f, 2.02f, -0.05f).Scale(0.78f, 0.66f, 0.74f).ColorRole("blossom")));
+        }
+
+        private static void AddStreetDetails(ShapeNodeBuilder town)
+        {
+            town.Group("town.street.details", "Street Details", details =>
+            {
+                details
+                    .Shape("town.drain.left", "Left Stone Drain", LowPolyShapeTypes.Cube, drain => drain
+                        .Position(-1.28f, 0.05f, -0.15f)
+                        .Scale(0.16f, 0.08f, 7.1f)
+                        .ColorRole("stone.dark"))
+                    .Shape("town.drain.right", "Right Stone Drain", LowPolyShapeTypes.Cube, drain => drain
+                        .Position(1.28f, 0.05f, -0.15f)
+                        .Scale(0.16f, 0.08f, 7.1f)
+                        .ColorRole("stone.dark"))
+                    .Shape("town.utility.pole", "Wood Utility Pole", LowPolyShapeTypes.Cylinder, pole => pole
+                        .Position(3.75f, 1.85f, -0.2f)
+                        .Scale(0.11f, 1.85f, 0.11f)
+                        .ColorRole("timber"))
+                    .Shape("town.utility.crossbar", "Utility Crossbar", LowPolyShapeTypes.Cube, bar => bar
+                        .Position(3.75f, 3.32f, -0.2f)
+                        .Scale(0.95f, 0.09f, 0.09f)
+                        .ColorRole("timber"))
+                    .Shape("town.utility.insulator.left", "Left Ceramic Insulator", LowPolyShapeTypes.Cylinder, item => item
+                        .Position(3.47f, 3.44f, -0.2f)
+                        .Scale(0.055f, 0.13f, 0.055f)
+                        .ColorRole("paper")
+                        .Mirror(ShapeMirrorAxis.X));
+
+                for (int index = 0; index < 5; index++)
+                {
+                    float z = -2.2f + (index * 1.05f);
+                    details.Shape($"town.drain.grate.{index}", $"Drain Grate {index + 1}", LowPolyShapeTypes.Cube, grate => grate
+                        .Position(-1.28f, 0.105f, z)
+                        .Scale(0.28f, 0.025f, 0.48f)
+                        .ColorRole("roof")
+                        .Mirror(ShapeMirrorAxis.X));
+                }
+            });
         }
     }
 }

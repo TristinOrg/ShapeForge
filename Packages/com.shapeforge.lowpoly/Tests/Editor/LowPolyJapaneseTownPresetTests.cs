@@ -31,7 +31,7 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Japanese Town"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(65));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(95));
             Assert.That(generatedRoot.transform.Find("Ramen Shop/Tiled Roof/Front Roof Slope"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Tea House/Sliding Door"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Shrine Torii/Upper Crossbar"), Is.Not.Null);
