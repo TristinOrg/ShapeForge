@@ -21,6 +21,8 @@ Code / JSON / Editor / External AI
 
 External AI integrations remain outside the schema and core packages. They produce validated ShapeForge documents through the same public JSON format used by scripts and authoring tools.
 
+Draft 2020-12 JSON Schema documents and minimal prompt examples live in `Packages/com.shapeforge.schema/Documentation~`. External tools should validate generated documents against the matching versioned schema before passing them to an engine adapter.
+
 ## Initial scope
 
 - An engine-agnostic schema package with versioned shape and style documents.
