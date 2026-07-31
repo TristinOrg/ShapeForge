@@ -102,16 +102,43 @@ namespace ShapeForge.LowPoly.Tests
             string      schema  = File.ReadAllText(Path.Combine(folder, "stylized-human-reference-1.0.schema.json"));
             string      example = File.ReadAllText(Path.Combine(folder, "stylized-human-reference.example.json"));
 
-            ShapeJsonSerializer                                   serializer = new();
+            ShapeJsonSerializer                                 serializer = new();
             LowPolyStylizedHumanReferenceSpecificationValidator validator = new();
-            LowPolyStylizedHumanReferenceSpecification          reference = serializer
+            LowPolyStylizedHumanReferenceSpecification         reference = serializer
                 .DeserializeSpecification<LowPolyStylizedHumanReferenceSpecification>(example, validator.Validate);
-            LowPolyStylizedHumanSpecification result = new LowPolyStylizedHumanReferenceMapper().Map(reference);
+            LowPolyStylizedHumanSpecification                   result = new LowPolyStylizedHumanReferenceMapper()
+                .Map(reference);
 
             Assert.That(schema, Does.Contain(
                 $"\"const\": \"{LowPolyStylizedHumanReferenceSpecification.CurrentSchema}\""));
             Assert.That(reference.Side, Is.Not.Null);
             Assert.That(result.Hair.Parting, Is.EqualTo(0.68f));
+        }
+
+        [Test]
+        public void ExtractionPromptEmbedsSchemaAndForbidsDepthGuessing()
+        {
+            const string schema = "{\"title\":\"reference\"}";
+
+            string prompt = LowPolyStylizedHumanReferencePrompt.Create(schema);
+
+            Assert.That(prompt, Does.Contain(schema));
+            Assert.That(prompt, Does.Contain("never infer depth"));
+            Assert.That(prompt, Does.Contain("image-left 0"));
+            Assert.That(prompt, Does.EndWith(schema));
+            Assert.Throws<System.ArgumentException>(() => LowPolyStylizedHumanReferencePrompt.Create(" "));
+        }
+
+        [Test]
+        public void PublishedExtractionGuideMatchesRuntimeProtocol()
+        {
+            PackageInfo package = PackageInfo.FindForAssembly(typeof(LowPolyStylizedHumanReferencePrompt).Assembly);
+            string      folder  = Path.Combine(package.resolvedPath, "Documentation~", "Templates");
+            string      guide   = File.ReadAllText(Path.Combine(folder, "stylized-human-reference.prompt.md"));
+
+            Assert.That(guide, Does.Contain("top of hair to bottom of feet"));
+            Assert.That(guide, Does.Contain("Never estimate depth from the front image"));
+            Assert.That(guide, Does.Contain(nameof(LowPolyStylizedHumanReferencePrompt)));
         }
     }
 }
