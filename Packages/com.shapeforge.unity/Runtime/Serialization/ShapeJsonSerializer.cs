@@ -91,5 +91,38 @@ namespace ShapeForge.Unity
             styleValidator.Validate(definition);
             return definition;
         }
+
+        /// <summary>
+        /// Serializes a template-owned semantic specification without coupling the adapter to its package.
+        /// </summary>
+        public string SerializeSpecification<TSpecification>(TSpecification specification)
+            where TSpecification : class
+        {
+            if (specification == null)
+                throw new ArgumentNullException(nameof(specification));
+
+            return JsonConvert.SerializeObject(specification, Settings);
+        }
+
+        /// <summary>
+        /// Deserializes and validates a template-owned semantic specification.
+        /// </summary>
+        public TSpecification DeserializeSpecification<TSpecification>(
+            string                 json,
+            Action<TSpecification> validate)
+            where TSpecification : class
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Specification JSON cannot be empty.", nameof(json));
+
+            if (validate == null)
+                throw new ArgumentNullException(nameof(validate));
+
+            TSpecification specification = JsonConvert.DeserializeObject<TSpecification>(json, Settings) ??
+                                           throw new JsonSerializationException(
+                                               "Specification JSON produced no definition.");
+            validate(specification);
+            return specification;
+        }
     }
 }

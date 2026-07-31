@@ -1,0 +1,24 @@
+{
+  "schema": "shapeforge.lowpoly.stylized-human/1.0",
+  "name": "Asymmetric Fantasy Hero",
+  "style": "lowpoly/fantasy-hero",
+  "overallScale": 1,
+  "proportions": {
+    "headScale": 1.08,
+    "shoulderWidth": 0.92,
+    "bodyWidth": 0.9,
+    "legLength": 1.08
+  },
+  "head": {
+    "width": 0.96,
+    "height": 1.04,
+    "depth": 1.02,
+    "jawWidth": 0.86
+  },
+  "hair": {
+    "volume": 1.08,
+    "parting": 0.7,
+    "fringeLength": 0.72,
+    "sideburnLength": 0.42
+  }
+}

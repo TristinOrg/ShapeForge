@@ -11,3 +11,5 @@ Use `UnityShapeModelGenerator.Prepare` when generating the same immutable defini
 `ShapeJsonSerializer.Serialize(ShapeCapabilityCatalogDocument)` exports any backend capability catalog as compact, versioned JSON for external authoring tools and LLM context.
 
 The same serializer exports `ShapeTemplateCatalogDocument` discovery metadata. Template-specific specification serialization remains owned by the package that defines that specification.
+
+Use `SerializeSpecification` and `DeserializeSpecification` for template-owned data at the Unity JSON boundary. Deserialization requires the owning package's validator callback, so external documents cannot bypass semantic validation.
