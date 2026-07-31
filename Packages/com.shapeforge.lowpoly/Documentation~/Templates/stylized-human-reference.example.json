@@ -1,0 +1,19 @@
+{
+  "schema": "shapeforge.lowpoly.stylized-human-reference/1.0",
+  "front": {
+    "headWidth": 0.252,
+    "headHeight": 0.273,
+    "shoulderWidth": 0.326,
+    "bodyWidth": 0.165,
+    "legLength": 0.505,
+    "jawWidthToHeadWidth": 0.741,
+    "hairWidthToHeadWidth": 1.242,
+    "parting": 0.68,
+    "fringeLength": 0.72,
+    "sideburnLength": 0.28
+  },
+  "side": {
+    "headDepth": 0.218,
+    "hairDepthToHeadDepth": 1.134
+  }
+}

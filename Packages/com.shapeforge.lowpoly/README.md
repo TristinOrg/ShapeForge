@@ -8,6 +8,8 @@ Use `LowPolyShapeCapabilityCatalog.Instance` to query all ten supported geometry
 
 `LowPolyStylizedHumanTemplate` is the first optional semantic compiler. It accepts a validated `LowPolyStylizedHumanSpecification` with readable body, head, and hair controls, then produces the same articulated Shape Definition used by the Hero preset. Its Draft 2020-12 Schema and prompt-ready example live under `Documentation~/Templates`.
 
+`LowPolyStylizedHumanReferenceMapper` converts normalized front-view measurements and optional side-view measurements into that semantic specification. Measurements are ratios rather than pixels, making them resolution-independent and straightforward for external LLMs to author. Missing side-view data deliberately preserves the base head depth instead of guessing an invisible dimension. A versioned reference Schema and example also live under `Documentation~/Templates`.
+
 Use `LowPolyModelGenerator` as the reusable runtime entry point for validated definitions or external ShapeForge JSON. Register style documents once, then reuse the same pipeline for subsequent models.
 
 For repeated models, call `ParseJson` once and pass the returned `ShapeDefinition` to `Generate`. `GenerateJson` is intended for one-off documents because it parses and validates on every call.
