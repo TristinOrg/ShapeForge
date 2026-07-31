@@ -22,6 +22,9 @@ namespace ShapeForge
             if (string.IsNullOrWhiteSpace(definition.Id))
                 throw new ShapeValidationException("Every style requires a stable ID.");
 
+            if (string.Equals(definition.Id, definition.BaseStyle, StringComparison.Ordinal))
+                throw new ShapeValidationException($"Style '{definition.Id}' cannot inherit from itself.");
+
             if (definition.Palette == null)
                 throw new ShapeValidationException($"Style '{definition.Id}' requires a palette.");
 

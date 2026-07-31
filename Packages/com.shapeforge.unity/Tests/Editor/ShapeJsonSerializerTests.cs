@@ -55,7 +55,10 @@ namespace ShapeForge.Unity.Tests
         [Test]
         public void StyleRoundTripPreservesPalette()
         {
-            ShapeStyleDefinition source = new ShapeStyleDefinition("lowpoly/default");
+            ShapeStyleDefinition source = new ShapeStyleDefinition("lowpoly/default")
+            {
+                BaseStyle = "lowpoly/base"
+            };
             source.Palette.Set("primary", new ForgeColor(0f, 0f, 1f));
 
             ShapeJsonSerializer serializer = new ShapeJsonSerializer();
@@ -63,6 +66,8 @@ namespace ShapeForge.Unity.Tests
             ShapeStyleDefinition result     = serializer.DeserializeStyle(json);
 
             Assert.That(json, Does.Contain("\"schema\":\"shapeforge.style/1.0\""));
+            Assert.That(json, Does.Contain("\"baseStyle\":\"lowpoly/base\""));
+            Assert.That(result.BaseStyle, Is.EqualTo("lowpoly/base"));
             Assert.That(result.Palette.TryGetColor("primary", out ForgeColor color), Is.True);
             Assert.That(color, Is.EqualTo(new ForgeColor(0f, 0f, 1f)));
         }

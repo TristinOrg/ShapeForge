@@ -29,6 +29,7 @@ External AI integrations remain outside the schema and core packages. They produ
 - An official Low Poly package implementing the contracts.
 - Hierarchical pivots for simple modular animation.
 - Customizable appearance, palettes, and styles separated from geometry.
+- Inheritable styles that override semantic palette roles without duplicating complete palettes.
 - EditMode tests for core behavior and package samples for developer workflows.
 
 Unity version: `2022.3.62f3`.

@@ -39,6 +39,11 @@ namespace ShapeForge
         public string Id { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the optional parent style whose palette roles are inherited.
+        /// </summary>
+        public string BaseStyle { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets the semantic color palette.
         /// </summary>
         public ShapePalette Palette { get; set; } = new ShapePalette();

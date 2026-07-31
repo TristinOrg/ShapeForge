@@ -8,8 +8,9 @@ namespace ShapeForge
     /// </summary>
     public sealed class ShapeStyleResolver : IShapeStyleResolver
     {
-        private readonly Dictionary<string, ShapeStyleDefinition> styles = new(StringComparer.Ordinal);
-        private readonly ShapeStyleDefinitionValidator validator = new();
+        private readonly Dictionary<string, ShapeStyleDefinition> styles   = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, ResolvedPalette>      palettes = new(StringComparer.Ordinal);
+        private readonly ShapeStyleDefinitionValidator            validator  = new();
 
         /// <summary>
         /// Initializes a resolver with its available style definitions.
@@ -29,6 +30,8 @@ namespace ShapeForge
                 if (!this.styles.TryAdd(style.Id, style))
                     throw new ArgumentException($"Duplicate style ID '{style.Id}'.", nameof(styles));
             }
+
+            RebuildPalettes();
         }
 
         /// <summary>
@@ -40,7 +43,23 @@ namespace ShapeForge
                 throw new ArgumentNullException(nameof(style));
 
             validator.Validate(style);
-            styles[style.Id] = style;
+            bool                 hadPrevious = styles.TryGetValue(style.Id, out ShapeStyleDefinition previous);
+            styles[style.Id]                 = style;
+
+            try
+            {
+                RebuildPalettes();
+            }
+            catch
+            {
+                if (hadPrevious)
+                    styles[style.Id] = previous;
+                else
+                    styles.Remove(style.Id);
+
+                RebuildPalettes();
+                throw;
+            }
         }
 
         /// <inheritdoc />
@@ -52,11 +71,66 @@ namespace ShapeForge
             if (node == null)
                 throw new ArgumentNullException(nameof(node));
 
-            if (styles.TryGetValue(definition.Style, out ShapeStyleDefinition style))
-                return style.Palette.TryGetColor(node.Appearance.ColorRole, out color);
+            if (palettes.TryGetValue(definition.Style, out ResolvedPalette palette))
+                return palette.TryGetColor(node.Appearance.ColorRole, out color);
 
             color = default;
             return false;
+        }
+
+        private void RebuildPalettes()
+        {
+            palettes.Clear();
+            foreach (string styleId in styles.Keys)
+                ResolvePalette(styleId, new HashSet<string>(StringComparer.Ordinal));
+        }
+
+        private ResolvedPalette ResolvePalette(string styleId, HashSet<string> chain)
+        {
+            if (palettes.TryGetValue(styleId, out ResolvedPalette resolved))
+                return resolved;
+
+            if (!styles.TryGetValue(styleId, out ShapeStyleDefinition style))
+                throw new ShapeValidationException($"Inherited style '{styleId}' is not registered.");
+
+            if (!chain.Add(styleId))
+                throw new ShapeValidationException($"Style inheritance contains a cycle at '{styleId}'.");
+
+            ResolvedPalette palette = string.IsNullOrWhiteSpace(style.BaseStyle)
+                ? new ResolvedPalette()
+                : new ResolvedPalette(ResolvePalette(style.BaseStyle, chain));
+
+            foreach (ShapePaletteEntry entry in style.Palette.Entries)
+                palette.Set(entry.Role, entry.Color);
+
+            chain.Remove(styleId);
+            palettes.Add(styleId, palette);
+            return palette;
+        }
+
+        private sealed class ResolvedPalette
+        {
+            private readonly Dictionary<string, ForgeColor> colors;
+
+            public ResolvedPalette()
+            {
+                colors = new(StringComparer.Ordinal);
+            }
+
+            public ResolvedPalette(ResolvedPalette source)
+            {
+                colors = new(source.colors, StringComparer.Ordinal);
+            }
+
+            public void Set(string role, ForgeColor color)
+            {
+                colors[role] = color;
+            }
+
+            public bool TryGetColor(string role, out ForgeColor color)
+            {
+                return colors.TryGetValue(role, out color);
+            }
         }
     }
 }

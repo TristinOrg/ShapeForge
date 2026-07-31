@@ -47,7 +47,7 @@ Schema and Core use assemblies with no UnityEngine references. Unity adapts Sche
 
 ## Architecture
 
-Schema provides versioned engine-agnostic shape and style documents. Core provides validation, fluent authoring, mutable style registration, and engine-neutral transform target/resolver contracts without UnityEngine. The Unity Adapter owns JSON, GameObject generation, lifecycle-safe serialized appearance, and a root model manifest that resolves stable node IDs without hierarchy traversal. LowPoly supplies a reusable definition/JSON generation pipeline, cached Cube, Sphere, Cylinder, and Capsule render resources, a detailed Inventor Workbench and articulated Sentinel Robot preset, plus undoable Editor preview commands.
+Schema provides versioned engine-agnostic shape and style documents with optional base-style references. Core provides validation, cached style inheritance, fluent authoring, mutable style registration, and engine-neutral transform target/resolver contracts without UnityEngine. The Unity Adapter owns JSON, GameObject generation, lifecycle-safe serialized appearance, and a root model manifest that resolves stable node IDs without hierarchy traversal. LowPoly supplies a reusable definition/JSON generation pipeline, cached primitive and procedural render resources, showcase presets, plus undoable Editor preview commands.
 
 ## Coding Conventions
 
@@ -58,7 +58,7 @@ Schema provides versioned engine-agnostic shape and style documents. Core provid
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Nineteen first-party EditMode tests cover fluent authoring, the JSON contract and runtime generation entry point, prepared count- and time-budgeted batch generation, hierarchy adaptation, identity and color validation, lifecycle-safe color reapplication, shared material and primitive-mesh reuse, style resolution, LowPoly generation, furniture generation, and modular Robot pivots.
+- Thirty-six first-party EditMode tests cover fluent authoring, JSON contracts, cached style inheritance, runtime generation, prepared count- and time-budgeted batches, hierarchy adaptation, validation, lifecycle-safe appearance, shared render resources, procedural geometry, presets, and motion-ready pivots.
 - `ShapeForge > Diagnostics > Benchmark JSON Generation` measures 200 alternating Table and Robot JSON generations, managed heap growth, and shared render-resource counts without saving generated objects.
 - The benchmark reports JSON parsing and prepared-definition generation separately. Repeated runtime models should call `LowPolyModelGenerator.ParseJson` once and reuse the validated definition.
 - Prepared batches use `UnityShapeGenerationPlan` to validate an immutable definition once before repeated generation.
@@ -82,7 +82,7 @@ Schema provides versioned engine-agnostic shape and style documents. Core provid
 ## Unknowns And Confidence
 
 - The initial API and Unity JSON serialization shape are implemented but remain pre-1.0 and may evolve.
-- Style inheritance, palette resolution, animation bindings, and external JSON schema versioning remain design work.
+- Motion clip serialization and a published machine-readable JSON Schema remain design work.
 - Supported Unity versions and public release license are not yet decided.
 
 ## Source Files Inspected
