@@ -30,7 +30,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(leftArm, Is.Not.Null);
             Assert.That(leftShoulder.Type, Is.EqualTo(ShapeTypes.Group));
             Assert.That(FindNode(leftShoulder, leftArm.Id), Is.SameAs(leftArm));
-            Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.Capsule));
+            Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.LatheProfile));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace ShapeForge.LowPoly.Tests
 
             generatedRoot = generator.Generate(definition);
 
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(27));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(37));
             Assert.That(generatedRoot.transform.Find("Left Shoulder Pivot/Left Elbow Pivot/Left Hand"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Right Hip Pivot/Right Knee Pivot/Right Foot"), Is.Not.Null);
 
