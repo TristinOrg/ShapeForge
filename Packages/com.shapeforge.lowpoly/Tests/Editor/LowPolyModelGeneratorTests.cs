@@ -32,7 +32,7 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.GenerateJson(serializer.Serialize(LowPolyWorkbenchPreset.CreateDefinition()));
 
             Renderer top = generatedRoot.transform.Find("Worktop").GetComponent<Renderer>();
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(26));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(37));
             Assert.That(top.sharedMaterial.color.r, Is.EqualTo(0.1f).Within(0.0001f));
             Assert.That(top.HasPropertyBlock(), Is.False);
         }

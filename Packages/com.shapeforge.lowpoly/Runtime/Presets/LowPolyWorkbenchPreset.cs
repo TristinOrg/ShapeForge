@@ -21,9 +21,11 @@ namespace ShapeForge.LowPoly
                 .Root("workbench", "Inventor Workbench", table =>
                 {
                     table
-                        .Shape("workbench.top", "Worktop", LowPolyShapeTypes.Cube, top => top
+                        .Shape("workbench.top", "Worktop", LowPolyShapeTypes.ExtrudedProfile, top => top
                             .Position(0f, 1.15f, 0f)
-                            .Scale(2.8f, 0.2f, 1.35f)
+                            .Rotation(90f, 0f, 0f)
+                            .Scale(2.8f, 1.35f, 1f)
+                            .ExtrudedProfile(0.2f, 0.035f, RoundedRectangleProfile())
                             .ColorRole("wood.primary"))
                         .Shape("workbench.top.front", "Front Edge", LowPolyShapeTypes.Cube, edge => edge
                             .Position(0f, 1.11f, -0.68f)
@@ -36,7 +38,15 @@ namespace ShapeForge.LowPoly
                         .Shape("workbench.brace.back", "Back Crossbar", LowPolyShapeTypes.Cube, brace => brace
                             .Position(0f, 0.72f, 0.52f)
                             .Scale(2.35f, 0.16f, 0.14f)
-                            .ColorRole("metal.dark"));
+                            .ColorRole("metal.dark"))
+                        .Shape("workbench.apron.front", "Front Apron", LowPolyShapeTypes.Cube, apron => apron
+                            .Position(-0.65f, 0.94f, -0.52f)
+                            .Scale(1.05f, 0.25f, 0.12f)
+                            .ColorRole("wood.secondary"))
+                        .Shape("workbench.apron.side", "Side Apron", LowPolyShapeTypes.Cube, apron => apron
+                            .Position(-1.18f, 0.94f, 0f)
+                            .Scale(0.12f, 0.25f, 0.92f)
+                            .ColorRole("wood.secondary"));
 
                     AddLeg(table, "front-left", "Front Left", -1.08f, -0.47f);
                     AddLeg(table, "front-right", "Front Right", 1.08f, -0.47f);
@@ -46,6 +56,7 @@ namespace ShapeForge.LowPoly
                     AddToolBoard(table);
                     AddLamp(table);
                     AddMug(table);
+                    AddVise(table);
                 })
                 .Build();
         }
@@ -70,9 +81,14 @@ namespace ShapeForge.LowPoly
         {
             float footZ = z + (z < 0f ? -0.08f : 0.08f);
             table
-                .Shape($"workbench.leg.{id}", $"{label} Leg", LowPolyShapeTypes.Cube, leg => leg
+                .Shape($"workbench.leg.{id}", $"{label} Leg", LowPolyShapeTypes.ProfileLoft, leg => leg
                     .Position(x, 0.55f, z)
-                    .Scale(0.22f, 1.1f, 0.22f)
+                    .Scale(0.28f, 1.1f, 0.28f)
+                    .ProfileLoft(
+                        RoundedRectangleProfile(),
+                        Section(-0.5f, 0.78f, 0.78f),
+                        Section(0.5f, 1f, 1f))
+                    .LoftQuality(1, true)
                     .ColorRole("metal.dark"))
                 .Shape($"workbench.foot.{id}", $"{label} Foot", LowPolyShapeTypes.Cube, foot => foot
                     .Position(x, 0.08f, footZ)
@@ -91,6 +107,10 @@ namespace ShapeForge.LowPoly
                     .Position(0f, 0f, -0.34f)
                     .Scale(1.12f, 0.4f, 0.1f)
                     .ColorRole("wood.primary"))
+                .Shape("workbench.drawer.inset", "Drawer Inset", LowPolyShapeTypes.Cube, inset => inset
+                    .Position(0f, 0f, -0.405f)
+                    .Scale(0.78f, 0.2f, 0.025f)
+                    .ColorRole("wood.secondary"))
                 .Shape("workbench.drawer.handle", "Drawer Handle", LowPolyShapeTypes.Cylinder, handle => handle
                     .Position(0f, 0f, -0.43f)
                     .Rotation(90f, 0f, 0f)
@@ -123,7 +143,17 @@ namespace ShapeForge.LowPoly
                     .Position(0.52f, 0.1f, -0.12f)
                     .Rotation(90f, 0f, 0f)
                     .Scale(0.28f, 0.08f, 0.28f)
-                    .ColorRole("ceramic")));
+                    .ColorRole("ceramic"))
+                .Shape("workbench.tool.pliers.left", "Pliers Left Jaw", LowPolyShapeTypes.Cube, jaw => jaw
+                    .Position(0.08f, 0.02f, -0.13f)
+                    .Rotation(0f, 0f, -9f)
+                    .Scale(0.07f, 0.55f, 0.07f)
+                    .ColorRole("metal.accent"))
+                .Shape("workbench.tool.pliers.right", "Pliers Right Jaw", LowPolyShapeTypes.Cube, jaw => jaw
+                    .Position(0.21f, 0.02f, -0.13f)
+                    .Rotation(0f, 0f, 9f)
+                    .Scale(0.07f, 0.55f, 0.07f)
+                    .ColorRole("metal.accent")));
         }
 
         private static void AddLamp(ShapeNodeBuilder table)
@@ -159,6 +189,56 @@ namespace ShapeForge.LowPoly
                     .Position(0.23f, 0f, 0f)
                     .Scale(0.18f, 0.22f, 0.08f)
                     .ColorRole("ceramic")));
+        }
+
+        private static void AddVise(ShapeNodeBuilder table)
+        {
+            table.Group("workbench.vise", "Bench Vise", vise => vise
+                .Position(1.05f, 1.36f, -0.38f)
+                .Shape("workbench.vise.base", "Vise Swivel Base", LowPolyShapeTypes.Cylinder, part => part
+                    .Scale(0.3f, 0.08f, 0.3f)
+                    .ColorRole("metal.dark"))
+                .Shape("workbench.vise.body", "Vise Body", LowPolyShapeTypes.ProfileLoft, part => part
+                    .Position(0f, 0.16f, 0f)
+                    .Scale(0.48f, 0.3f, 0.38f)
+                    .ProfileLoft(
+                        RoundedRectangleProfile(),
+                        Section(-0.5f, 0.72f, 0.82f),
+                        Section(0.5f, 1f, 1f))
+                    .LoftQuality(1, true)
+                    .ColorRole("metal.secondary"))
+                .Shape("workbench.vise.jaw.fixed", "Fixed Jaw", LowPolyShapeTypes.Cube, jaw => jaw
+                    .Position(0f, 0.32f, 0.14f)
+                    .Scale(0.52f, 0.16f, 0.12f)
+                    .ColorRole("metal.accent"))
+                .Shape("workbench.vise.jaw.moving", "Moving Jaw", LowPolyShapeTypes.Cube, jaw => jaw
+                    .Position(0f, 0.32f, -0.18f)
+                    .Scale(0.52f, 0.16f, 0.12f)
+                    .ColorRole("metal.accent"))
+                .Shape("workbench.vise.screw", "Vise Screw", LowPolyShapeTypes.Cylinder, screw => screw
+                    .Position(0f, 0.14f, -0.38f)
+                    .Rotation(90f, 0f, 0f)
+                    .Scale(0.08f, 0.28f, 0.08f)
+                    .ColorRole("metal.dark"))
+                .Shape("workbench.vise.handle", "Vise Handle", LowPolyShapeTypes.Cylinder, handle => handle
+                    .Position(0f, 0.14f, -0.68f)
+                    .Rotation(0f, 0f, 90f)
+                    .Scale(0.035f, 0.34f, 0.035f)
+                    .ColorRole("metal.accent")));
+        }
+
+        private static ForgeVector2[] RoundedRectangleProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.42f, 0.5f), new(0.42f, 0.5f), new(0.5f, 0.42f), new(0.5f, -0.42f),
+                new(0.42f, -0.5f), new(-0.42f, -0.5f), new(-0.5f, -0.42f), new(-0.5f, 0.42f)
+            };
+        }
+
+        private static ShapeProfileSection Section(float z, float scaleX, float scaleY)
+        {
+            return new(z, new(scaleX, scaleY), new());
         }
     }
 }

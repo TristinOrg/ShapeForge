@@ -36,7 +36,7 @@ namespace ShapeForge.LowPoly.Tests
             secondGeneratedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Inventor Workbench"));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(26));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(37));
             Assert.That(generatedRoot.transform.Find("Tool Board/Upper Shelf"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Task Lamp/Lamp Bulb"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Drawer/Drawer Face").localPosition.z, Is.LessThan(0f));
@@ -53,7 +53,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(renderer.HasPropertyBlock(), Is.False);
             Assert.That(renderer.sharedMaterial, Is.SameAs(secondRenderer.sharedMaterial));
             Assert.That(generatedRoot.GetComponentsInChildren<UnityShapeAppearanceManifest>().Length, Is.EqualTo(1));
-            Assert.That(generatedRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(26));
+            Assert.That(generatedRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(36));
 
             renderer.sharedMaterial = null;
             generatedRoot.GetComponent<UnityShapeAppearanceManifest>().Apply();
