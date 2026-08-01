@@ -23,6 +23,15 @@ PACKAGES = {
 }
 VERSION = "0.1.0"
 TAG = f"v{VERSION}"
+REQUIRED_ROOT_FILES = (
+    "CHANGELOG.md",
+    "COMMERCIAL-LICENSE.md",
+    "CONTRIBUTING.md",
+    "COPYING",
+    "LICENSE.md",
+    "README.md",
+    "SECURITY.md",
+)
 
 
 def load_json(path: Path) -> dict:
@@ -40,6 +49,12 @@ def validate_packages(errors: list[str]) -> None:
             errors.append(f"{package_name}: expected version {VERSION}")
         if manifest.get("unity") != "2022.3":
             errors.append(f"{package_name}: expected Unity 2022.3 compatibility")
+        if f"/{TAG}/" not in manifest.get("documentationUrl", ""):
+            errors.append(f"{package_name}: documentation URL is not pinned to {TAG}")
+        if f"/{TAG}/" not in manifest.get("changelogUrl", ""):
+            errors.append(f"{package_name}: changelog URL is not pinned to {TAG}")
+        if f"/{TAG}/" not in manifest.get("licensesUrl", ""):
+            errors.append(f"{package_name}: license URL is not pinned to {TAG}")
 
         dependencies = manifest.get("dependencies", {})
         for dependency, version in local_dependencies.items():
@@ -76,6 +91,10 @@ def validate_engine_boundaries(errors: list[str]) -> None:
 
 def main() -> int:
     errors: list[str] = []
+    for filename in REQUIRED_ROOT_FILES:
+        if not (ROOT / filename).is_file():
+            errors.append(f"Missing release document: {filename}")
+
     validate_packages(errors)
     validate_json_files(errors)
     validate_engine_boundaries(errors)
