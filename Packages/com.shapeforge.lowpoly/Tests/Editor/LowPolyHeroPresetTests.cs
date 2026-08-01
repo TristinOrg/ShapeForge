@@ -34,6 +34,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(generatedRoot.name, Is.EqualTo("Pocket Fantasy Hero"));
             Assert.That(rig.TryGetNodeId(ShapeRigRoles.Hips, out string hipsId), Is.True);
             Assert.That(hipsId, Is.EqualTo("hero.pelvis.pivot"));
+            Assert.That(rig.ConstrainRotationOffset(ShapeRigRoles.LeftKnee, new(-180f, 15f, 15f)),
+                Is.EqualTo(new ForgeVector3(-120f, 0f, 0f)));
             Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(31));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Unified Polygon Hair Shell"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear"), Is.Not.Null);

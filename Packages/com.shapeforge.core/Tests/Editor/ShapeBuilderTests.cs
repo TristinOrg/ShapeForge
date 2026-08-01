@@ -86,7 +86,10 @@ namespace ShapeForge.Tests
         {
             ShapeDefinition definition = ShapeBuilder
                 .Create("Actor")
-                .WithRig("humanoid/basic", new ShapeRigJoint(ShapeRigRoles.Head, "head-pivot"))
+                .WithRig("humanoid/basic", new ShapeRigJoint(
+                    ShapeRigRoles.Head,
+                    "head-pivot",
+                    new ShapeRigRotationConstraint(new(-20f, -45f, -15f), new(30f, 45f, 15f))))
                 .Root("actor", "Actor", root => root
                     .Group("head-pivot", "Head Pivot"))
                 .Build();
@@ -94,6 +97,10 @@ namespace ShapeForge.Tests
 
             Assert.That(index.TryGetNodeId(ShapeRigRoles.Head, out string nodeId), Is.True);
             Assert.That(nodeId, Is.EqualTo("head-pivot"));
+            Assert.That(index.ConstrainRotationOffset(ShapeRigRoles.Head, new(-90f, 10f, 40f)),
+                Is.EqualTo(new ForgeVector3(-20f, 10f, 15f)));
+            Assert.That(index.ConstrainRotationOffset("custom/unconstrained", new(1f, 2f, 3f)),
+                Is.EqualTo(new ForgeVector3(1f, 2f, 3f)));
         }
 
         [Test]
@@ -115,6 +122,20 @@ namespace ShapeForge.Tests
                 .WithRig("humanoid/basic",
                     new ShapeRigJoint(ShapeRigRoles.Head, "actor"),
                     new ShapeRigJoint(ShapeRigRoles.Head, "actor"))
+                .Root("actor", "Actor");
+
+            Assert.Throws<ShapeValidationException>(() => builder.Build());
+        }
+
+        [Test]
+        public void BuildRejectsInvertedSemanticRigRotationLimits()
+        {
+            ShapeBuilder builder = ShapeBuilder
+                .Create("Actor")
+                .WithRig("humanoid/basic", new ShapeRigJoint(
+                    ShapeRigRoles.Head,
+                    "actor",
+                    new ShapeRigRotationConstraint(new(10f, 0f, 0f), new(-10f, 0f, 0f))))
                 .Root("actor", "Actor");
 
             Assert.Throws<ShapeValidationException>(() => builder.Build());

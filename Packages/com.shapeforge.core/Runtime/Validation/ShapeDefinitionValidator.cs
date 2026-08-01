@@ -50,7 +50,33 @@ namespace ShapeForge
                 if (string.IsNullOrWhiteSpace(joint.NodeId) || !nodeIds.Contains(joint.NodeId))
                     throw new ShapeValidationException(
                         $"Semantic rig role '{joint.Role}' targets unknown node '{joint.NodeId}'.");
+
+                ValidateRotationConstraint(joint);
             }
+        }
+
+        private static void ValidateRotationConstraint(ShapeRigJoint joint)
+        {
+            ShapeRigRotationConstraint constraint = joint.RotationConstraint;
+            if (constraint == null)
+                return;
+
+            ValidateFinite(constraint.Minimum, joint.Role);
+            ValidateFinite(constraint.Maximum, joint.Role);
+            if (constraint.Minimum.X > constraint.Maximum.X ||
+                constraint.Minimum.Y > constraint.Maximum.Y ||
+                constraint.Minimum.Z > constraint.Maximum.Z)
+                throw new ShapeValidationException(
+                    $"Semantic rig role '{joint.Role}' rotation minimum cannot exceed its maximum.");
+        }
+
+        private static void ValidateFinite(ForgeVector3 value, string role)
+        {
+            if (float.IsNaN(value.X) || float.IsInfinity(value.X) ||
+                float.IsNaN(value.Y) || float.IsInfinity(value.Y) ||
+                float.IsNaN(value.Z) || float.IsInfinity(value.Z))
+                throw new ShapeValidationException(
+                    $"Semantic rig role '{role}' rotation limits must be finite.");
         }
 
         private static void ValidateNode(ShapeNode node, HashSet<string> nodeIds)

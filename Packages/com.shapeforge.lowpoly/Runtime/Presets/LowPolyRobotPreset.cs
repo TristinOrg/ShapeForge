@@ -20,15 +20,17 @@ namespace ShapeForge.LowPoly
                 .WithStyle(StyleId)
                 .WithRig("humanoid/basic",
                     new ShapeRigJoint(ShapeRigRoles.Root, "robot"),
-                    new ShapeRigJoint(ShapeRigRoles.Head, "robot.head.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftShoulder, "robot.arm.left.shoulder.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftElbow, "robot.arm.left.elbow.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightShoulder, "robot.arm.right.shoulder.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightElbow, "robot.arm.right.elbow.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftHip, "robot.leg.left.hip.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftKnee, "robot.leg.left.knee.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightHip, "robot.leg.right.hip.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightKnee, "robot.leg.right.knee.pivot"))
+                    Joint(ShapeRigRoles.Head, "robot.head.pivot", -30f, 30f, -75f, 75f, -25f, 25f),
+                    Joint(ShapeRigRoles.LeftShoulder, "robot.arm.left.shoulder.pivot",
+                        -80f, 80f, -40f, 40f, -20f, 105f),
+                    Joint(ShapeRigRoles.LeftElbow, "robot.arm.left.elbow.pivot", -5f, 125f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.RightShoulder, "robot.arm.right.shoulder.pivot",
+                        -80f, 80f, -40f, 40f, -105f, 20f),
+                    Joint(ShapeRigRoles.RightElbow, "robot.arm.right.elbow.pivot", -5f, 125f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.LeftHip, "robot.leg.left.hip.pivot", -50f, 50f, -20f, 20f, -15f, 15f),
+                    Joint(ShapeRigRoles.LeftKnee, "robot.leg.left.knee.pivot", -125f, 5f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.RightHip, "robot.leg.right.hip.pivot", -50f, 50f, -20f, 20f, -15f, 15f),
+                    Joint(ShapeRigRoles.RightKnee, "robot.leg.right.knee.pivot", -125f, 5f, 0f, 0f, 0f, 0f))
                 .Root("robot", "Sentinel Robot", robot =>
                 {
                     robot
@@ -75,6 +77,21 @@ namespace ShapeForge.LowPoly
                     AddLeg(robot, "right", "Right", 0.3f);
                 })
                 .Build();
+        }
+
+        private static ShapeRigJoint Joint(
+            string role,
+            string nodeId,
+            float  minimumX,
+            float  maximumX,
+            float  minimumY,
+            float  maximumY,
+            float  minimumZ,
+            float  maximumZ)
+        {
+            return new ShapeRigJoint(role, nodeId, new ShapeRigRotationConstraint(
+                new(minimumX, minimumY, minimumZ),
+                new(maximumX, maximumY, maximumZ)));
         }
 
         /// <summary>

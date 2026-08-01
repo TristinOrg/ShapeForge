@@ -34,6 +34,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.LatheProfile));
             Assert.That(rig.TryGetNodeId(ShapeRigRoles.LeftElbow, out string elbowId), Is.True);
             Assert.That(elbowId, Is.EqualTo("robot.arm.left.elbow.pivot"));
+            Assert.That(rig.ConstrainRotationOffset(ShapeRigRoles.LeftElbow, new(160f, 5f, 5f)),
+                Is.EqualTo(new ForgeVector3(125f, 0f, 0f)));
         }
 
         [Test]

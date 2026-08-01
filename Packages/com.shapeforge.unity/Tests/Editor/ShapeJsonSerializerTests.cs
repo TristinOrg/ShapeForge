@@ -40,10 +40,12 @@ namespace ShapeForge.Unity.Tests
                 Rig = new ShapeRigDefinition
                 {
                     Type   = "humanoid/basic",
-                    Joints = new[]
+                    Joints = new ShapeRigJoint[]
                     {
-                        new(ShapeRigRoles.Root, "robot"),
-                        new(ShapeRigRoles.Head, "body")
+                        new ShapeRigJoint(ShapeRigRoles.Root, "robot"),
+                        new ShapeRigJoint(ShapeRigRoles.Head, "body", new ShapeRigRotationConstraint(
+                            new(-20f, -45f, -15f),
+                            new(30f, 45f, 15f)))
                     }
                 }
             };
@@ -72,6 +74,8 @@ namespace ShapeForge.Unity.Tests
                 Is.EqualTo(new ForgeVector2(0.35f, 0.6f)));
             Assert.That(result.Root.Children[0].MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
             Assert.That(result.Rig.Joints[1].NodeId, Is.EqualTo("body"));
+            Assert.That(result.Rig.Joints[1].RotationConstraint.Maximum,
+                Is.EqualTo(new ForgeVector3(30f, 45f, 15f)));
         }
 
         [Test]

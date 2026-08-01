@@ -25,6 +25,18 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Initializes a constrained semantic joint mapping.
+        /// </summary>
+        public ShapeRigJoint(
+            string                     role,
+            string                     nodeId,
+            ShapeRigRotationConstraint rotationConstraint)
+            : this(role, nodeId)
+        {
+            RotationConstraint = rotationConstraint;
+        }
+
+        /// <summary>
         /// Gets or sets the engine-independent semantic role.
         /// </summary>
         public string Role { get; set; } = string.Empty;
@@ -33,5 +45,10 @@ namespace ShapeForge
         /// Gets or sets the stable target node ID.
         /// </summary>
         public string NodeId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets optional rotation limits relative to the node's authored rest pose.
+        /// </summary>
+        public ShapeRigRotationConstraint RotationConstraint { get; set; }
     }
 }

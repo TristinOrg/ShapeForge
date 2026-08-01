@@ -33,7 +33,17 @@
       "required": ["role", "nodeId"],
       "properties": {
         "role": { "type": "string", "minLength": 1 },
-        "nodeId": { "type": "string", "minLength": 1 }
+        "nodeId": { "type": "string", "minLength": 1 },
+        "rotationConstraint": { "$ref": "#/$defs/rotationConstraint" }
+      }
+    },
+    "rotationConstraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum", "maximum"],
+      "properties": {
+        "minimum": { "$ref": "#/$defs/vector3" },
+        "maximum": { "$ref": "#/$defs/vector3" }
       }
     },
     "vector2": {

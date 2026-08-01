@@ -22,17 +22,19 @@ namespace ShapeForge.LowPoly
                 .WithStyle(specification.Style)
                 .WithRig("humanoid/basic",
                     new ShapeRigJoint(ShapeRigRoles.Root, "hero"),
-                    new ShapeRigJoint(ShapeRigRoles.Hips, "hero.pelvis.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.Spine, "hero.spine.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.Head, "hero.head.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftShoulder, "hero.arm.left.shoulder.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftElbow, "hero.arm.left.elbow.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightShoulder, "hero.arm.right.shoulder.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightElbow, "hero.arm.right.elbow.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftHip, "hero.leg.left.hip.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.LeftKnee, "hero.leg.left.knee.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightHip, "hero.leg.right.hip.pivot"),
-                    new ShapeRigJoint(ShapeRigRoles.RightKnee, "hero.leg.right.knee.pivot"))
+                    Joint(ShapeRigRoles.Hips, "hero.pelvis.pivot", -10f, 10f, -15f, 15f, -10f, 10f),
+                    Joint(ShapeRigRoles.Spine, "hero.spine.pivot", -15f, 20f, -25f, 25f, -12f, 12f),
+                    Joint(ShapeRigRoles.Head, "hero.head.pivot", -25f, 35f, -60f, 60f, -25f, 25f),
+                    Joint(ShapeRigRoles.LeftShoulder, "hero.arm.left.shoulder.pivot",
+                        -70f, 70f, -35f, 35f, -25f, 110f),
+                    Joint(ShapeRigRoles.LeftElbow, "hero.arm.left.elbow.pivot", -10f, 120f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.RightShoulder, "hero.arm.right.shoulder.pivot",
+                        -70f, 70f, -35f, 35f, -110f, 25f),
+                    Joint(ShapeRigRoles.RightElbow, "hero.arm.right.elbow.pivot", -10f, 120f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.LeftHip, "hero.leg.left.hip.pivot", -45f, 45f, -20f, 20f, -15f, 15f),
+                    Joint(ShapeRigRoles.LeftKnee, "hero.leg.left.knee.pivot", -120f, 5f, 0f, 0f, 0f, 0f),
+                    Joint(ShapeRigRoles.RightHip, "hero.leg.right.hip.pivot", -45f, 45f, -20f, 20f, -15f, 15f),
+                    Joint(ShapeRigRoles.RightKnee, "hero.leg.right.knee.pivot", -120f, 5f, 0f, 0f, 0f, 0f))
                 .Root("hero", specification.Name, hero =>
                 {
                     hero.Scale(specification.OverallScale, specification.OverallScale, specification.OverallScale);
@@ -45,6 +47,21 @@ namespace ShapeForge.LowPoly
                     AddLeg(hero, "right", "Right", 0.17f * proportions.BodyWidth, proportions.LegLength);
                 })
                 .Build();
+        }
+
+        private static ShapeRigJoint Joint(
+            string role,
+            string nodeId,
+            float  minimumX,
+            float  maximumX,
+            float  minimumY,
+            float  maximumY,
+            float  minimumZ,
+            float  maximumZ)
+        {
+            return new ShapeRigJoint(role, nodeId, new ShapeRigRotationConstraint(
+                new(minimumX, minimumY, minimumZ),
+                new(maximumX, maximumY, maximumZ)));
         }
 
         /// <summary>Creates the blue-black modern-fantasy palette used by the character.</summary>
