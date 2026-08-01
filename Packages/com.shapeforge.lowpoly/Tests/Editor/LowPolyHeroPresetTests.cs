@@ -36,10 +36,13 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(hipsId, Is.EqualTo("hero.pelvis.pivot"));
             Assert.That(rig.ConstrainRotationOffset(ShapeRigRoles.LeftKnee, new(-180f, 15f, 15f)),
                 Is.EqualTo(new ForgeVector3(-120f, 0f, 0f)));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(45));
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(42));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Reference Unified Hair Volume"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear (Mirror X)"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Left Blue Gray Eye"), Is.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Subtle Mouth"), Is.Null);
+            Assert.That(generatedRoot.transform.Find("Head Pivot").localScale, Is.EqualTo(Vector3.one * 0.67f));
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Open Short Jacket"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Fitted Black Shirt"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Fitted Tall Boot"), Is.Not.Null);

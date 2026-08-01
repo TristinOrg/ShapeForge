@@ -1,16 +1,17 @@
 namespace ShapeForge.LowPoly
 {
     /// <summary>
-    /// Provides a reference-driven pocket-fantasy character with articulated semantic pivots.
+    /// Provides an authored pocket-fantasy character with articulated semantic pivots.
     /// </summary>
     public static class LowPolyHeroPreset
     {
-        private const float ReferenceHeight = 3.5f;
+        private const float HeadAssemblyScale = 0.67f;
+        private const float ReferenceHeight   = 3.5f;
 
         /// <summary>Gets the style identifier used by the hero preset.</summary>
         public const string StyleId = "lowpoly/fantasy-hero";
 
-        /// <summary>Creates the reference-driven pocket fantasy hero definition.</summary>
+        /// <summary>Creates the authored pocket fantasy hero definition.</summary>
         public static ShapeDefinition CreateDefinition()
         {
             return LowPolyStylizedHumanTemplate.Instance.Compile(new());
@@ -172,7 +173,10 @@ namespace ShapeForge.LowPoly
             hero.Group("hero.head.pivot", "Head Pivot", head =>
             {
                 head.Position(0f, 2.35f, 0f)
-                    .Scale(headScale, headScale, headScale)
+                    .Scale(
+                        headScale * HeadAssemblyScale,
+                        headScale * HeadAssemblyScale,
+                        headScale * HeadAssemblyScale)
                     .Shape("hero.neck", "Short Neck", LowPolyShapeTypes.LatheProfile, neck => neck
                         .Position(0f, 0.06f, 0.02f)
                         .LatheProfile(16, true,
@@ -193,7 +197,7 @@ namespace ShapeForge.LowPoly
                     "skin",
                     3,
                     1);
-                AddFace(head, headShape);
+                AddEars(head, headShape);
                 AddReferenceCage(
                     head,
                     "hero.hair",
@@ -211,25 +215,13 @@ namespace ShapeForge.LowPoly
             });
         }
 
-        private static void AddFace(ShapeNodeBuilder head, LowPolyStylizedHumanHead shape)
+        private static void AddEars(ShapeNodeBuilder head, LowPolyStylizedHumanHead shape)
         {
             head.Shape("hero.ear.left", "Left Ear", LowPolyShapeTypes.Capsule, ear => ear
                     .Position(-0.435f * shape.Width, 0.5f * shape.Height, 0f)
                     .Scale(0.065f, 0.095f, 0.042f)
                     .ColorRole("skin.shadow")
-                    .Mirror(ShapeMirrorAxis.X))
-                .Shape("hero.eye.left", "Left Blue Gray Eye", LowPolyShapeTypes.Sphere, eye => eye
-                    .Position(-0.17f * shape.Width, 0.53f * shape.Height, -0.445f * shape.Depth)
-                    .Scale(0.052f, 0.032f, 0.014f)
-                    .Rotation(0f, 0f, -4f)
-                    .ColorRole("eye")
-                    .Mirror(ShapeMirrorAxis.X))
-                .Shape("hero.mouth", "Subtle Mouth", LowPolyShapeTypes.ExtrudedProfile, mouth => mouth
-                    .Position(0f, 0.335f * shape.Height, -0.46f * shape.Depth)
-                    .Scale(0.12f, 0.022f, 1f)
-                    .ExtrudedProfile(0.012f, 0f,
-                        new(-0.5f, 0.1f), new(0f, -0.18f), new(0.5f, 0.1f), new(0f, 0.18f))
-                    .ColorRole("mouth"));
+                    .Mirror(ShapeMirrorAxis.X));
         }
 
         private static void AddHairDetails(ShapeNodeBuilder head, LowPolyStylizedHumanHair hair)
