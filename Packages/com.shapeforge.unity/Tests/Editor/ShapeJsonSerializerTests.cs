@@ -24,6 +24,14 @@ namespace ShapeForge.Unity.Tests
             child.Path.Add(new(0f, 1f, 0.5f));
             child.ProfileSections.Add(new(-0.5f, new(0.8f, 0.9f), ForgeVector2.Zero));
             child.ProfileSections.Add(new(0.5f, ForgeVector2.One, new(0f, 0.1f)));
+            child.ProfileCageSections.Add(new(-0.5f, new ForgeVector2[]
+            {
+                new(-0.4f, -0.5f), new(0.4f, -0.5f), new(0.5f, 0.5f), new(-0.5f, 0.5f)
+            }));
+            child.ProfileCageSections.Add(new(0.5f, new ForgeVector2[]
+            {
+                new(-0.3f, -0.4f), new(0.5f, -0.5f), new(0.35f, 0.6f), new(-0.45f, 0.4f)
+            }));
             root.Add(child);
 
             ShapeDefinition source = new ShapeDefinition("Robot", root)
@@ -41,6 +49,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(json, Does.Contain("\"profile\":[{\"x\":-0.5,\"y\":0.5}"));
             Assert.That(json, Does.Contain("\"path\":[{\"x\":0.0,\"y\":0.0,\"z\":0.0}"));
             Assert.That(json, Does.Contain("\"profileSections\":[{\"z\":-0.5"));
+            Assert.That(json, Does.Contain("\"profileCageSections\":[{\"z\":-0.5"));
             Assert.That(json, Does.Contain("\"mirrorAxis\":\"x\""));
             Assert.That(result.Root.Children, Has.Count.EqualTo(1));
             Assert.That(result.Root.Children[0].Transform.Position, Is.EqualTo(new ForgeVector3(1f, 2f, 3f)));
@@ -49,6 +58,8 @@ namespace ShapeForge.Unity.Tests
             Assert.That(result.Root.Children[0].Profile[1], Is.EqualTo(new ForgeVector2(0.5f, -0.5f)));
             Assert.That(result.Root.Children[0].Path[1], Is.EqualTo(new ForgeVector3(0f, 1f, 0.5f)));
             Assert.That(result.Root.Children[0].ProfileSections[1].Offset, Is.EqualTo(new ForgeVector2(0f, 0.1f)));
+            Assert.That(result.Root.Children[0].ProfileCageSections[1].Profile[2],
+                Is.EqualTo(new ForgeVector2(0.35f, 0.6f)));
             Assert.That(result.Root.Children[0].MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
         }
 

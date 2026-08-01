@@ -132,6 +132,18 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Adds an ordered depth section with an independently authored closed profile.
+        /// </summary>
+        public ShapeNodeBuilder ProfileCageSection(float z, params ForgeVector2[] profile)
+        {
+            if (profile == null)
+                throw new ArgumentNullException(nameof(profile));
+
+            Node.ProfileCageSections.Add(new(z, profile));
+            return this;
+        }
+
+        /// <summary>
         /// Adds a non-rendering child group.
         /// </summary>
         public ShapeNodeBuilder Group(

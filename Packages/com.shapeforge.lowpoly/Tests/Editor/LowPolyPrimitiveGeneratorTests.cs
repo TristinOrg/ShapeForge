@@ -218,6 +218,42 @@ namespace ShapeForge.LowPoly.Tests
         }
 
         [Test]
+        public void GenerateBuildsAndCachesIndependentProfileCages()
+        {
+            ShapeNode first  = CreateCage("cage-a", "Cage A");
+            ShapeNode second = CreateCage("cage-b", "Cage B");
+            ShapeNode root   = new("cages", "Cages", ShapeTypes.Group);
+            root.Add(first).Add(second);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            generatedRoot = generator.Generate(new("Cages", root));
+
+            Mesh firstMesh  = generatedRoot.transform.Find("Cage A").GetComponent<MeshFilter>().sharedMesh;
+            Mesh secondMesh = generatedRoot.transform.Find("Cage B").GetComponent<MeshFilter>().sharedMesh;
+            Assert.That(firstMesh.name, Is.EqualTo("Low Poly Profile Cage"));
+            Assert.That(firstMesh.bounds.size.z, Is.EqualTo(1f).Within(0.0001f));
+            Assert.That(firstMesh.bounds.max.x, Is.GreaterThan(0.55f));
+            Assert.That(firstMesh, Is.SameAs(secondMesh));
+            AssertDuplicateVerticesShareNormals(firstMesh);
+        }
+
+        [Test]
+        public void GenerateRejectsProfileCagesWithMismatchedPointCounts()
+        {
+            ShapeNode cage = CreateCage("invalid-cage", "Invalid Cage");
+            cage.ProfileCageSections[1].Profile.RemoveAt(0);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
+            {
+                new LowPolyPrimitiveGenerator()
+            });
+
+            Assert.Throws<System.ArgumentException>(() => generator.Generate(new("Invalid", cage)));
+        }
+
+        [Test]
         public void GenerateSmoothsProfileControlPointsBeforeCachingMeshes()
         {
             ShapeNode first  = CreateLathe("smooth-a", "Smooth A", 12, true);
@@ -312,6 +348,26 @@ namespace ShapeForge.LowPoly.Tests
             node.Profile.Add(new(0.24f, 0.5f));
             node.Parameters[LowPolyShapeParameters.RadialSegments] = radialSegments;
             node.Parameters[LowPolyShapeParameters.SmoothNormals]  = smoothNormals ? 1f : 0f;
+            return node;
+        }
+
+        private static ShapeNode CreateCage(string id, string name)
+        {
+            ShapeNode node = new(id, name, LowPolyShapeTypes.ProfileCage);
+            node.ProfileCageSections.Add(new(-0.5f, new ForgeVector2[]
+            {
+                new(-0.4f, -0.5f), new(0.4f, -0.5f), new(0.5f, 0.5f), new(-0.5f, 0.5f)
+            }));
+            node.ProfileCageSections.Add(new(0f, new ForgeVector2[]
+            {
+                new(-0.55f, -0.45f), new(0.45f, -0.55f), new(0.62f, 0.4f), new(-0.48f, 0.58f)
+            }));
+            node.ProfileCageSections.Add(new(0.5f, new ForgeVector2[]
+            {
+                new(-0.3f, -0.4f), new(0.5f, -0.5f), new(0.35f, 0.6f), new(-0.45f, 0.4f)
+            }));
+            node.Parameters[LowPolyShapeParameters.ProfileSmoothing] = 1f;
+            node.Parameters[LowPolyShapeParameters.SmoothNormals]    = 1f;
             return node;
         }
 

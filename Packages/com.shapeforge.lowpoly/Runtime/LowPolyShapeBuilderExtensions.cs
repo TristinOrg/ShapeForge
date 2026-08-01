@@ -113,6 +113,47 @@ namespace ShapeForge.LowPoly
                 .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
         }
 
+        /// <summary>Configures ordered independent profiles for a profile-cage node.</summary>
+        public static ShapeNodeBuilder ProfileCage(
+            this ShapeNodeBuilder                 builder,
+            params ShapeProfileCageSection[] sections)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (sections == null)
+                throw new ArgumentNullException(nameof(sections));
+
+            foreach (ShapeProfileCageSection section in sections)
+            {
+                if (section == null)
+                    throw new ArgumentException("Profile cage sections cannot contain null entries.", nameof(sections));
+
+                ForgeVector2[] profile = new ForgeVector2[section.Profile.Count];
+                section.Profile.CopyTo(profile, 0);
+                builder.ProfileCageSection(section.Z, profile);
+            }
+
+            return builder;
+        }
+
+        /// <summary>Configures profile smoothing and optional averaged normals for a profile cage.</summary>
+        public static ShapeNodeBuilder CageQuality(
+            this ShapeNodeBuilder builder,
+            int                   profileSmoothing,
+            bool                  smoothNormals)
+        {
+            if (builder == null)
+                throw new ArgumentNullException(nameof(builder));
+
+            if (profileSmoothing < 0 || profileSmoothing > 4)
+                throw new ArgumentOutOfRangeException(nameof(profileSmoothing));
+
+            return builder
+                .Parameter(LowPolyShapeParameters.ProfileSmoothing, profileSmoothing)
+                .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
+        }
+
         /// <summary>Configures a radius-height profile revolved around the local Y axis.</summary>
         public static ShapeNodeBuilder LatheProfile(
             this ShapeNodeBuilder builder,

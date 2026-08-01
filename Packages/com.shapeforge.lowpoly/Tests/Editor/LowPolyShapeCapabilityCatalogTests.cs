@@ -40,6 +40,10 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(sweep.MinimumPathPoints, Is.EqualTo(2));
             Assert.That(sweep.Cost, Is.EqualTo(ShapeGenerationCost.InputScaled));
 
+            Assert.That(catalog.TryGet(LowPolyShapeTypes.ProfileCage, out ShapeCapability cage), Is.True);
+            Assert.That(cage.MinimumProfileCageSections, Is.EqualTo(2));
+            Assert.That(cage.Cost, Is.EqualTo(ShapeGenerationCost.InputScaled));
+
             Assert.That(catalog.TryGet(LowPolyShapeTypes.LatheProfile, out ShapeCapability lathe), Is.True);
             ShapeParameterCapability segments = FindParameter(lathe, LowPolyShapeParameters.RadialSegments);
             Assert.That(segments.Minimum, Is.EqualTo(3f));
@@ -59,6 +63,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(json, Does.Contain("\"id\":\"lowpoly/official\""));
             Assert.That(json, Does.Contain("\"type\":\"lowpoly/profile-loft\""));
             Assert.That(json, Does.Contain("\"minimumProfileSections\":2"));
+            Assert.That(json, Does.Contain("\"minimumProfileCageSections\":2"));
         }
 
         private static ShapeParameterCapability FindParameter(ShapeCapability capability, string name)

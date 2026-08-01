@@ -9,11 +9,12 @@ namespace ShapeForge
     [Serializable]
     public sealed class ShapeNode
     {
-        private readonly List<ShapeNode>                   children        = new();
-        private readonly List<ForgeVector2>                profile         = new();
-        private readonly List<ForgeVector3>                path            = new();
-        private readonly List<ShapeProfileSection>         profileSections = new();
-        private readonly Dictionary<string, float>         parameters      = new(StringComparer.Ordinal);
+        private readonly List<ShapeNode>               children            = new();
+        private readonly List<ForgeVector2>            profile             = new();
+        private readonly List<ForgeVector3>            path                = new();
+        private readonly List<ShapeProfileSection>     profileSections     = new();
+        private readonly List<ShapeProfileCageSection> profileCageSections = new();
+        private readonly Dictionary<string, float>     parameters          = new(StringComparer.Ordinal);
 
         /// <summary>
         /// Initializes an empty group node for serialization.
@@ -83,6 +84,11 @@ namespace ShapeForge
         public IList<ShapeProfileSection> ProfileSections => profileSections;
 
         /// <summary>
+        /// Gets optional ordered depth sections whose independent profiles form a profile cage.
+        /// </summary>
+        public IList<ShapeProfileCageSection> ProfileCageSections => profileCageSections;
+
+        /// <summary>
         /// Gets the child shape definitions.
         /// </summary>
         public IList<ShapeNode> Children => children;
@@ -117,6 +123,11 @@ namespace ShapeForge
         private bool ShouldSerializeProfileSections()
         {
             return profileSections.Count > 0;
+        }
+
+        private bool ShouldSerializeProfileCageSections()
+        {
+            return profileCageSections.Count > 0;
         }
 
         private bool ShouldSerializeMirrorAxis()

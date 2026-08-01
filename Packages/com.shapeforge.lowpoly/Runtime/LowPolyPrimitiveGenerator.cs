@@ -27,6 +27,7 @@ namespace ShapeForge.LowPoly
                     node.Type == LowPolyShapeTypes.Frustum ||
                     node.Type == LowPolyShapeTypes.ExtrudedProfile ||
                     node.Type == LowPolyShapeTypes.ProfileLoft ||
+                    node.Type == LowPolyShapeTypes.ProfileCage ||
                     node.Type == LowPolyShapeTypes.LatheProfile ||
                     node.Type == LowPolyShapeTypes.ProfileSweep);
         }
@@ -103,6 +104,16 @@ namespace ShapeForge.LowPoly
                 return LowPolyProceduralMeshCache.GetLatheProfile(
                     node.Profile,
                     radialSegments,
+                    smoothNormals,
+                    smoothing);
+            }
+
+            if (node.Type == LowPolyShapeTypes.ProfileCage)
+            {
+                int  smoothing     = GetIntegerParameter(node, LowPolyShapeParameters.ProfileSmoothing, 0, 0, 4);
+                bool smoothNormals = GetNonNegativeParameter(node, LowPolyShapeParameters.SmoothNormals, 0f) > 0f;
+                return LowPolyProceduralMeshCache.GetProfileCage(
+                    node.ProfileCageSections,
                     smoothNormals,
                     smoothing);
             }

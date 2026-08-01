@@ -58,6 +58,15 @@ namespace ShapeForge.LowPoly
                 Toggle(LowPolyShapeParameters.SmoothNormals, "Enables averaged normals."),
                 Integer(LowPolyShapeParameters.ProfileSmoothing, "Corner-cutting profile smoothing iterations.", 0, 0, 4)),
             new(
+                LowPolyShapeTypes.ProfileCage,
+                "A volume joining ordered depth sections with independently authored closed profiles.",
+                "Asymmetric hair shells, tailored clothing, footwear, vehicle bodies, furniture, and organic props.",
+                "Every section must have the same point count and matching point correspondence.",
+                ShapeGenerationCost.InputScaled,
+                0, 0, 0, 2,
+                Toggle(LowPolyShapeParameters.SmoothNormals, "Enables averaged normals."),
+                Integer(LowPolyShapeParameters.ProfileSmoothing, "Per-section corner smoothing iterations.", 0, 0, 4)),
+            new(
                 LowPolyShapeTypes.LatheProfile,
                 "A radius-height profile revolved around local Y.",
                 "Heads, limbs, vessels, knobs, columns, wheels, and other rotational forms.",

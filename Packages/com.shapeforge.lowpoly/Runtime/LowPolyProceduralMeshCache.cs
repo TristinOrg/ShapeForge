@@ -13,6 +13,7 @@ namespace ShapeForge.LowPoly
         private static readonly Dictionary<int, List<ProfileMeshEntry>>      ProfileMeshes = new();
         private static readonly Dictionary<int, List<LoftMeshEntry>>         LoftMeshes    = new();
         private static readonly Dictionary<int, List<LatheMeshEntry>>        LatheMeshes   = new();
+        private static readonly Dictionary<int, List<CageMeshEntry>>         CageMeshes    = new();
 
         public static Mesh GetWedge()
         {
@@ -179,6 +180,73 @@ namespace ShapeForge.LowPoly
                 smoothNormals);
             entries.Add(new(points, radialSegments, smoothNormals, smoothing, mesh));
             return mesh;
+        }
+
+        public static Mesh GetProfileCage(
+            IList<ShapeProfileCageSection> sections,
+            bool                            smoothNormals,
+            int                             smoothing)
+        {
+            ValidateCageSections(sections);
+            ValidateSmoothing(smoothing);
+
+            int hash = GetCageHash(sections, smoothNormals, smoothing);
+            if (CageMeshes.TryGetValue(hash, out List<CageMeshEntry> entries))
+            {
+                for (int index = entries.Count - 1; index >= 0; index--)
+                {
+                    CageMeshEntry entry = entries[index];
+                    if (entry.Mesh == null)
+                    {
+                        entries.RemoveAt(index);
+                        continue;
+                    }
+
+                    if (entry.Matches(sections, smoothNormals, smoothing))
+                        return entry.Mesh;
+                }
+            }
+            else
+            {
+                entries = new();
+                CageMeshes.Add(hash, entries);
+            }
+
+            CageSection[] snapshot = CopyCageSections(sections);
+            Mesh          mesh     = CreateProfileCage(snapshot, smoothNormals, smoothing);
+            entries.Add(new(snapshot, smoothNormals, smoothing, mesh));
+            return mesh;
+        }
+
+        private static void ValidateCageSections(IList<ShapeProfileCageSection> sections)
+        {
+            if (sections == null)
+                throw new ArgumentNullException(nameof(sections));
+
+            if (sections.Count < 2)
+                throw new ArgumentException("Profile cages require at least two sections.", nameof(sections));
+
+            int pointCount = -1;
+            for (int index = 0; index < sections.Count; index++)
+            {
+                ShapeProfileCageSection section = sections[index] ??
+                                                  throw new ArgumentException(
+                                                      "Profile cage sections cannot contain null entries.",
+                                                      nameof(sections));
+                if (section.Profile == null || section.Profile.Count < 3)
+                    throw new ArgumentException(
+                        "Profile cage sections require at least three points.", nameof(sections));
+
+                if (index > 0 && section.Z <= sections[index - 1].Z)
+                    throw new ArgumentException(
+                        "Profile cage sections must be ordered by increasing depth.", nameof(sections));
+
+                if (pointCount >= 0 && section.Profile.Count != pointCount)
+                    throw new ArgumentException(
+                        "Profile cage sections must use the same point count.", nameof(sections));
+
+                pointCount = section.Profile.Count;
+            }
         }
 
         private static void ValidateLatheProfile(IList<ForgeVector2> profile, int radialSegments)
@@ -348,6 +416,31 @@ namespace ShapeForge.LowPoly
             return result;
         }
 
+        private static int GetCageHash(
+            IList<ShapeProfileCageSection> sections,
+            bool                            smoothNormals,
+            int                             smoothing)
+        {
+            int hash = (smoothNormals.GetHashCode() * 397) ^ smoothing;
+            foreach (ShapeProfileCageSection section in sections)
+            {
+                hash = (hash * 397) ^ section.Z.GetHashCode();
+                foreach (ForgeVector2 point in section.Profile)
+                    hash = (hash * 397) ^ point.GetHashCode();
+            }
+
+            return hash;
+        }
+
+        private static CageSection[] CopyCageSections(IList<ShapeProfileCageSection> sections)
+        {
+            CageSection[] result = new CageSection[sections.Count];
+            for (int index = 0; index < sections.Count; index++)
+                result[index] = new(sections[index].Z, CopyProfile(sections[index].Profile));
+
+            return result;
+        }
+
         private static Mesh GetOrCreate(MeshKey key, Func<Mesh> create)
         {
             if (Meshes.TryGetValue(key, out Mesh mesh))
@@ -370,6 +463,7 @@ namespace ShapeForge.LowPoly
             ProfileMeshes.Clear();
             LoftMeshes.Clear();
             LatheMeshes.Clear();
+            CageMeshes.Clear();
         }
 
         private static Mesh CreateWedge()
@@ -555,6 +649,44 @@ namespace ShapeForge.LowPoly
             }
 
             return builder.Build("Low Poly Profile Loft", smoothNormals);
+        }
+
+        private static Mesh CreateProfileCage(
+            CageSection[] sections,
+            bool          smoothNormals,
+            int           smoothing)
+        {
+            ForgeVector2[][] rings = new ForgeVector2[sections.Length][];
+            for (int index = 0; index < sections.Length; index++)
+                rings[index] = EnsureCounterClockwise(
+                    SmoothProfile(sections[index].Profile, smoothing, true));
+
+            MeshBuilder builder = new();
+            AddLoftCap(builder, rings[0], sections[0].Z, Triangulate(rings[0]), true);
+            AddLoftCap(
+                builder,
+                rings[rings.Length - 1],
+                sections[sections.Length - 1].Z,
+                Triangulate(rings[rings.Length - 1]),
+                false);
+
+            int pointCount = rings[0].Length;
+            for (int sectionIndex = 0; sectionIndex < sections.Length - 1; sectionIndex++)
+            {
+                ForgeVector2[] front = rings[sectionIndex];
+                ForgeVector2[] back  = rings[sectionIndex + 1];
+                for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
+                {
+                    int next = (pointIndex + 1) % pointCount;
+                    builder.AddQuad(
+                        ToVector3(front[pointIndex], sections[sectionIndex].Z),
+                        ToVector3(front[next], sections[sectionIndex].Z),
+                        ToVector3(back[next], sections[sectionIndex + 1].Z),
+                        ToVector3(back[pointIndex], sections[sectionIndex + 1].Z));
+                }
+            }
+
+            return builder.Build("Low Poly Profile Cage", smoothNormals);
         }
 
         private static Mesh CreateLatheProfile(
@@ -1069,6 +1201,79 @@ namespace ShapeForge.LowPoly
                 for (int index = 0; index < Points.Length; index++)
                 {
                     if (!Points[index].Equals(profile[index]))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Owns immutable profile-cage data and its generated Unity mesh.
+        /// </summary>
+        private sealed class CageMeshEntry
+        {
+            private readonly CageSection[] sections;
+            private readonly bool          smoothNormals;
+            private readonly int           smoothing;
+
+            public CageMeshEntry(
+                CageSection[] sections,
+                bool          smoothNormals,
+                int           smoothing,
+                Mesh          mesh)
+            {
+                this.sections      = sections;
+                this.smoothNormals = smoothNormals;
+                this.smoothing     = smoothing;
+                Mesh               = mesh;
+            }
+
+            public Mesh Mesh { get; }
+
+            public bool Matches(
+                IList<ShapeProfileCageSection> candidateSections,
+                bool                            candidateSmoothNormals,
+                int                             candidateSmoothing)
+            {
+                if (sections.Length != candidateSections.Count ||
+                    smoothNormals != candidateSmoothNormals ||
+                    smoothing != candidateSmoothing)
+                    return false;
+
+                for (int sectionIndex = 0; sectionIndex < sections.Length; sectionIndex++)
+                {
+                    if (!sections[sectionIndex].Matches(candidateSections[sectionIndex]))
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Stores one immutable profile-cage section without retaining mutable schema objects.
+        /// </summary>
+        private readonly struct CageSection
+        {
+            public CageSection(float z, ForgeVector2[] profile)
+            {
+                Z       = z;
+                Profile = profile;
+            }
+
+            public float Z { get; }
+
+            public ForgeVector2[] Profile { get; }
+
+            public bool Matches(ShapeProfileCageSection section)
+            {
+                if (section == null || !Z.Equals(section.Z) || Profile.Length != section.Profile.Count)
+                    return false;
+
+                for (int index = 0; index < Profile.Length; index++)
+                {
+                    if (!Profile[index].Equals(section.Profile[index]))
                         return false;
                 }
 

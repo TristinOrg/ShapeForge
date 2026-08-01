@@ -102,6 +102,28 @@ namespace ShapeForge
                     throw new ShapeValidationException($"Shape node '{node.Id}' profile sections must be finite.");
             }
 
+            if (node.ProfileCageSections == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile cage section collection.");
+
+            foreach (ShapeProfileCageSection section in node.ProfileCageSections)
+            {
+                if (section == null)
+                    throw new ShapeValidationException(
+                        $"Shape node '{node.Id}' cannot contain null profile cage sections.");
+
+                if (float.IsNaN(section.Z) || float.IsInfinity(section.Z) || section.Profile == null)
+                    throw new ShapeValidationException(
+                        $"Shape node '{node.Id}' profile cage sections must be finite and contain profiles.");
+
+                foreach (ForgeVector2 point in section.Profile)
+                {
+                    if (float.IsNaN(point.X) || float.IsInfinity(point.X) ||
+                        float.IsNaN(point.Y) || float.IsInfinity(point.Y))
+                        throw new ShapeValidationException(
+                            $"Shape node '{node.Id}' profile cage points must be finite.");
+                }
+            }
+
             foreach (ShapeNode child in node.Children)
                 ValidateNode(child, nodeIds);
         }

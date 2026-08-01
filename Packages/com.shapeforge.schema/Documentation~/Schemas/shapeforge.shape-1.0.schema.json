@@ -74,6 +74,19 @@
         "offset": { "$ref": "#/$defs/vector2" }
       }
     },
+    "profileCageSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["z", "profile"],
+      "properties": {
+        "z": { "$ref": "#/$defs/finiteNumber" },
+        "profile": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/vector2" }
+        }
+      }
+    },
     "node": {
       "type": "object",
       "additionalProperties": false,
@@ -100,6 +113,10 @@
         "profileSections": {
           "type": "array",
           "items": { "$ref": "#/$defs/profileSection" }
+        },
+        "profileCageSections": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/profileCageSection" }
         },
         "children": {
           "type": "array",

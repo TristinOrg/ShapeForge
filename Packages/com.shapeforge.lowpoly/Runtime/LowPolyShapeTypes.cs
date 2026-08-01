@@ -46,6 +46,11 @@ namespace ShapeForge.LowPoly
         public const string ProfileLoft = "lowpoly/profile-loft";
 
         /// <summary>
+        /// Identifies a volume joining ordered sections with independently authored profiles.
+        /// </summary>
+        public const string ProfileCage = "lowpoly/profile-cage";
+
+        /// <summary>
         /// Identifies a volume formed by revolving a radius-height profile around its local Y axis.
         /// </summary>
         public const string LatheProfile = "lowpoly/lathe-profile";

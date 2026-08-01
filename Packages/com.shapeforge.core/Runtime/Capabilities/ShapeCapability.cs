@@ -22,24 +22,52 @@ namespace ShapeForge
             int                        minimumPathPoints      = 0,
             int                        minimumProfileSections = 0,
             params ShapeParameterCapability[] parameters)
+            : this(
+                type,
+                summary,
+                bestFor,
+                limitations,
+                cost,
+                minimumProfilePoints,
+                minimumPathPoints,
+                minimumProfileSections,
+                0,
+                parameters)
+        {
+        }
+
+        /// <summary>Initializes a capability that consumes independently authored profile-cage sections.</summary>
+        public ShapeCapability(
+            string                     type,
+            string                     summary,
+            string                     bestFor,
+            string                     limitations,
+            ShapeGenerationCost        cost,
+            int                        minimumProfilePoints,
+            int                        minimumPathPoints,
+            int                        minimumProfileSections,
+            int                        minimumProfileCageSections,
+            params ShapeParameterCapability[] parameters)
         {
             if (string.IsNullOrWhiteSpace(type))
                 throw new ArgumentException("A shape capability requires a type.", nameof(type));
 
-            if (minimumProfilePoints < 0 || minimumPathPoints < 0 || minimumProfileSections < 0)
+            if (minimumProfilePoints < 0 || minimumPathPoints < 0 || minimumProfileSections < 0 ||
+                minimumProfileCageSections < 0)
                 throw new ArgumentOutOfRangeException(nameof(minimumProfilePoints));
 
             if (!Enum.IsDefined(typeof(ShapeGenerationCost), cost))
                 throw new ArgumentOutOfRangeException(nameof(cost));
 
-            Type                   = type;
-            Summary                = summary ?? string.Empty;
-            BestFor                = bestFor ?? string.Empty;
-            Limitations            = limitations ?? string.Empty;
-            Cost                   = cost;
-            MinimumProfilePoints   = minimumProfilePoints;
-            MinimumPathPoints      = minimumPathPoints;
-            MinimumProfileSections = minimumProfileSections;
+            Type                       = type;
+            Summary                    = summary ?? string.Empty;
+            BestFor                    = bestFor ?? string.Empty;
+            Limitations                = limitations ?? string.Empty;
+            Cost                       = cost;
+            MinimumProfilePoints       = minimumProfilePoints;
+            MinimumPathPoints          = minimumPathPoints;
+            MinimumProfileSections     = minimumProfileSections;
+            MinimumProfileCageSections = minimumProfileCageSections;
             ShapeParameterCapability[] parameterArray = parameters == null
                 ? Array.Empty<ShapeParameterCapability>()
                 : (ShapeParameterCapability[])parameters.Clone();
@@ -81,6 +109,9 @@ namespace ShapeForge
 
         /// <summary>Gets the minimum required profile-section count.</summary>
         public int MinimumProfileSections { get; }
+
+        /// <summary>Gets the minimum required independent profile-cage section count.</summary>
+        public int MinimumProfileCageSections { get; }
 
         /// <summary>Gets the supported numeric parameters.</summary>
         public IReadOnlyList<ShapeParameterCapability> Parameters => parameters;
