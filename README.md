@@ -156,6 +156,8 @@ Templates do not add character-, furniture-, or building-specific concepts to Sh
 
 ## Reference-Image Mapping
 
+Schema and Core provide a generic `shapeforge.reference/1.0` contract for any model category. Each semantic part can carry aligned front, side, and back bounds, confidence, and an optional ordered silhouette. Core validates observations, reports missing coverage or cross-view height disagreement, and publishes provider-neutral extraction instructions that forbid inventing hidden geometry.
+
 The Low Poly package includes a deterministic reference-measurement pipeline for the Stylized Human template.
 
 `LowPolyStylizedHumanReferenceMapper` maps normalized observations from a front view and an optional side view into a `LowPolyStylizedHumanSpecification`.

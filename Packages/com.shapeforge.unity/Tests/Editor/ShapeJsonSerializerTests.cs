@@ -121,5 +121,38 @@ namespace ShapeForge.Unity.Tests
             Assert.That(json, Does.Contain("\"requiredShapeTypes\":[\"example/body\"]"));
             Assert.That(json, Does.Contain("\"tags\":[\"human\",\"stylized\"]"));
         }
+
+        [Test]
+        public void GenericReferenceRoundTripPreservesMultiViewSilhouette()
+        {
+            ShapeReferenceDefinition source = new()
+            {
+                Name = "Character"
+            };
+            ShapeReferenceViewObservation front = new()
+            {
+                Minimum    = new(0.2f, 0.1f),
+                Maximum    = new(0.8f, 0.9f),
+                Confidence = 0.95f
+            };
+            front.Silhouette.Add(new(0.2f, 0.1f));
+            front.Silhouette.Add(new(0.8f, 0.1f));
+            front.Silhouette.Add(new(0.5f, 0.9f));
+            source.Parts.Add(new ShapeReferencePart
+            {
+                Id    = "head",
+                Front = front
+            });
+            ShapeJsonSerializer serializer = new();
+
+            string json = serializer.SerializeSpecification(source);
+            ShapeReferenceDefinition result = serializer.DeserializeSpecification<ShapeReferenceDefinition>(
+                json,
+                new ShapeReferenceDefinitionValidator().Validate);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.reference/1.0\""));
+            Assert.That(result.Parts[0].Front.Confidence, Is.EqualTo(0.95f));
+            Assert.That(result.Parts[0].Front.Silhouette[2], Is.EqualTo(new ForgeVector2(0.5f, 0.9f)));
+        }
     }
 }
