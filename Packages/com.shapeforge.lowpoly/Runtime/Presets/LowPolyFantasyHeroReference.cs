@@ -3,11 +3,15 @@ namespace ShapeForge.LowPoly
     /// <summary>
     /// Provides measured multi-view silhouettes for the pocket-fantasy hero preset.
     /// </summary>
-    internal static class LowPolyFantasyHeroReference
+    public static class LowPolyFantasyHeroReference
     {
+        /// <summary>Identifies the measured head part.</summary>
         public const string HeadPartId = "character/head";
+
+        /// <summary>Identifies the measured hair part.</summary>
         public const string HairPartId = "character/hair";
 
+        /// <summary>Creates a fresh, mutable copy of the built-in aligned reference observations.</summary>
         public static ShapeReferenceDefinition Create()
         {
             ShapeReferenceDefinition reference = new()

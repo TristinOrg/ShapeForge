@@ -36,35 +36,35 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(hipsId, Is.EqualTo("hero.pelvis.pivot"));
             Assert.That(rig.ConstrainRotationOffset(ShapeRigRoles.LeftKnee, new(-180f, 15f, 15f)),
                 Is.EqualTo(new ForgeVector3(-120f, 0f, 0f)));
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(31));
-            Assert.That(generatedRoot.transform.Find("Head Pivot/Unified Polygon Hair Shell"), Is.Not.Null);
+            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(45));
+            Assert.That(generatedRoot.transform.Find("Head Pivot/Reference Unified Hair Volume"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear (Mirror X)"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Cropped Jacket"), Is.Not.Null);
-            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Long Black Shirt"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Left Open Short Jacket"), Is.Not.Null);
+            Assert.That(generatedRoot.transform.Find("Pelvis Pivot/Spine Pivot/Fitted Black Shirt"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Left Hip Pivot/Left Knee Pivot/Left Fitted Tall Boot"), Is.Not.Null);
 
             MeshFilter coat = generatedRoot.transform
-                .Find("Pelvis Pivot/Spine Pivot/Long Black Shirt")
+                .Find("Pelvis Pivot/Spine Pivot/Fitted Black Shirt")
                 .GetComponent<MeshFilter>();
             MeshFilter head = generatedRoot.transform
-                .Find("Head Pivot/Sculpted Human Head")
+                .Find("Head Pivot/Reference Sculpted Head")
                 .GetComponent<MeshFilter>();
             MeshFilter hairMesh = generatedRoot.transform
-                .Find("Head Pivot/Unified Polygon Hair Shell")
+                .Find("Head Pivot/Reference Unified Hair Volume")
                 .GetComponent<MeshFilter>();
             MeshFilter jacketPanel = generatedRoot.transform
-                .Find("Pelvis Pivot/Spine Pivot/Left Cropped Jacket")
+                .Find("Pelvis Pivot/Spine Pivot/Left Open Short Jacket")
                 .GetComponent<MeshFilter>();
             MeshFilter boot = generatedRoot.transform
-                .Find("Left Hip Pivot/Left Knee Pivot/Left Tapered Boot")
+                .Find("Left Hip Pivot/Left Knee Pivot/Left Long Toe Boot")
                 .GetComponent<MeshFilter>();
 
-            Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
-            Assert.That(head.sharedMesh.name, Is.EqualTo("Low Poly Lathe Profile"));
-            Assert.That(hairMesh.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
+            Assert.That(coat.sharedMesh.name, Is.EqualTo("Low Poly Profile Cage"));
+            Assert.That(head.sharedMesh.name, Is.EqualTo("Low Poly Profile Cage"));
+            Assert.That(hairMesh.sharedMesh.name, Is.EqualTo("Low Poly Profile Cage"));
             Assert.That(jacketPanel.sharedMesh.name, Is.EqualTo("Low Poly Extruded Profile"));
-            Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Profile Loft"));
+            Assert.That(boot.sharedMesh.name, Is.EqualTo("Low Poly Profile Cage"));
 
             Assert.That(style.Palette.TryGetColor("hair", out ForgeColor hair), Is.True);
             Assert.That(hair.B, Is.GreaterThan(hair.R));
@@ -75,6 +75,35 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(model.TryGetTarget("hero.spine.pivot", out _), Is.True);
             Assert.That(model.TryGetTarget("hero.head.pivot", out _), Is.True);
             Assert.That(model.TryGetTarget("hero.leg.left.knee.pivot", out _), Is.True);
+        }
+
+        [Test]
+        public void BuiltInReferenceHasCompleteConsistentHeadAndHairCoverage()
+        {
+            ShapeReferenceDefinition      reference = LowPolyFantasyHeroReference.Create();
+            ShapeReferenceCoverageReport report    = new ShapeReferenceCoverageAnalyzer().Analyze(reference);
+            ShapeDefinition definition = LowPolyStylizedHumanTemplate.Instance.Compile(new(), reference);
+
+            Assert.That(report.PartCount, Is.EqualTo(2));
+            Assert.That(report.HasCompleteCoverage, Is.True);
+            Assert.That(report.IsConsistent, Is.True);
+            Assert.That(FindNode(definition.Root, "hero.head").Type, Is.EqualTo(LowPolyShapeTypes.ProfileCage));
+            Assert.That(FindNode(definition.Root, "hero.hair").Type, Is.EqualTo(LowPolyShapeTypes.ProfileCage));
+        }
+
+        private static ShapeNode FindNode(ShapeNode node, string id)
+        {
+            if (node.Id == id)
+                return node;
+
+            foreach (ShapeNode child in node.Children)
+            {
+                ShapeNode result = FindNode(child, id);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
         }
     }
 }

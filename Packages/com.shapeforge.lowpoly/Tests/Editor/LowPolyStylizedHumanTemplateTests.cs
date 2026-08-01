@@ -66,11 +66,12 @@ namespace ShapeForge.LowPoly.Tests
 
             Assert.That(result.Name, Is.EqualTo("Custom Hero"));
             Assert.That(result.Root.Transform.Scale, Is.EqualTo(new ForgeVector3(1.1f, 1.1f, 1.1f)));
-            Assert.That(resultHead.Transform.Scale.X, Is.EqualTo(0.82f * 1.1f).Within(0.0001f));
-            Assert.That(shoulder.Transform.Position.X, Is.EqualTo(0.37f * 1.25f * 0.9f).Within(0.0001f));
-            Assert.That(pants.Transform.Scale.Y, Is.EqualTo(0.58f * 1.15f).Within(0.0001f));
-            Assert.That(resultHair.Profile[5], Is.Not.EqualTo(baselineHair.Profile[5]));
-            Assert.That(resultHair.Profile[13], Is.Not.EqualTo(baselineHair.Profile[13]));
+            Assert.That(resultHead.Transform.Scale.X, Is.EqualTo(0.875f * 1.1f).Within(0.0001f));
+            Assert.That(shoulder.Transform.Position.X, Is.EqualTo(0.41f * 1.25f * 0.9f).Within(0.0001f));
+            Assert.That(pants.Transform.Scale.Y, Is.EqualTo(0.62f * 1.15f).Within(0.0001f));
+            Assert.That(resultHair.Transform.Scale, Is.Not.EqualTo(baselineHair.Transform.Scale));
+            Assert.That(resultHair.ProfileCageSections, Has.Count.EqualTo(11));
+            Assert.That(resultHead.ProfileCageSections, Has.Count.EqualTo(9));
         }
 
         [Test]
@@ -97,6 +98,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(template, Is.SameAs(LowPolyStylizedHumanTemplate.Instance));
             Assert.That(template.Descriptor.Category, Is.EqualTo("character"));
             Assert.That(template.Descriptor.RequiredShapeTypes, Does.Contain(LowPolyShapeTypes.ProfileLoft));
+            Assert.That(template.Descriptor.RequiredShapeTypes, Does.Contain(LowPolyShapeTypes.ProfileCage));
         }
 
         [Test]

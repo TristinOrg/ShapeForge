@@ -17,6 +17,7 @@ namespace ShapeForge.LowPoly
                 LowPolyShapeTypes.Capsule,
                 LowPolyShapeTypes.ExtrudedProfile,
                 LowPolyShapeTypes.ProfileLoft,
+                LowPolyShapeTypes.ProfileCage,
                 LowPolyShapeTypes.LatheProfile,
                 LowPolyShapeTypes.ProfileSweep
             },
@@ -35,8 +36,17 @@ namespace ShapeForge.LowPoly
         /// <inheritdoc />
         public override ShapeDefinition Compile(LowPolyStylizedHumanSpecification specification)
         {
+            return Compile(specification, LowPolyFantasyHeroReference.Create());
+        }
+
+        /// <summary>Compiles a stylized human from semantic controls and measured multi-view silhouettes.</summary>
+        public ShapeDefinition Compile(
+            LowPolyStylizedHumanSpecification specification,
+            ShapeReferenceDefinition          reference)
+        {
             validator.Validate(specification);
-            return LowPolyHeroPreset.CreateDefinition(specification);
+            new ShapeReferenceDefinitionValidator().Validate(reference);
+            return LowPolyHeroPreset.CreateDefinition(specification, reference);
         }
     }
 }

@@ -160,6 +160,8 @@ Schema and Core provide a generic `shapeforge.reference/1.0` contract for any mo
 
 The Low Poly package includes a deterministic reference-measurement pipeline for the Stylized Human template.
 
+The bundled Fantasy Hero now uses aligned front, side, and back silhouettes for its head and primary hair volume rather than inheriting the earlier primitive head construction.
+
 `LowPolyStylizedHumanReferenceMapper` maps normalized observations from a front view and an optional side view into a `LowPolyStylizedHumanSpecification`.
 
 Current measurements include head dimensions, shoulder and torso width, leg length, jaw width, hair width and depth, hair parting, fringe length, and sideburn length.
