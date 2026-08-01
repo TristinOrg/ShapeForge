@@ -4,12 +4,21 @@
   "displayName": "ShapeForge Low Poly",
   "description": "Official Low Poly implementation and examples for ShapeForge.",
   "unity": "2022.3",
+  "documentationUrl": "https://github.com/TristinOrg/ShapeForge/tree/v0.1.0/Packages/com.shapeforge.lowpoly",
+  "changelogUrl": "https://github.com/TristinOrg/ShapeForge/blob/v0.1.0/Packages/com.shapeforge.lowpoly/CHANGELOG.md",
+  "keywords": [
+    "procedural-modeling",
+    "low-poly",
+    "runtime-generation"
+  ],
   "dependencies": {
     "com.shapeforge.schema": "0.1.0",
     "com.shapeforge.core": "0.1.0",
     "com.shapeforge.unity": "0.1.0"
   },
   "author": {
-    "name": "Tristin Wen"
+    "name": "Tristin Wen",
+    "email": "Tristin_Wen@outlook.com",
+    "url": "https://github.com/TristinOrg"
   }
 }

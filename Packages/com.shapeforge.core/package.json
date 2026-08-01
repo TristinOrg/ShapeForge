@@ -4,10 +4,19 @@
   "displayName": "ShapeForge Core",
   "description": "Extensible shape definitions and generation contracts for ShapeForge.",
   "unity": "2022.3",
+  "documentationUrl": "https://github.com/TristinOrg/ShapeForge/tree/v0.1.0/Packages/com.shapeforge.core",
+  "changelogUrl": "https://github.com/TristinOrg/ShapeForge/blob/v0.1.0/Packages/com.shapeforge.core/CHANGELOG.md",
+  "keywords": [
+    "procedural-modeling",
+    "framework",
+    "generation"
+  ],
   "dependencies": {
     "com.shapeforge.schema": "0.1.0"
   },
   "author": {
-    "name": "Tristin Wen"
+    "name": "Tristin Wen",
+    "email": "Tristin_Wen@outlook.com",
+    "url": "https://github.com/TristinOrg"
   }
 }
