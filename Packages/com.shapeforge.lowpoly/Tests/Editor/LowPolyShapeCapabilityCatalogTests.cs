@@ -43,6 +43,11 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(catalog.TryGet(LowPolyShapeTypes.ProfileCage, out ShapeCapability cage), Is.True);
             Assert.That(cage.MinimumProfileCageSections, Is.EqualTo(2));
             Assert.That(cage.Cost, Is.EqualTo(ShapeGenerationCost.InputScaled));
+            ShapeParameterCapability cageSubdivisions = FindParameter(
+                cage,
+                LowPolyShapeParameters.CageSubdivisions);
+            Assert.That(cageSubdivisions.Minimum, Is.EqualTo(0f));
+            Assert.That(cageSubdivisions.Maximum, Is.EqualTo(8f));
 
             Assert.That(catalog.TryGet(LowPolyShapeTypes.LatheProfile, out ShapeCapability lathe), Is.True);
             ShapeParameterCapability segments = FindParameter(lathe, LowPolyShapeParameters.RadialSegments);

@@ -2,7 +2,7 @@
 
 The first official ShapeForge implementation. It provides Low Poly geometry, palettes, styles, and reusable presets for characters, furniture, buildings, props, and other model categories through ShapeForge extension contracts.
 
-Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes and base materials without generating Collider components. Parameterized Wedge and Frustum shapes use flat-shaded procedural meshes; equivalent parameter sets share one cached Mesh. Profile Cage joins ordered sections whose closed profiles may differ at every depth, enabling asymmetric shells that Profile Loft cannot express. Equivalent immutable cage inputs share one cached Mesh.
+Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes and base materials without generating Collider components. Parameterized Wedge and Frustum shapes use flat-shaded procedural meshes; equivalent parameter sets share one cached Mesh. Profile Cage joins ordered sections whose closed profiles may differ at every depth, enabling asymmetric shells that Profile Loft cannot express. Bounded cached interpolation adds rounded continuity without expanding authoring JSON.
 
 Use `LowPolyShapeCapabilityCatalog.Instance` to query all eleven supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
 

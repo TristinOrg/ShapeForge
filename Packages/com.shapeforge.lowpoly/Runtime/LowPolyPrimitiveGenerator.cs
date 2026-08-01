@@ -110,10 +110,12 @@ namespace ShapeForge.LowPoly
 
             if (node.Type == LowPolyShapeTypes.ProfileCage)
             {
+                int  subdivisions  = GetIntegerParameter(node, LowPolyShapeParameters.CageSubdivisions, 0, 0, 8);
                 int  smoothing     = GetIntegerParameter(node, LowPolyShapeParameters.ProfileSmoothing, 0, 0, 4);
                 bool smoothNormals = GetNonNegativeParameter(node, LowPolyShapeParameters.SmoothNormals, 0f) > 0f;
                 return LowPolyProceduralMeshCache.GetProfileCage(
                     node.ProfileCageSections,
+                    subdivisions,
                     smoothNormals,
                     smoothing);
             }

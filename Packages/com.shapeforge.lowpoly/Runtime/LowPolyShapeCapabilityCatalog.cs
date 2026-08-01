@@ -64,6 +64,7 @@ namespace ShapeForge.LowPoly
                 "Every section must have the same point count and matching point correspondence.",
                 ShapeGenerationCost.InputScaled,
                 0, 0, 0, 2,
+                Integer(LowPolyShapeParameters.CageSubdivisions, "Interpolated rings between authored sections.", 0, 0, 8),
                 Toggle(LowPolyShapeParameters.SmoothNormals, "Enables averaged normals."),
                 Integer(LowPolyShapeParameters.ProfileSmoothing, "Per-section corner smoothing iterations.", 0, 0, 4)),
             new(

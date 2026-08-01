@@ -90,6 +90,9 @@ namespace ShapeForge.LowPoly
         /// <summary>Controls the number of interpolated rings between authored loft sections.</summary>
         public const string LoftSubdivisions = "loftSubdivisions";
 
+        /// <summary>Controls interpolated rings between independently authored cage sections.</summary>
+        public const string CageSubdivisions = "cageSubdivisions";
+
         /// <summary>Enables averaged vertex normals on a profile loft when greater than zero.</summary>
         public const string SmoothNormals = "smoothNormals";
 

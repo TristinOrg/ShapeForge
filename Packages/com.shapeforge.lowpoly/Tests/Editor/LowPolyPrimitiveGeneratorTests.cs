@@ -222,8 +222,10 @@ namespace ShapeForge.LowPoly.Tests
         {
             ShapeNode first  = CreateCage("cage-a", "Cage A");
             ShapeNode second = CreateCage("cage-b", "Cage B");
+            ShapeNode coarse = CreateCage("cage-c", "Cage C");
+            coarse.Parameters[LowPolyShapeParameters.CageSubdivisions] = 0f;
             ShapeNode root   = new("cages", "Cages", ShapeTypes.Group);
-            root.Add(first).Add(second);
+            root.Add(first).Add(second).Add(coarse);
             UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
             {
                 new LowPolyPrimitiveGenerator()
@@ -233,10 +235,13 @@ namespace ShapeForge.LowPoly.Tests
 
             Mesh firstMesh  = generatedRoot.transform.Find("Cage A").GetComponent<MeshFilter>().sharedMesh;
             Mesh secondMesh = generatedRoot.transform.Find("Cage B").GetComponent<MeshFilter>().sharedMesh;
+            Mesh coarseMesh = generatedRoot.transform.Find("Cage C").GetComponent<MeshFilter>().sharedMesh;
             Assert.That(firstMesh.name, Is.EqualTo("Low Poly Profile Cage"));
             Assert.That(firstMesh.bounds.size.z, Is.EqualTo(1f).Within(0.0001f));
             Assert.That(firstMesh.bounds.max.x, Is.GreaterThan(0.55f));
             Assert.That(firstMesh, Is.SameAs(secondMesh));
+            Assert.That(firstMesh, Is.Not.SameAs(coarseMesh));
+            Assert.That(firstMesh.vertexCount, Is.GreaterThan(coarseMesh.vertexCount));
             AssertDuplicateVerticesShareNormals(firstMesh);
         }
 
@@ -367,6 +372,7 @@ namespace ShapeForge.LowPoly.Tests
                 new(-0.3f, -0.4f), new(0.5f, -0.5f), new(0.35f, 0.6f), new(-0.45f, 0.4f)
             }));
             node.Parameters[LowPolyShapeParameters.ProfileSmoothing] = 1f;
+            node.Parameters[LowPolyShapeParameters.CageSubdivisions] = 2f;
             node.Parameters[LowPolyShapeParameters.SmoothNormals]    = 1f;
             return node;
         }

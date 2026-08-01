@@ -184,13 +184,17 @@ namespace ShapeForge.LowPoly
 
         public static Mesh GetProfileCage(
             IList<ShapeProfileCageSection> sections,
+            int                             subdivisions,
             bool                            smoothNormals,
             int                             smoothing)
         {
             ValidateCageSections(sections);
+            if (subdivisions < 0 || subdivisions > 8)
+                throw new ArgumentOutOfRangeException(nameof(subdivisions));
+
             ValidateSmoothing(smoothing);
 
-            int hash = GetCageHash(sections, smoothNormals, smoothing);
+            int hash = GetCageHash(sections, subdivisions, smoothNormals, smoothing);
             if (CageMeshes.TryGetValue(hash, out List<CageMeshEntry> entries))
             {
                 for (int index = entries.Count - 1; index >= 0; index--)
@@ -202,7 +206,7 @@ namespace ShapeForge.LowPoly
                         continue;
                     }
 
-                    if (entry.Matches(sections, smoothNormals, smoothing))
+                    if (entry.Matches(sections, subdivisions, smoothNormals, smoothing))
                         return entry.Mesh;
                 }
             }
@@ -213,8 +217,8 @@ namespace ShapeForge.LowPoly
             }
 
             CageSection[] snapshot = CopyCageSections(sections);
-            Mesh          mesh     = CreateProfileCage(snapshot, smoothNormals, smoothing);
-            entries.Add(new(snapshot, smoothNormals, smoothing, mesh));
+            Mesh          mesh     = CreateProfileCage(snapshot, subdivisions, smoothNormals, smoothing);
+            entries.Add(new(snapshot, subdivisions, smoothNormals, smoothing, mesh));
             return mesh;
         }
 
@@ -418,10 +422,12 @@ namespace ShapeForge.LowPoly
 
         private static int GetCageHash(
             IList<ShapeProfileCageSection> sections,
+            int                             subdivisions,
             bool                            smoothNormals,
             int                             smoothing)
         {
-            int hash = (smoothNormals.GetHashCode() * 397) ^ smoothing;
+            int hash = (subdivisions * 397) ^ smoothNormals.GetHashCode();
+            hash     = (hash * 397) ^ smoothing;
             foreach (ShapeProfileCageSection section in sections)
             {
                 hash = (hash * 397) ^ section.Z.GetHashCode();
@@ -653,25 +659,32 @@ namespace ShapeForge.LowPoly
 
         private static Mesh CreateProfileCage(
             CageSection[] sections,
+            int           subdivisions,
             bool          smoothNormals,
             int           smoothing)
         {
-            ForgeVector2[][] rings = new ForgeVector2[sections.Length][];
+            CageSection[] prepared = new CageSection[sections.Length];
             for (int index = 0; index < sections.Length; index++)
-                rings[index] = EnsureCounterClockwise(
-                    SmoothProfile(sections[index].Profile, smoothing, true));
+                prepared[index] = new(
+                    sections[index].Z,
+                    EnsureCounterClockwise(SmoothProfile(sections[index].Profile, smoothing, true)));
+
+            prepared = InterpolateCageSections(prepared, subdivisions);
+            ForgeVector2[][] rings = new ForgeVector2[prepared.Length][];
+            for (int index = 0; index < prepared.Length; index++)
+                rings[index] = prepared[index].Profile;
 
             MeshBuilder builder = new();
-            AddLoftCap(builder, rings[0], sections[0].Z, Triangulate(rings[0]), true);
+            AddLoftCap(builder, rings[0], prepared[0].Z, Triangulate(rings[0]), true);
             AddLoftCap(
                 builder,
                 rings[rings.Length - 1],
-                sections[sections.Length - 1].Z,
+                prepared[prepared.Length - 1].Z,
                 Triangulate(rings[rings.Length - 1]),
                 false);
 
             int pointCount = rings[0].Length;
-            for (int sectionIndex = 0; sectionIndex < sections.Length - 1; sectionIndex++)
+            for (int sectionIndex = 0; sectionIndex < prepared.Length - 1; sectionIndex++)
             {
                 ForgeVector2[] front = rings[sectionIndex];
                 ForgeVector2[] back  = rings[sectionIndex + 1];
@@ -679,14 +692,39 @@ namespace ShapeForge.LowPoly
                 {
                     int next = (pointIndex + 1) % pointCount;
                     builder.AddQuad(
-                        ToVector3(front[pointIndex], sections[sectionIndex].Z),
-                        ToVector3(front[next], sections[sectionIndex].Z),
-                        ToVector3(back[next], sections[sectionIndex + 1].Z),
-                        ToVector3(back[pointIndex], sections[sectionIndex + 1].Z));
+                        ToVector3(front[pointIndex], prepared[sectionIndex].Z),
+                        ToVector3(front[next], prepared[sectionIndex].Z),
+                        ToVector3(back[next], prepared[sectionIndex + 1].Z),
+                        ToVector3(back[pointIndex], prepared[sectionIndex + 1].Z));
                 }
             }
 
             return builder.Build("Low Poly Profile Cage", smoothNormals);
+        }
+
+        private static CageSection[] InterpolateCageSections(CageSection[] sections, int subdivisions)
+        {
+            if (subdivisions == 0)
+                return sections;
+
+            int           stride = subdivisions + 1;
+            CageSection[] result = new CageSection[((sections.Length - 1) * stride) + 1];
+            int           write  = 0;
+            for (int sectionIndex = 0; sectionIndex < sections.Length - 1; sectionIndex++)
+            {
+                CageSection first  = sections[sectionIndex];
+                CageSection second = sections[sectionIndex + 1];
+                result[write++] = first;
+                for (int step = 1; step <= subdivisions; step++)
+                {
+                    float time       = step / (float)stride;
+                    float smoothTime = time * time * (3f - (2f * time));
+                    result[write++] = CageSection.Lerp(first, second, smoothTime);
+                }
+            }
+
+            result[write] = sections[sections.Length - 1];
+            return result;
         }
 
         private static Mesh CreateLatheProfile(
@@ -1214,16 +1252,19 @@ namespace ShapeForge.LowPoly
         private sealed class CageMeshEntry
         {
             private readonly CageSection[] sections;
+            private readonly int           subdivisions;
             private readonly bool          smoothNormals;
             private readonly int           smoothing;
 
             public CageMeshEntry(
                 CageSection[] sections,
+                int           subdivisions,
                 bool          smoothNormals,
                 int           smoothing,
                 Mesh          mesh)
             {
                 this.sections      = sections;
+                this.subdivisions  = subdivisions;
                 this.smoothNormals = smoothNormals;
                 this.smoothing     = smoothing;
                 Mesh               = mesh;
@@ -1233,10 +1274,12 @@ namespace ShapeForge.LowPoly
 
             public bool Matches(
                 IList<ShapeProfileCageSection> candidateSections,
+                int                             candidateSubdivisions,
                 bool                            candidateSmoothNormals,
                 int                             candidateSmoothing)
             {
                 if (sections.Length != candidateSections.Count ||
+                    subdivisions != candidateSubdivisions ||
                     smoothNormals != candidateSmoothNormals ||
                     smoothing != candidateSmoothing)
                     return false;
@@ -1278,6 +1321,18 @@ namespace ShapeForge.LowPoly
                 }
 
                 return true;
+            }
+
+            public static CageSection Lerp(CageSection first, CageSection second, float time)
+            {
+                ForgeVector2[] profile = new ForgeVector2[first.Profile.Length];
+                for (int index = 0; index < profile.Length; index++)
+                    profile[index] = LowPolyProceduralMeshCache.Lerp(
+                        first.Profile[index],
+                        second.Profile[index],
+                        time);
+
+                return new(Mathf.Lerp(first.Z, second.Z, time), profile);
             }
         }
 

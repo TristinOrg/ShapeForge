@@ -143,13 +143,27 @@ namespace ShapeForge.LowPoly
             int                   profileSmoothing,
             bool                  smoothNormals)
         {
+            return CageQuality(builder, 0, profileSmoothing, smoothNormals);
+        }
+
+        /// <summary>Configures interpolated rings, profile smoothing, and normals for a profile cage.</summary>
+        public static ShapeNodeBuilder CageQuality(
+            this ShapeNodeBuilder builder,
+            int                   subdivisions,
+            int                   profileSmoothing,
+            bool                  smoothNormals)
+        {
             if (builder == null)
                 throw new ArgumentNullException(nameof(builder));
+
+            if (subdivisions < 0 || subdivisions > 8)
+                throw new ArgumentOutOfRangeException(nameof(subdivisions));
 
             if (profileSmoothing < 0 || profileSmoothing > 4)
                 throw new ArgumentOutOfRangeException(nameof(profileSmoothing));
 
             return builder
+                .Parameter(LowPolyShapeParameters.CageSubdivisions, subdivisions)
                 .Parameter(LowPolyShapeParameters.ProfileSmoothing, profileSmoothing)
                 .Parameter(LowPolyShapeParameters.SmoothNormals, smoothNormals ? 1f : 0f);
         }
