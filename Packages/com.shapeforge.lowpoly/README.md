@@ -16,6 +16,8 @@ External tools can pass a generic, validated `ShapeReferenceDefinition` to the t
 
 Use `LowPolyModelGenerator` as the reusable runtime entry point for validated definitions or external ShapeForge JSON. Register style documents once, then reuse the same pipeline for subsequent models.
 
+Applications can configure `ShapeValidationLimits` for untrusted documents and use `Regenerate` or `RegenerateJson` to replace an existing model only after its new hierarchy completes successfully.
+
 For repeated models, call `ParseJson` once and pass the returned `ShapeDefinition` to `Generate`. `GenerateJson` is intended for one-off documents because it parses and validates on every call.
 
 For a large number of instances, create a `LowPolyGenerationBatch` and call `GenerateNext` or `GenerateForMilliseconds` from an existing update or loading scheduler. The caller owns the count or elapsed-time budget; ShapeForge creates no coroutine, iterator state machine, global runner, or hidden update loop.

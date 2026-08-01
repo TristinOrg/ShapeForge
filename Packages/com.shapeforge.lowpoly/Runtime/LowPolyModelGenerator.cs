@@ -17,12 +17,15 @@ namespace ShapeForge.LowPoly
         /// <summary>
         /// Initializes a reusable Low Poly generation pipeline.
         /// </summary>
-        public LowPolyModelGenerator(IEnumerable<ShapeStyleDefinition> styles = null)
+        public LowPolyModelGenerator(
+            IEnumerable<ShapeStyleDefinition> styles           = null,
+            ShapeValidationLimits              validationLimits = null)
         {
             styleResolver  = new(styles ?? Array.Empty<ShapeStyleDefinition>());
             modelGenerator = new(
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
-                styleResolver);
+                styleResolver,
+                validationLimits: validationLimits);
         }
 
         /// <summary>
@@ -47,6 +50,14 @@ namespace ShapeForge.LowPoly
         public GameObject Generate(ShapeDefinition definition, Transform parent = null)
         {
             return modelGenerator.Generate(definition, parent);
+        }
+
+        /// <summary>
+        /// Atomically replaces an existing generated model after the new definition succeeds.
+        /// </summary>
+        public GameObject Regenerate(UnityShapeModel existingModel, ShapeDefinition definition)
+        {
+            return modelGenerator.Regenerate(existingModel, definition);
         }
 
         /// <summary>
@@ -82,6 +93,14 @@ namespace ShapeForge.LowPoly
         public GameObject GenerateJson(string json, Transform parent = null)
         {
             return Generate(ParseJson(json), parent);
+        }
+
+        /// <summary>
+        /// Parses external JSON and replaces an existing model only after parsing and generation succeed.
+        /// </summary>
+        public GameObject RegenerateJson(UnityShapeModel existingModel, string json)
+        {
+            return Regenerate(existingModel, ParseJson(json));
         }
     }
 }

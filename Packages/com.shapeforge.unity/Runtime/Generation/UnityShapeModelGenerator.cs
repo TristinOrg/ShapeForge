@@ -13,6 +13,7 @@ namespace ShapeForge.Unity
         private readonly IUnityAppearanceBackend   appearanceBackend;
         private readonly IShapeStyleResolver        styleResolver;
         private readonly ShapeDefinitionValidator  validator = new();
+        private readonly ShapeValidationLimits      validationLimits;
 
         /// <summary>
         /// Initializes a Unity model generator with explicit shape implementations.
@@ -20,13 +21,15 @@ namespace ShapeForge.Unity
         public UnityShapeModelGenerator(
             IEnumerable<IUnityShapeGenerator> generators,
             IShapeStyleResolver                styleResolver     = null,
-            IUnityAppearanceBackend            appearanceBackend = null)
+            IUnityAppearanceBackend            appearanceBackend = null,
+            ShapeValidationLimits              validationLimits  = null)
         {
             if (generators == null)
                 throw new ArgumentNullException(nameof(generators));
 
             this.styleResolver     = styleResolver;
             this.appearanceBackend = appearanceBackend ?? new HybridUnityAppearanceBackend();
+            this.validationLimits  = validationLimits ?? ShapeValidationLimits.Default;
 
             foreach (IUnityShapeGenerator generator in generators)
             {
@@ -42,8 +45,26 @@ namespace ShapeForge.Unity
         /// </summary>
         public GameObject Generate(ShapeDefinition definition, Transform parent = null)
         {
-            validator.Validate(definition);
+            validator.Validate(definition, validationLimits);
             return GeneratePrepared(definition, parent);
+        }
+
+        /// <summary>
+        /// Generates a replacement first and destroys the existing model only after generation succeeds.
+        /// </summary>
+        public GameObject Regenerate(UnityShapeModel existingModel, ShapeDefinition definition)
+        {
+            if (existingModel == null)
+                throw new ArgumentNullException(nameof(existingModel));
+
+            validator.Validate(definition, validationLimits);
+            Transform  existingTransform = existingModel.transform;
+            Transform  parent            = existingTransform.parent;
+            int        siblingIndex       = existingTransform.GetSiblingIndex();
+            GameObject replacement        = GeneratePrepared(definition, parent);
+            replacement.transform.SetSiblingIndex(siblingIndex);
+            DestroyGeneratedObject(existingModel.gameObject);
+            return replacement;
         }
 
         /// <summary>
@@ -51,7 +72,7 @@ namespace ShapeForge.Unity
         /// </summary>
         public UnityShapeGenerationPlan Prepare(ShapeDefinition definition)
         {
-            validator.Validate(definition);
+            validator.Validate(definition, validationLimits);
             return new(this, definition);
         }
 

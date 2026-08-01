@@ -13,8 +13,19 @@ namespace ShapeForge
         /// </summary>
         public void Validate(ShapeDefinition definition)
         {
+            Validate(definition, ShapeValidationLimits.Default);
+        }
+
+        /// <summary>
+        /// Validates a definition against explicit authored-complexity limits.
+        /// </summary>
+        public void Validate(ShapeDefinition definition, ShapeValidationLimits limits)
+        {
             if (definition == null)
                 throw new ArgumentNullException(nameof(definition));
+
+            if (limits == null)
+                throw new ArgumentNullException(nameof(limits));
 
             if (!string.Equals(definition.Schema, ShapeDefinition.CurrentSchema, StringComparison.Ordinal))
                 throw new ShapeValidationException($"Unsupported shape schema '{definition.Schema}'.");
@@ -22,8 +33,9 @@ namespace ShapeForge
             if (definition.Root != null && definition.Root.MirrorAxis != ShapeMirrorAxis.None)
                 throw new ShapeValidationException("The root node cannot create a mirrored sibling.");
 
-            HashSet<string> nodeIds = new HashSet<string>(StringComparer.Ordinal);
-            ValidateNode(definition.Root, nodeIds);
+            HashSet<string> nodeIds = new(StringComparer.Ordinal);
+            ValidationState state   = new(limits);
+            ValidateNode(definition.Root, nodeIds, state, 1);
             ValidateRig(definition.Rig, nodeIds);
         }
 
@@ -79,10 +91,16 @@ namespace ShapeForge
                     $"Semantic rig role '{role}' rotation limits must be finite.");
         }
 
-        private static void ValidateNode(ShapeNode node, HashSet<string> nodeIds)
+        private static void ValidateNode(
+            ShapeNode       node,
+            HashSet<string> nodeIds,
+            ValidationState state,
+            int             depth)
         {
             if (node == null)
                 throw new ShapeValidationException("Shape definitions cannot contain null nodes.");
+
+            state.AddNode(depth);
 
             if (string.IsNullOrWhiteSpace(node.Id))
                 throw new ShapeValidationException("Every shape node requires a stable ID.");
@@ -95,6 +113,8 @@ namespace ShapeForge
 
             if (node.Transform == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a transform.");
+
+            ValidateTransform(node);
 
             if (node.Appearance == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires appearance data.");
@@ -121,6 +141,8 @@ namespace ShapeForge
             if (node.Profile == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile collection.");
 
+            state.AddPoints(node.Profile.Count);
+
             foreach (ForgeVector2 point in node.Profile)
             {
                 if (float.IsNaN(point.X) || float.IsInfinity(point.X) ||
@@ -130,6 +152,8 @@ namespace ShapeForge
 
             if (node.Path == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a path collection.");
+
+            state.AddPoints(node.Path.Count);
 
             foreach (ForgeVector3 point in node.Path)
             {
@@ -141,6 +165,8 @@ namespace ShapeForge
 
             if (node.ProfileSections == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a profile section collection.");
+
+            state.AddPoints(node.ProfileSections.Count);
 
             foreach (ShapeProfileSection section in node.ProfileSections)
             {
@@ -168,6 +194,8 @@ namespace ShapeForge
                     throw new ShapeValidationException(
                         $"Shape node '{node.Id}' profile cage sections must be finite and contain profiles.");
 
+                state.AddPoints(section.Profile.Count);
+
                 foreach (ForgeVector2 point in section.Profile)
                 {
                     if (float.IsNaN(point.X) || float.IsInfinity(point.X) ||
@@ -177,8 +205,63 @@ namespace ShapeForge
                 }
             }
 
+            if (node.Children == null)
+                throw new ShapeValidationException($"Shape node '{node.Id}' requires a child collection.");
+
             foreach (ShapeNode child in node.Children)
-                ValidateNode(child, nodeIds);
+                ValidateNode(child, nodeIds, state, depth + 1);
+        }
+
+        private static void ValidateTransform(ShapeNode node)
+        {
+            ShapeTransform transform = node.Transform;
+            if (!IsFinite(transform.Position) ||
+                !IsFinite(transform.EulerAngles) ||
+                !IsFinite(transform.Scale))
+                throw new ShapeValidationException($"Shape node '{node.Id}' transform values must be finite.");
+        }
+
+        private static bool IsFinite(ForgeVector3 value)
+        {
+            return !float.IsNaN(value.X) && !float.IsInfinity(value.X) &&
+                   !float.IsNaN(value.Y) && !float.IsInfinity(value.Y) &&
+                   !float.IsNaN(value.Z) && !float.IsInfinity(value.Z);
+        }
+
+        /// <summary>
+        /// Tracks aggregate definition cost without exposing mutable counters.
+        /// </summary>
+        private sealed class ValidationState
+        {
+            private readonly ShapeValidationLimits limits;
+            private int                            nodeCount;
+            private int                            pointCount;
+
+            public ValidationState(ShapeValidationLimits limits)
+            {
+                this.limits = limits;
+            }
+
+            public void AddNode(int depth)
+            {
+                if (depth > limits.MaximumHierarchyDepth)
+                    throw new ShapeValidationException(
+                        $"Shape hierarchy exceeds the maximum depth of {limits.MaximumHierarchyDepth}.");
+
+                nodeCount++;
+                if (nodeCount > limits.MaximumNodeCount)
+                    throw new ShapeValidationException(
+                        $"Shape definition exceeds the maximum node count of {limits.MaximumNodeCount}.");
+            }
+
+            public void AddPoints(int count)
+            {
+                if (count > limits.MaximumAuthoredPoints - pointCount)
+                    throw new ShapeValidationException(
+                        $"Shape definition exceeds the maximum authored point count of {limits.MaximumAuthoredPoints}.");
+
+                pointCount += count;
+            }
         }
     }
 }

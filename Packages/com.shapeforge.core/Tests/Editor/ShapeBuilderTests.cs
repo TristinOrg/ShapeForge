@@ -82,6 +82,74 @@ namespace ShapeForge.Tests
         }
 
         [Test]
+        public void ValidatorRejectsDefinitionsBeyondExplicitComplexityLimits()
+        {
+            ShapeNode root = new("root", "Root", ShapeTypes.Group);
+            root.Add(new("first", "First", ShapeTypes.Group));
+            root.Add(new("second", "Second", ShapeTypes.Group));
+            ShapeDefinition definition = new()
+            {
+                Root = root
+            };
+            ShapeValidationLimits limits = new(maximumNodeCount: 2);
+
+            Assert.Throws<ShapeValidationException>(() =>
+                new ShapeDefinitionValidator().Validate(definition, limits));
+        }
+
+        [Test]
+        public void ValidatorRejectsDeepHierarchyBeforeGeneration()
+        {
+            ShapeNode root  = new("root", "Root", ShapeTypes.Group);
+            ShapeNode child = new("child", "Child", ShapeTypes.Group);
+            root.Add(child);
+            child.Add(new("grandchild", "Grandchild", ShapeTypes.Group));
+            ShapeDefinition definition = new()
+            {
+                Root = root
+            };
+            ShapeValidationLimits limits = new(maximumHierarchyDepth: 2);
+
+            Assert.Throws<ShapeValidationException>(() =>
+                new ShapeDefinitionValidator().Validate(definition, limits));
+        }
+
+        [Test]
+        public void ValidatorRejectsAggregateAuthoredPointBudget()
+        {
+            ShapeNode root = new("root", "Root", ShapeTypes.Group);
+            root.Profile.Add(new(0f, 0f));
+            root.Profile.Add(new(1f, 0f));
+            root.Path.Add(new(0f, 0f, 0f));
+            ShapeDefinition definition = new()
+            {
+                Root = root
+            };
+            ShapeValidationLimits limits = new(maximumAuthoredPoints: 2);
+
+            Assert.Throws<ShapeValidationException>(() =>
+                new ShapeDefinitionValidator().Validate(definition, limits));
+        }
+
+        [Test]
+        public void ValidatorRejectsNonFiniteTransforms()
+        {
+            ShapeDefinition definition = new()
+            {
+                Root = new("root", "Root", ShapeTypes.Group)
+                {
+                    Transform = new()
+                    {
+                        Position = new(float.PositiveInfinity, 0f, 0f)
+                    }
+                }
+            };
+
+            Assert.Throws<ShapeValidationException>(() =>
+                new ShapeDefinitionValidator().Validate(definition));
+        }
+
+        [Test]
         public void BuildCreatesResolvableSemanticRig()
         {
             ShapeDefinition definition = ShapeBuilder

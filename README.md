@@ -211,6 +211,8 @@ Typical workflows are:
 
 For one-off documents, `GenerateJson` performs parsing and validation for that call.
 
+`Regenerate` and `RegenerateJson` build a replacement hierarchy first, preserve the existing model if parsing or generation fails, and swap it only after the new hierarchy completes successfully. This supports iterative authoring and external LLM edits without leaving a half-generated model.
+
 For repeated models, parse once and reuse the resulting definition. At the Unity Adapter level, prepared generation plans validate an immutable tree once and skip redundant validation for later instances.
 
 `LowPolyGenerationBatch` supports `GenerateNext` and `GenerateForMilliseconds`. ShapeForge intentionally creates no hidden coroutine, iterator state machine, global runner, or background update loop—the caller owns scheduling and budgeting.
@@ -273,6 +275,8 @@ to measure parsing, prepared generation, managed heap growth, and shared render-
 ## JSON and Validation
 
 ShapeForge documents are versioned and validated before generation.
+
+Default validation budgets reject definitions above 4,096 authored nodes, 64 hierarchy levels, or 262,144 combined profile/path points before a backend allocates Unity objects or meshes. `ShapeValidationLimits` lets trusted applications select tighter budgets for external JSON and platform-specific memory constraints.
 
 Published Draft 2020-12 schemas and minimal examples live under package `Documentation~` directories. External tools should validate against the matching schema version before passing data to an engine adapter.
 

@@ -94,6 +94,54 @@ namespace ShapeForge.Unity.Tests
             Assert.That(model.TryGetTarget("arm-left.mirror-x", out _), Is.True);
         }
 
+        [Test]
+        public void GenerateAppliesConfiguredComplexityLimitsBeforeAllocatingObjects()
+        {
+            ShapeNode root = new("root", "Limited Root", ShapeTypes.Group);
+            root.Add(new("child", "Child", TestGenerator.Type));
+            UnityShapeModelGenerator generator = new(
+                new IUnityShapeGenerator[] { new TestGenerator() },
+                validationLimits: new(maximumNodeCount: 1));
+
+            Assert.Throws<ShapeValidationException>(() =>
+                generator.Generate(new("Limited", root)));
+            Assert.That(GameObject.Find("Limited Root"), Is.Null);
+        }
+
+        [Test]
+        public void RegenerateReplacesModelAfterSuccessfulGeneration()
+        {
+            GameObject parent = new("Parent");
+            ShapeNode originalRoot = new("original", "Original", ShapeTypes.Group);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[] { new TestGenerator() });
+            generatedRoot = generator.Generate(new("Original", originalRoot), parent.transform);
+            UnityShapeModel existingModel = generatedRoot.GetComponent<UnityShapeModel>();
+            ShapeNode replacementRoot = new("replacement", "Replacement", ShapeTypes.Group);
+
+            generatedRoot = generator.Regenerate(existingModel, new("Replacement", replacementRoot));
+
+            Assert.That(parent.transform.childCount, Is.EqualTo(1));
+            Assert.That(parent.transform.GetChild(0).name, Is.EqualTo("Replacement"));
+            Assert.That(generatedRoot.GetComponent<UnityShapeModel>().TryGetTarget("replacement", out _), Is.True);
+            Object.DestroyImmediate(parent);
+            generatedRoot = null;
+        }
+
+        [Test]
+        public void RegenerateKeepsExistingModelWhenReplacementIsInvalid()
+        {
+            ShapeNode originalRoot = new("original", "Original", ShapeTypes.Group);
+            UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[] { new TestGenerator() });
+            generatedRoot = generator.Generate(new("Original", originalRoot));
+            UnityShapeModel existingModel = generatedRoot.GetComponent<UnityShapeModel>();
+            ShapeDefinition invalid = new("Invalid", new("duplicate", "Invalid", ShapeTypes.Group));
+            invalid.Root.Add(new("duplicate", "Duplicate", ShapeTypes.Group));
+
+            Assert.Throws<ShapeValidationException>(() => generator.Regenerate(existingModel, invalid));
+            Assert.That(generatedRoot, Is.Not.Null);
+            Assert.That(generatedRoot.name, Is.EqualTo("Original"));
+        }
+
         private sealed class TestGenerator : IUnityShapeGenerator
         {
             public const string Type = "test/shape";

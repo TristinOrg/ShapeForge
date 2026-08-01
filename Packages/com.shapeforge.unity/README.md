@@ -8,6 +8,8 @@ Every generated root includes a `UnityShapeModel` that resolves stable node IDs 
 
 Use `UnityShapeModelGenerator.Prepare` when generating the same immutable definition repeatedly. Its `UnityShapeGenerationPlan` validates once and skips redundant tree validation for subsequent instances.
 
+The generator accepts optional complexity limits and supports failure-safe regeneration. An existing hierarchy remains intact unless its replacement completes successfully.
+
 `ShapeJsonSerializer.Serialize(ShapeCapabilityCatalogDocument)` exports any backend capability catalog as compact, versioned JSON for external authoring tools and LLM context.
 
 The same serializer exports `ShapeTemplateCatalogDocument` discovery metadata. Template-specific specification serialization remains owned by the package that defines that specification.

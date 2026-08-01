@@ -2,6 +2,8 @@
 
 ShapeForge Core defines style-independent shape data, palettes, style resolution, and generation contracts. It must not depend on Low Poly implementations, render pipelines, or external AI providers.
 
+`ShapeDefinitionValidator` applies configurable `ShapeValidationLimits` for node count, hierarchy depth, and aggregate authored points before a backend allocates engine objects or procedural meshes.
+
 Generic reference validation accepts semantic parts with aligned front, side, and back observations. Coverage analysis detects missing views and normalized height disagreement before a style implementation maps silhouettes into geometry.
 
 Styles may set `BaseStyle` to inherit another registered style. Derived palette roles override inherited roles; unresolved roles fall back through the inheritance chain. `ShapeStyleResolver` validates missing parents and cycles when styles are registered, then caches flattened palettes for constant-time generation lookups.
