@@ -6,6 +6,8 @@ namespace ShapeForge.LowPoly
     public static class LowPolyHeroPreset
     {
         private const float HeadAssemblyScale = 0.67f;
+        private const string HairReferencePartId = "character/hair";
+        private const string HeadReferencePartId = "character/head";
         private const float ReferenceHeight   = 3.5f;
 
         /// <summary>Gets the style identifier used by the hero preset.</summary>
@@ -32,8 +34,8 @@ namespace ShapeForge.LowPoly
             else
             {
                 LowPolyReferenceProfileCageMapper mapper = new();
-                headCage = mapper.Map(reference, LowPolyFantasyHeroReference.HeadPartId, 24, 9);
-                hairCage = mapper.Map(reference, LowPolyFantasyHeroReference.HairPartId, 32, 11);
+                headCage = mapper.Map(reference, HeadReferencePartId, 24, 9);
+                hairCage = mapper.Map(reference, HairReferencePartId, 32, 11);
             }
 
             return ShapeBuilder

@@ -162,8 +162,6 @@ The Low Poly package includes a deterministic reference-measurement pipeline for
 
 The bundled Fantasy Hero uses authored, semantically aligned profile cages for a coherent rounded head and primary hair volume. The same template can still consume aligned front, side, and back silhouettes when a caller explicitly supplies a measured reference.
 
-`LowPolyStylizedHumanReferenceMapper` maps normalized observations from a front view and an optional side view into a `LowPolyStylizedHumanSpecification`.
-
 Current measurements include head dimensions, shoulder and torso width, leg length, jaw width, hair width and depth, hair parting, fringe length, and sideburn length.
 
 Measurements are ratios rather than pixels, making them independent of image resolution. Missing side-view data deliberately preserves the base depth instead of inventing dimensions that are not visible.
@@ -174,7 +172,7 @@ A provider-neutral extraction protocol, JSON Schema, and example are published u
 Packages/com.shapeforge.lowpoly/Documentation~/Templates
 ```
 
-`LowPolyStylizedHumanReferencePrompt.Create` can combine the runtime protocol with the authoritative schema for a vision-capable external model. ShapeForge itself remains independent of OpenAI, Gemini, or any other AI provider.
+External tools can feed the same generic reference document into supported semantic templates. ShapeForge itself remains independent of OpenAI, Gemini, or any other AI provider.
 
 ## Styles and Appearance
 
@@ -313,7 +311,7 @@ The framework is most useful when an asset can be represented as meaningful part
 
 ## Tests
 
-The repository currently contains 63 first-party EditMode tests covering fluent authoring, validation, JSON contracts, style inheritance, capability discovery, semantic templates, Stylized Human compilation, reference mapping, runtime generation, hierarchy adaptation, appearance lifecycle behavior, shared resources, procedural geometry, presets, and motion-ready pivots.
+The repository includes first-party EditMode coverage for fluent authoring, validation, JSON contracts, style inheritance, capability discovery, semantic templates, Stylized Human compilation, generic reference mapping, runtime generation, hierarchy adaptation, appearance lifecycle behavior, shared resources, procedural geometry, presets, and motion-ready pivots.
 
 ## Project Status
 

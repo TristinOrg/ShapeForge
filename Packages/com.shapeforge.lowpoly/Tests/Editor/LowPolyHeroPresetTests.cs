@@ -80,20 +80,6 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(model.TryGetTarget("hero.leg.left.knee.pivot", out _), Is.True);
         }
 
-        [Test]
-        public void BuiltInReferenceHasCompleteConsistentHeadAndHairCoverage()
-        {
-            ShapeReferenceDefinition      reference = LowPolyFantasyHeroReference.Create();
-            ShapeReferenceCoverageReport report    = new ShapeReferenceCoverageAnalyzer().Analyze(reference);
-            ShapeDefinition definition = LowPolyStylizedHumanTemplate.Instance.Compile(new(), reference);
-
-            Assert.That(report.PartCount, Is.EqualTo(2));
-            Assert.That(report.HasCompleteCoverage, Is.True);
-            Assert.That(report.IsConsistent, Is.True);
-            Assert.That(FindNode(definition.Root, "hero.head").Type, Is.EqualTo(LowPolyShapeTypes.ProfileCage));
-            Assert.That(FindNode(definition.Root, "hero.hair").Type, Is.EqualTo(LowPolyShapeTypes.ProfileCage));
-        }
-
         private static ShapeNode FindNode(ShapeNode node, string id)
         {
             if (node.Id == id)
