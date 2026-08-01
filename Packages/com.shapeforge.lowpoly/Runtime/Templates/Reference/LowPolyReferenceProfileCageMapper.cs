@@ -19,7 +19,7 @@ namespace ShapeForge.LowPoly
 
         /// <summary>
         /// Maps one semantic part into normalized profile-cage geometry.
-        /// Side image-left maps to negative depth and image-right maps to positive depth.
+        /// Side image-left maps to negative depth and must face the model front.
         /// </summary>
         public LowPolyReferenceProfileCage Map(
             ShapeReferenceDefinition reference,
@@ -103,7 +103,8 @@ namespace ShapeForge.LowPoly
             ForgeVector2[] result    = new ForgeVector2[pointCount];
             for (int index = 0; index < pointCount; index++)
             {
-                float distance = perimeter * index / pointCount;
+                int   sampleIndex = mirrorX ? (pointCount - index) % pointCount : index;
+                float distance    = perimeter * sampleIndex / pointCount;
                 int   segment  = FindSegment(cumulative, distance);
                 float length   = cumulative[segment + 1] - cumulative[segment];
                 float amount   = length <= 0f ? 0f : (distance - cumulative[segment]) / length;
@@ -136,7 +137,7 @@ namespace ShapeForge.LowPoly
                 ForgeVector2[] profile = new ForgeVector2[front.Length];
                 for (int pointIndex = 0; pointIndex < profile.Length; pointIndex++)
                 {
-                    ForgeVector2 source = Lerp(back[pointIndex], front[pointIndex], depth);
+                    ForgeVector2 source = Lerp(front[pointIndex], back[pointIndex], depth);
                     profile[pointIndex] = new(source.X * scaleX, source.Y * scaleY + offsetY);
                 }
 
