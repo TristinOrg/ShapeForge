@@ -233,6 +233,7 @@ The Low Poly package currently includes:
 - **Fantasy Hero** — a proportioned stylized human assembled from semantic and procedural parts;
 - **Inventor Workbench** — detailed furniture and prop composition;
 - **Japanese Town** — buildings, environment dressing, street furniture, and shrine elements in one generated hierarchy;
+- **Shibuya Crossing** — a dense modern scramble crossing with diagonal markings, media towers, signals, signage, and lightweight crowds;
 - animated variants demonstrating lightweight mechanical motion and a simple human walk.
 
 The animated samples control cached `IShapeTransformTarget` instances without defining a ShapeForge animation-file format. Clips, tracks, interpolation, blending, retargeting, and playback remain responsibilities of a future dedicated motion layer.

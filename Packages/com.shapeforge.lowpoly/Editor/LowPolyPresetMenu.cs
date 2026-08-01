@@ -41,6 +41,14 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyHeroPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Shibuya Crossing", false, 14)]
+        private static void GenerateShibuyaCrossing()
+        {
+            Generate(
+                LowPolyShibuyaCrossingPreset.CreateDefinition(),
+                LowPolyShibuyaCrossingPreset.CreateStyle());
+        }
+
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
         private static void GenerateAnimatedWorkbench()
         {
