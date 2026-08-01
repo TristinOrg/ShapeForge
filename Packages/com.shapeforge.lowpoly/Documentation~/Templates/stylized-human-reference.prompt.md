@@ -4,7 +4,7 @@ Use this protocol with a vision-capable LLM and the adjacent `stylized-human-ref
 
 ## Input requirements
 
-- One full-body front image is required. A distinct side image is optional.
+- One full-body front image is required. A distinct side image or clearly separated side panel is optional.
 - Use an orthographic or long-lens view where possible. Strong perspective makes ratios unreliable.
 - The top of the hair, jaw, shoulders, torso sides, hips, knees, and bottom of both feet must be visible.
 - Request a clearer image when required landmarks are cropped or occluded; do not guess them.
@@ -17,7 +17,7 @@ Use this protocol with a vision-capable LLM and the adjacent `stylized-human-ref
 - Divide jaw width by head width and hair width by head width.
 - Normalize fringe length from hairline zero to jaw one and sideburn length from temple zero to jaw one.
 - Exclude weapons, loose accessories, shadows, background, and empty transparent padding.
-- Emit `side` only from a separate side image. Never estimate depth from the front image.
+- Emit `side` only from a separate side image or clearly separated side panel. Never estimate depth from the front image.
 
 ## Output contract
 

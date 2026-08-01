@@ -15,7 +15,8 @@ namespace ShapeForge.LowPoly
             "top-of-hair to bottom-of-feet height. Exclude weapons, loose accessories, shadows, and perspective " +
             "padding. Measure jaw width relative to head width, hair width relative to head width, fringe from " +
             "hairline to jaw, and sideburn from temple to jaw. Parting uses image-left 0 and image-right 1. " +
-            "Only emit side measurements when a distinct side image is supplied; never infer depth from the front " +
+            "Only emit side measurements when a distinct side image or clearly separated side panel is supplied; " +
+            "never infer depth from the front " +
             "image. If the full figure or required front landmarks are occluded, request a clearer image instead " +
             "of fabricating values. Return one JSON object conforming exactly to the supplied Schema, with no " +
             "Markdown or explanation.";

@@ -140,5 +140,53 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(guide, Does.Contain("Never estimate depth from the front image"));
             Assert.That(guide, Does.Contain(nameof(LowPolyStylizedHumanReferencePrompt)));
         }
+
+        [Test]
+        public void AnalyzerReportsMissingSideCoverageWithoutInventingDiagnostics()
+        {
+            LowPolyStylizedHumanReferenceReport report = new LowPolyStylizedHumanReferenceAnalyzer().Analyze(new());
+
+            Assert.That(report.HasSideView, Is.False);
+            Assert.That(report.HasCompleteGeometryCoverage, Is.False);
+            Assert.That(report.Diagnostics, Has.Count.EqualTo(10));
+            Assert.That(report.Diagnostics, Has.None.Property("View")
+                .EqualTo(LowPolyStylizedHumanReferenceView.Side));
+        }
+
+        [Test]
+        public void AnalyzerReportsCompleteSideCoverageInStableOrder()
+        {
+            LowPolyStylizedHumanReferenceSpecification reference = new()
+            {
+                Side = new()
+            };
+
+            LowPolyStylizedHumanReferenceReport report = new LowPolyStylizedHumanReferenceAnalyzer()
+                .Analyze(reference);
+
+            Assert.That(report.HasCompleteGeometryCoverage, Is.True);
+            Assert.That(report.Diagnostics, Has.Count.EqualTo(12));
+            Assert.That(report.Diagnostics[0].Path, Is.EqualTo("front.headWidth"));
+            Assert.That(report.Diagnostics[10].Path, Is.EqualTo("side.headDepth"));
+            Assert.That(report.Diagnostics[11].Path, Is.EqualTo("side.hairDepthToHeadDepth"));
+        }
+
+        [Test]
+        public void AnalyzerClassifiesSemanticDeviationMagnitude()
+        {
+            LowPolyStylizedHumanReferenceSpecification reference = new();
+            reference.Front.HeadWidth     = 0.264f;
+            reference.Front.ShoulderWidth = 0.408f;
+
+            LowPolyStylizedHumanReferenceReport report = new LowPolyStylizedHumanReferenceAnalyzer()
+                .Analyze(reference);
+
+            Assert.That(report.Diagnostics[0].Multiplier, Is.EqualTo(1.1f).Within(0.0001f));
+            Assert.That(report.Diagnostics[0].Deviation,
+                Is.EqualTo(LowPolyStylizedHumanReferenceDeviation.Moderate));
+            Assert.That(report.Diagnostics[2].Multiplier, Is.EqualTo(1.2f).Within(0.0001f));
+            Assert.That(report.Diagnostics[2].Deviation,
+                Is.EqualTo(LowPolyStylizedHumanReferenceDeviation.Strong));
+        }
     }
 }

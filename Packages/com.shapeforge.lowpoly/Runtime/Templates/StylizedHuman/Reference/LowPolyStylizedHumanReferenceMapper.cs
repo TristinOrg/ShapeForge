@@ -7,16 +7,6 @@ namespace ShapeForge.LowPoly
     /// </summary>
     public sealed class LowPolyStylizedHumanReferenceMapper
     {
-        private const float BaselineHeadWidth             = 0.24f;
-        private const float BaselineHeadHeight            = 0.26f;
-        private const float BaselineShoulderWidth         = 0.34f;
-        private const float BaselineBodyWidth             = 0.17f;
-        private const float BaselineLegLength             = 0.49f;
-        private const float BaselineJawWidth              = 0.78f;
-        private const float BaselineHairWidth             = 1.15f;
-        private const float BaselineHeadDepth             = 0.21f;
-        private const float BaselineHairDepth             = 1.08f;
-
         private readonly LowPolyStylizedHumanReferenceSpecificationValidator referenceValidator = new();
         private readonly LowPolyStylizedHumanSpecificationValidator          resultValidator    = new();
 
@@ -35,21 +25,26 @@ namespace ShapeForge.LowPoly
             LowPolyStylizedHumanSpecification result = Copy(baseSpecification ?? new());
             LowPolyStylizedHumanFrontReference front  = reference.Front;
 
-            result.Proportions.ShoulderWidth = front.ShoulderWidth / BaselineShoulderWidth;
-            result.Proportions.BodyWidth     = front.BodyWidth / BaselineBodyWidth;
-            result.Proportions.LegLength     = front.LegLength / BaselineLegLength;
-            result.Head.Width                = front.HeadWidth / BaselineHeadWidth;
-            result.Head.Height               = front.HeadHeight / BaselineHeadHeight;
-            result.Head.JawWidth             = front.JawWidthToHeadWidth / BaselineJawWidth;
-            result.Hair.Volume               = front.HairWidthToHeadWidth / BaselineHairWidth;
+            result.Proportions.ShoulderWidth = front.ShoulderWidth /
+                                               LowPolyStylizedHumanReferenceBaseline.ShoulderWidth;
+            result.Proportions.BodyWidth     = front.BodyWidth / LowPolyStylizedHumanReferenceBaseline.BodyWidth;
+            result.Proportions.LegLength     = front.LegLength / LowPolyStylizedHumanReferenceBaseline.LegLength;
+            result.Head.Width                = front.HeadWidth / LowPolyStylizedHumanReferenceBaseline.HeadWidth;
+            result.Head.Height               = front.HeadHeight / LowPolyStylizedHumanReferenceBaseline.HeadHeight;
+            result.Head.JawWidth             = front.JawWidthToHeadWidth /
+                                               LowPolyStylizedHumanReferenceBaseline.JawWidthToHeadWidth;
+            result.Hair.Volume               = front.HairWidthToHeadWidth /
+                                               LowPolyStylizedHumanReferenceBaseline.HairWidthToHeadWidth;
             result.Hair.Parting              = front.Parting;
             result.Hair.FringeLength         = front.FringeLength;
             result.Hair.SideburnLength       = front.SideburnLength;
 
             if (reference.Side != null)
             {
-                result.Head.Depth = reference.Side.HeadDepth / BaselineHeadDepth;
-                float sideVolume  = reference.Side.HairDepthToHeadDepth / BaselineHairDepth;
+                result.Head.Depth = reference.Side.HeadDepth /
+                                    LowPolyStylizedHumanReferenceBaseline.HeadDepth;
+                float sideVolume  = reference.Side.HairDepthToHeadDepth /
+                                    LowPolyStylizedHumanReferenceBaseline.HairDepthToHeadDepth;
                 result.Hair.Volume = (result.Hair.Volume + sideVolume) * 0.5f;
             }
 
