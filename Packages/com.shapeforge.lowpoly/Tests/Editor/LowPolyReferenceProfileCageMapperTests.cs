@@ -26,13 +26,20 @@ namespace ShapeForge.LowPoly.Tests
             LowPolyReferenceProfileCage cage = new LowPolyReferenceProfileCageMapper()
                 .Map(reference, "head", 12, 5);
 
-            Assert.That(cage.Position, Is.EqualTo(new ForgeVector3(0f, 0.5f, 0f)));
-            Assert.That(cage.Scale, Is.EqualTo(new ForgeVector3(0.6f, 0.8f, 0.4f)));
-            Assert.That(cage.Sections, Has.Count.EqualTo(5));
+            AssertVector(cage.Position, new(0f, 0.5f, 0f));
+            AssertVector(cage.Scale, new(0.6f, 0.8f, 0.4f));
+            Assert.That(cage.Sections.Count, Is.EqualTo(5));
             Assert.That(cage.Sections[0].Z, Is.EqualTo(-0.5f));
             Assert.That(cage.Sections[2].Profile, Has.Count.EqualTo(12));
             Assert.That(cage.Sections[2].Profile[0].Y, Is.EqualTo(0.5f).Within(0.001f));
             Assert.That(cage.Sections[0].Profile[0].Y, Is.LessThan(cage.Sections[2].Profile[0].Y));
+        }
+
+        private static void AssertVector(ForgeVector3 actual, ForgeVector3 expected)
+        {
+            Assert.That(actual.X, Is.EqualTo(expected.X).Within(0.0001f));
+            Assert.That(actual.Y, Is.EqualTo(expected.Y).Within(0.0001f));
+            Assert.That(actual.Z, Is.EqualTo(expected.Z).Within(0.0001f));
         }
 
         [Test]

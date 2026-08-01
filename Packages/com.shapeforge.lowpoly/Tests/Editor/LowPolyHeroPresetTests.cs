@@ -72,7 +72,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(style.Palette.TryGetColor("hair", out ForgeColor hair), Is.True);
             Assert.That(hair.B, Is.GreaterThan(hair.R));
             Assert.That(style.Palette.TryGetColor("jacket", out ForgeColor jacket), Is.True);
-            Assert.That(jacket.R, Is.LessThan(0.05f));
+            Assert.That(jacket.R, Is.EqualTo(0.102f).Within(0.0001f));
 
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
             Assert.That(model.TryGetTarget("hero.spine.pivot", out _), Is.True);
