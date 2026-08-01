@@ -18,6 +18,17 @@ namespace ShapeForge.LowPoly
             return ShapeBuilder
                 .Create("Low Poly Sentinel Robot")
                 .WithStyle(StyleId)
+                .WithRig("humanoid/basic",
+                    new ShapeRigJoint(ShapeRigRoles.Root, "robot"),
+                    new ShapeRigJoint(ShapeRigRoles.Head, "robot.head.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftShoulder, "robot.arm.left.shoulder.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftElbow, "robot.arm.left.elbow.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightShoulder, "robot.arm.right.shoulder.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightElbow, "robot.arm.right.elbow.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftHip, "robot.leg.left.hip.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftKnee, "robot.leg.left.knee.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightHip, "robot.leg.right.hip.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightKnee, "robot.leg.right.knee.pivot"))
                 .Root("robot", "Sentinel Robot", robot =>
                 {
                     robot

@@ -27,10 +27,13 @@ namespace ShapeForge.LowPoly.Tests
             UnityShapeModelGenerator generator  = new(
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
+            ShapeRigIndex rig = new(definition.Rig);
 
             generatedRoot = generator.Generate(definition);
 
             Assert.That(generatedRoot.name, Is.EqualTo("Pocket Fantasy Hero"));
+            Assert.That(rig.TryGetNodeId(ShapeRigRoles.Hips, out string hipsId), Is.True);
+            Assert.That(hipsId, Is.EqualTo("hero.pelvis.pivot"));
             Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.EqualTo(31));
             Assert.That(generatedRoot.transform.Find("Head Pivot/Unified Polygon Hair Shell"), Is.Not.Null);
             Assert.That(generatedRoot.transform.Find("Head Pivot/Left Ear"), Is.Not.Null);

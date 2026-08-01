@@ -80,5 +80,44 @@ namespace ShapeForge.Tests
 
             Assert.Throws<ShapeValidationException>(() => builder.Build());
         }
+
+        [Test]
+        public void BuildCreatesResolvableSemanticRig()
+        {
+            ShapeDefinition definition = ShapeBuilder
+                .Create("Actor")
+                .WithRig("humanoid/basic", new ShapeRigJoint(ShapeRigRoles.Head, "head-pivot"))
+                .Root("actor", "Actor", root => root
+                    .Group("head-pivot", "Head Pivot"))
+                .Build();
+            ShapeRigIndex index = new(definition.Rig);
+
+            Assert.That(index.TryGetNodeId(ShapeRigRoles.Head, out string nodeId), Is.True);
+            Assert.That(nodeId, Is.EqualTo("head-pivot"));
+        }
+
+        [Test]
+        public void BuildRejectsSemanticRigTargetingUnknownNode()
+        {
+            ShapeBuilder builder = ShapeBuilder
+                .Create("Actor")
+                .WithRig("humanoid/basic", new ShapeRigJoint(ShapeRigRoles.Head, "missing"))
+                .Root("actor", "Actor");
+
+            Assert.Throws<ShapeValidationException>(() => builder.Build());
+        }
+
+        [Test]
+        public void BuildRejectsDuplicateSemanticRigRoles()
+        {
+            ShapeBuilder builder = ShapeBuilder
+                .Create("Actor")
+                .WithRig("humanoid/basic",
+                    new ShapeRigJoint(ShapeRigRoles.Head, "actor"),
+                    new ShapeRigJoint(ShapeRigRoles.Head, "actor"))
+                .Root("actor", "Actor");
+
+            Assert.Throws<ShapeValidationException>(() => builder.Build());
+        }
     }
 }

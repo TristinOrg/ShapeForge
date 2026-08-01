@@ -25,12 +25,15 @@ namespace ShapeForge.LowPoly.Tests
 
             ShapeNode leftShoulder = FindNode(definition.Root, "robot.arm.left.shoulder.pivot");
             ShapeNode leftArm      = FindNode(definition.Root, "robot.arm.left.upper");
+            ShapeRigIndex rig      = new(definition.Rig);
 
             Assert.That(leftShoulder, Is.Not.Null);
             Assert.That(leftArm, Is.Not.Null);
             Assert.That(leftShoulder.Type, Is.EqualTo(ShapeTypes.Group));
             Assert.That(FindNode(leftShoulder, leftArm.Id), Is.SameAs(leftArm));
             Assert.That(leftArm.Type, Is.EqualTo(LowPolyShapeTypes.LatheProfile));
+            Assert.That(rig.TryGetNodeId(ShapeRigRoles.LeftElbow, out string elbowId), Is.True);
+            Assert.That(elbowId, Is.EqualTo("robot.arm.left.elbow.pivot"));
         }
 
         [Test]

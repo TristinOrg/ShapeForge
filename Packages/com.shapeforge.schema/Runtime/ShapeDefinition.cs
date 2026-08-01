@@ -45,6 +45,11 @@ namespace ShapeForge
         public string Style { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the optional semantic rig exposed to motion systems.
+        /// </summary>
+        public ShapeRigDefinition Rig { get; set; }
+
+        /// <summary>
         /// Gets or sets the root shape node.
         /// </summary>
         public ShapeNode Root { get; set; } = new ShapeNode();

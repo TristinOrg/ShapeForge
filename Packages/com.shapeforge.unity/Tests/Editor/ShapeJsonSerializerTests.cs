@@ -36,7 +36,16 @@ namespace ShapeForge.Unity.Tests
 
             ShapeDefinition source = new ShapeDefinition("Robot", root)
             {
-                Style = "example/style"
+                Style = "example/style",
+                Rig = new ShapeRigDefinition
+                {
+                    Type   = "humanoid/basic",
+                    Joints = new[]
+                    {
+                        new(ShapeRigRoles.Root, "robot"),
+                        new(ShapeRigRoles.Head, "body")
+                    }
+                }
             };
             ShapeJsonSerializer serializer = new ShapeJsonSerializer();
 
@@ -51,6 +60,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(json, Does.Contain("\"profileSections\":[{\"z\":-0.5"));
             Assert.That(json, Does.Contain("\"profileCageSections\":[{\"z\":-0.5"));
             Assert.That(json, Does.Contain("\"mirrorAxis\":\"x\""));
+            Assert.That(json, Does.Contain("\"rig\":{\"type\":\"humanoid/basic\""));
             Assert.That(result.Root.Children, Has.Count.EqualTo(1));
             Assert.That(result.Root.Children[0].Transform.Position, Is.EqualTo(new ForgeVector3(1f, 2f, 3f)));
             Assert.That(result.Root.Children[0].Appearance.Color, Is.EqualTo(new ForgeColor(1f, 0f, 0f)));
@@ -61,6 +71,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(result.Root.Children[0].ProfileCageSections[1].Profile[2],
                 Is.EqualTo(new ForgeVector2(0.35f, 0.6f)));
             Assert.That(result.Root.Children[0].MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
+            Assert.That(result.Rig.Joints[1].NodeId, Is.EqualTo("body"));
         }
 
         [Test]

@@ -20,6 +20,19 @@ namespace ShapeForge.LowPoly
             return ShapeBuilder
                 .Create(specification.Name)
                 .WithStyle(specification.Style)
+                .WithRig("humanoid/basic",
+                    new ShapeRigJoint(ShapeRigRoles.Root, "hero"),
+                    new ShapeRigJoint(ShapeRigRoles.Hips, "hero.pelvis.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.Spine, "hero.spine.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.Head, "hero.head.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftShoulder, "hero.arm.left.shoulder.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftElbow, "hero.arm.left.elbow.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightShoulder, "hero.arm.right.shoulder.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightElbow, "hero.arm.right.elbow.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftHip, "hero.leg.left.hip.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.LeftKnee, "hero.leg.left.knee.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightHip, "hero.leg.right.hip.pivot"),
+                    new ShapeRigJoint(ShapeRigRoles.RightKnee, "hero.leg.right.knee.pivot"))
                 .Root("hero", specification.Name, hero =>
                 {
                     hero.Scale(specification.OverallScale, specification.OverallScale, specification.OverallScale);

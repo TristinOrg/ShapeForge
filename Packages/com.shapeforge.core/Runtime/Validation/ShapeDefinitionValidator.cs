@@ -24,6 +24,33 @@ namespace ShapeForge
 
             HashSet<string> nodeIds = new HashSet<string>(StringComparer.Ordinal);
             ValidateNode(definition.Root, nodeIds);
+            ValidateRig(definition.Rig, nodeIds);
+        }
+
+        private static void ValidateRig(ShapeRigDefinition rig, HashSet<string> nodeIds)
+        {
+            if (rig == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(rig.Type))
+                throw new ShapeValidationException("A semantic rig requires a type.");
+
+            if (rig.Joints == null)
+                throw new ShapeValidationException("A semantic rig requires a joint collection.");
+
+            HashSet<string> roles = new(StringComparer.Ordinal);
+            foreach (ShapeRigJoint joint in rig.Joints)
+            {
+                if (joint == null || string.IsNullOrWhiteSpace(joint.Role))
+                    throw new ShapeValidationException("Every semantic rig joint requires a role.");
+
+                if (!roles.Add(joint.Role))
+                    throw new ShapeValidationException($"Duplicate semantic rig role '{joint.Role}'.");
+
+                if (string.IsNullOrWhiteSpace(joint.NodeId) || !nodeIds.Contains(joint.NodeId))
+                    throw new ShapeValidationException(
+                        $"Semantic rig role '{joint.Role}' targets unknown node '{joint.NodeId}'.");
+            }
         }
 
         private static void ValidateNode(ShapeNode node, HashSet<string> nodeIds)

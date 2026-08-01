@@ -15,6 +15,7 @@ namespace ShapeForge.Unity
             ContractResolver  = new CamelCasePropertyNamesContractResolver(),
             Formatting        = Formatting.None,
             TypeNameHandling  = TypeNameHandling.None,
+            NullValueHandling = NullValueHandling.Ignore,
             Converters        = { new StringEnumConverter(new CamelCaseNamingStrategy()) }
         };
         private readonly ShapeDefinitionValidator      shapeValidator = new ShapeDefinitionValidator();

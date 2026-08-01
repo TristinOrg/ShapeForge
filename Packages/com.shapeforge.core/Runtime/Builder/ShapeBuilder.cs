@@ -9,6 +9,7 @@ namespace ShapeForge
     {
         private readonly string name;
         private string          style = string.Empty;
+        private ShapeRigDefinition rig;
         private ShapeNode       root;
 
         private ShapeBuilder(string name)
@@ -37,6 +38,19 @@ namespace ShapeForge
         }
 
         /// <summary>
+        /// Exposes semantic joint roles for engine-independent motion systems.
+        /// </summary>
+        public ShapeBuilder WithRig(string type, params ShapeRigJoint[] joints)
+        {
+            rig = new ShapeRigDefinition
+            {
+                Type   = type,
+                Joints = joints ?? Array.Empty<ShapeRigJoint>()
+            };
+            return this;
+        }
+
+        /// <summary>
         /// Defines the hierarchy root as a non-rendering group.
         /// </summary>
         public ShapeBuilder Root(
@@ -60,7 +74,8 @@ namespace ShapeForge
 
             ShapeDefinition definition = new ShapeDefinition(name, root)
             {
-                Style = style
+                Style = style,
+                Rig   = rig
             };
 
             new ShapeDefinitionValidator().Validate(definition);

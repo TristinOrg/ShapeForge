@@ -10,10 +10,32 @@
     "schema": { "const": "shapeforge.shape/1.0" },
     "name": { "type": "string", "minLength": 1 },
     "style": { "type": "string" },
+    "rig": { "$ref": "#/$defs/rig" },
     "root": { "$ref": "#/$defs/node" }
   },
   "$defs": {
     "finiteNumber": { "type": "number" },
+    "rig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "joints"],
+      "properties": {
+        "type": { "type": "string", "minLength": 1 },
+        "joints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/rigJoint" }
+        }
+      }
+    },
+    "rigJoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "nodeId"],
+      "properties": {
+        "role": { "type": "string", "minLength": 1 },
+        "nodeId": { "type": "string", "minLength": 1 }
+      }
+    },
     "vector2": {
       "type": "object",
       "additionalProperties": false,
