@@ -71,9 +71,12 @@ namespace ShapeForge.LowPoly.Tests
                 LowPolyHeroPreset.CreateStyle());
             UnityShapeModel model = generatedRoot.GetComponent<UnityShapeModel>();
             model.TryGetTarget("hero", out IShapeTransformTarget root);
+            model.TryGetTarget("hero.pelvis.pivot", out IShapeTransformTarget pelvis);
             model.TryGetTarget("hero.spine.pivot", out IShapeTransformTarget spine);
             model.TryGetTarget("hero.leg.left.hip.pivot", out IShapeTransformTarget leftHip);
             model.TryGetTarget("hero.leg.right.hip.pivot", out IShapeTransformTarget rightHip);
+            model.TryGetTarget("hero.leg.left.knee.pivot", out IShapeTransformTarget leftKnee);
+            model.TryGetTarget("hero.leg.right.knee.pivot", out IShapeTransformTarget rightKnee);
             ForgeVector3 initialPosition = root.LocalPosition;
 
             LowPolyMotionExample motion = generatedRoot.AddComponent<LowPolyMotionExample>();
@@ -81,9 +84,12 @@ namespace ShapeForge.LowPoly.Tests
             motion.Evaluate(0.25f);
 
             Assert.That(root.LocalPosition.Z, Is.LessThan(initialPosition.Z));
+            Assert.That(Mathf.Abs(pelvis.LocalEulerAngles.Y), Is.GreaterThan(0.01f));
             Assert.That(Mathf.Abs(spine.LocalEulerAngles.Y), Is.GreaterThan(0.01f));
             Assert.That(leftHip.LocalEulerAngles.X, Is.GreaterThan(0f));
             Assert.That(rightHip.LocalEulerAngles.X, Is.GreaterThan(180f));
+            Assert.That(leftKnee.LocalEulerAngles.X, Is.GreaterThan(180f));
+            Assert.That(rightKnee.LocalEulerAngles.X, Is.EqualTo(0f).Within(0.01f));
         }
 
         private static GameObject Generate(

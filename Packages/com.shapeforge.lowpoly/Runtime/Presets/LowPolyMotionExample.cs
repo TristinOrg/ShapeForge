@@ -117,22 +117,27 @@ namespace ShapeForge.LowPoly
 
         private void EvaluateHuman(float phase, float distance)
         {
-            float wave      = Mathf.Sin(phase * Mathf.PI * 2f);
-            float stepLift  = Mathf.Abs(wave) * 0.025f;
-            float leftKnee  = Mathf.Max(0f, wave) * 36f;
-            float rightKnee = Mathf.Max(0f, -wave) * 36f;
+            float cycle      = phase * Mathf.PI * 2f;
+            float stride     = Mathf.Sin(cycle);
+            float weight     = Mathf.Cos(cycle);
+            float doubleStep = Mathf.Cos(cycle * 2f);
+            float leftSwing  = Mathf.Max(0f, stride);
+            float rightSwing = Mathf.Max(0f, -stride);
+            float rootLift   = (1f - doubleStep) * 0.012f;
 
-            SetPositionOffset(0, new(0f, stepLift, -distance));
-            SetRotationOffset(1, new(3f, -wave * 4f, wave * 1.5f));
-            SetRotationOffset(2, new(-2f, wave * 2f, -wave));
-            SetRotationOffset(3, new(-wave * 20f, 0f, 0f));
-            SetRotationOffset(4, new(wave * 20f, 0f, 0f));
-            SetRotationOffset(5, new(8f + (Mathf.Max(0f, wave) * 8f), 0f, 0f));
-            SetRotationOffset(6, new(8f + (Mathf.Max(0f, -wave) * 8f), 0f, 0f));
-            SetRotationOffset(7, new(wave * 24f, 0f, 0f));
-            SetRotationOffset(8, new(-wave * 24f, 0f, 0f));
-            SetRotationOffset(9, new(-leftKnee, 0f, 0f));
-            SetRotationOffset(10, new(-rightKnee, 0f, 0f));
+            SetPositionOffset(0, new(0f, rootLift, -distance));
+            SetPositionOffset(1, new(weight * 0.018f, -rootLift * 0.35f, 0f));
+            SetRotationOffset(1, new(0f, -stride * 4.5f, -weight * 2.2f));
+            SetRotationOffset(2, new(4f, stride * 3.2f, weight * 1.4f));
+            SetRotationOffset(3, new(-2f, -stride * 1.6f, -weight * 0.7f));
+            SetRotationOffset(4, new(-stride * 23f, 0f, -3f));
+            SetRotationOffset(5, new(stride * 23f, 0f, 3f));
+            SetRotationOffset(6, new(10f + (leftSwing * 12f), 0f, 0f));
+            SetRotationOffset(7, new(10f + (rightSwing * 12f), 0f, 0f));
+            SetRotationOffset(8, new(stride * 27f, 0f, 0f));
+            SetRotationOffset(9, new(-stride * 27f, 0f, 0f));
+            SetRotationOffset(10, new(-(leftSwing * 42f), 0f, 0f));
+            SetRotationOffset(11, new(-(rightSwing * 42f), 0f, 0f));
         }
 
         private void EnsureBindings()
@@ -159,6 +164,7 @@ namespace ShapeForge.LowPoly
             if (preset == LowPolyMotionPreset.HumanHeroWalk)
             {
                 Bind("hero");
+                Bind("hero.pelvis.pivot");
                 Bind("hero.spine.pivot");
                 Bind("hero.head.pivot");
                 Bind("hero.arm.left.shoulder.pivot");
