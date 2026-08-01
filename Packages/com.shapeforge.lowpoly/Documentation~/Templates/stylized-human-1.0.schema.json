@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/TristinOrg/ShapeForge/main/Packages/com.shapeforge.lowpoly/Documentation~/Templates/stylized-human-1.0.schema.json",
+  "$id": "https://raw.githubusercontent.com/TristinOrg/ShapeForge/v0.1.0/Packages/com.shapeforge.lowpoly/Documentation~/Templates/stylized-human-1.0.schema.json",
   "title": "ShapeForge Low Poly Stylized Human 1.0",
   "type": "object",
   "additionalProperties": false,

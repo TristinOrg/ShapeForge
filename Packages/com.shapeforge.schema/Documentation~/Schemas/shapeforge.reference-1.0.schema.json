@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/TristinOrg/ShapeForge/main/Packages/com.shapeforge.schema/Documentation~/Schemas/shapeforge.reference-1.0.schema.json",
+  "$id": "https://raw.githubusercontent.com/TristinOrg/ShapeForge/v0.1.0/Packages/com.shapeforge.schema/Documentation~/Schemas/shapeforge.reference-1.0.schema.json",
   "title": "ShapeForge Multi-View Reference 1.0",
   "description": "Provider- and engine-independent semantic part observations from aligned reference views.",
   "type": "object",
