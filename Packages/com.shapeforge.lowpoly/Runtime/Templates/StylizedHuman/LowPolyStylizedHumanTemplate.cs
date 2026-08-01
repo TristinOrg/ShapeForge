@@ -36,7 +36,8 @@ namespace ShapeForge.LowPoly
         /// <inheritdoc />
         public override ShapeDefinition Compile(LowPolyStylizedHumanSpecification specification)
         {
-            return Compile(specification, LowPolyFantasyHeroReference.Create());
+            validator.Validate(specification);
+            return LowPolyHeroPreset.CreateDefinition(specification, null);
         }
 
         /// <summary>Compiles a stylized human from semantic controls and measured multi-view silhouettes.</summary>

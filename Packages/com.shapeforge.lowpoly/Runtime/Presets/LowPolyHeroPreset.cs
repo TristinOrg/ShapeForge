@@ -13,7 +13,7 @@ namespace ShapeForge.LowPoly
         /// <summary>Creates the reference-driven pocket fantasy hero definition.</summary>
         public static ShapeDefinition CreateDefinition()
         {
-            return LowPolyStylizedHumanTemplate.Instance.Compile(new(), LowPolyFantasyHeroReference.Create());
+            return LowPolyStylizedHumanTemplate.Instance.Compile(new());
         }
 
         internal static ShapeDefinition CreateDefinition(
@@ -21,17 +21,19 @@ namespace ShapeForge.LowPoly
             ShapeReferenceDefinition          reference)
         {
             LowPolyStylizedHumanProportions proportions = specification.Proportions;
-            LowPolyReferenceProfileCageMapper mapper      = new();
-            LowPolyReferenceProfileCage headCage = mapper.Map(
-                reference,
-                LowPolyFantasyHeroReference.HeadPartId,
-                24,
-                9);
-            LowPolyReferenceProfileCage hairCage = mapper.Map(
-                reference,
-                LowPolyFantasyHeroReference.HairPartId,
-                32,
-                11);
+            LowPolyReferenceProfileCage     headCage;
+            LowPolyReferenceProfileCage     hairCage;
+            if (reference == null)
+            {
+                headCage = CreateAuthoredHeadCage();
+                hairCage = CreateAuthoredHairCage();
+            }
+            else
+            {
+                LowPolyReferenceProfileCageMapper mapper = new();
+                headCage = mapper.Map(reference, LowPolyFantasyHeroReference.HeadPartId, 24, 9);
+                hairCage = mapper.Map(reference, LowPolyFantasyHeroReference.HairPartId, 32, 11);
+            }
 
             return ShapeBuilder
                 .Create(specification.Name)
@@ -56,7 +58,7 @@ namespace ShapeForge.LowPoly
                     hero.Scale(specification.OverallScale, specification.OverallScale, specification.OverallScale);
                     AddBody(hero, proportions);
                     AddHead(hero, headCage, hairCage, proportions.HeadScale, specification.Head, specification.Hair);
-                    float shoulderX = 0.41f * proportions.ShoulderWidth * proportions.BodyWidth;
+                    float shoulderX = 0.36f * proportions.ShoulderWidth * proportions.BodyWidth;
                     AddArm(hero, "left", "Left", -shoulderX);
                     AddArm(hero, "right", "Right", shoulderX);
                     AddLeg(hero, "left", "Left", -0.18f * proportions.BodyWidth, proportions.LegLength);
@@ -129,9 +131,9 @@ namespace ShapeForge.LowPoly
                         .ProfileSmoothing(1)
                         .ColorRole("jacket"))
                     .Shape("hero.collar.left", "Left Standing Collar", LowPolyShapeTypes.ExtrudedProfile, collar => collar
-                        .Position(-0.14f, 0.91f, -0.19f)
+                        .Position(-0.12f, 0.88f, -0.19f)
                         .Rotation(-8f, 8f, -8f)
-                        .Scale(0.22f, 0.28f, 1f)
+                        .Scale(0.17f, 0.22f, 1f)
                         .ExtrudedProfile(0.14f, 0.015f,
                             new(-0.5f, -0.5f), new(-0.32f, 0.48f), new(0.18f, 0.5f), new(0.5f, -0.34f))
                         .ColorRole("jacket.light")
@@ -189,7 +191,7 @@ namespace ShapeForge.LowPoly
                     headShape.Depth,
                     headShape.JawWidth,
                     "skin",
-                    2,
+                    3,
                     1);
                 AddFace(head, headShape);
                 AddReferenceCage(
@@ -203,8 +205,8 @@ namespace ShapeForge.LowPoly
                     hairShape.Volume,
                     1f,
                     "hair",
-                    2,
-                    0);
+                    3,
+                    1);
                 AddHairDetails(head, hairShape);
             });
         }
@@ -236,34 +238,38 @@ namespace ShapeForge.LowPoly
             float fringeDrop = (hair.FringeLength - 0.5f) * 0.2f;
             head.Shape("hero.hair.fringe.primary", "Diagonal Primary Fringe", LowPolyShapeTypes.ExtrudedProfile,
                     fringe => fringe
-                        .Position(-0.08f + partOffset, 0.58f - fringeDrop, -0.585f)
-                        .Rotation(0f, 0f, 13f)
-                        .Scale(0.46f, 0.43f + fringeDrop, 1f)
+                        .Position(-0.08f + partOffset, 0.64f - fringeDrop, -0.47f)
+                        .Rotation(0f, 0f, 10f)
+                        .Scale(0.34f, 0.31f + fringeDrop, 1f)
                         .ExtrudedProfile(0.055f, 0.008f,
-                            new(-0.5f, 0.46f), new(0.5f, 0.5f), new(0.23f, -0.5f), new(-0.22f, -0.26f))
+                            new(-0.5f, 0.4f), new(-0.22f, 0.5f), new(0.5f, 0.42f),
+                            new(0.2f, -0.5f), new(-0.18f, -0.24f))
+                        .ProfileSmoothing(1)
                         .ColorRole("hair.shadow"))
                 .Shape("hero.hair.fringe.secondary", "Diagonal Secondary Fringe", LowPolyShapeTypes.ExtrudedProfile,
                     fringe => fringe
-                        .Position(0.23f + partOffset, 0.61f - (fringeDrop * 0.7f), -0.57f)
-                        .Rotation(0f, 0f, -12f)
-                        .Scale(0.25f, 0.34f + fringeDrop, 1f)
+                        .Position(0.2f + partOffset, 0.66f - (fringeDrop * 0.7f), -0.465f)
+                        .Rotation(0f, 0f, -9f)
+                        .Scale(0.21f, 0.27f + fringeDrop, 1f)
                         .ExtrudedProfile(0.05f, 0.008f,
-                            new(-0.5f, 0.5f), new(0.5f, 0.42f), new(0.08f, -0.5f), new(-0.32f, -0.2f))
+                            new(-0.5f, 0.42f), new(-0.12f, 0.5f), new(0.5f, 0.36f),
+                            new(0.08f, -0.5f), new(-0.3f, -0.18f))
+                        .ProfileSmoothing(1)
                         .ColorRole("hair"))
                 .Shape("hero.hair.side.left", "Short Left Temple Lock", LowPolyShapeTypes.ExtrudedProfile, lockShape =>
                     lockShape
-                        .Position(-0.45f, 0.46f, -0.36f)
-                        .Rotation(0f, -16f, -5f)
-                        .Scale(0.14f, 0.28f + (hair.SideburnLength * 0.08f), 1f)
+                        .Position(-0.43f, 0.48f, -0.3f)
+                        .Rotation(0f, -12f, -4f)
+                        .Scale(0.11f, 0.2f + (hair.SideburnLength * 0.06f), 1f)
                         .ExtrudedProfile(0.08f, 0.008f,
                             new(-0.5f, 0.5f), new(0.48f, 0.4f), new(0.12f, -0.5f), new(-0.28f, -0.12f))
                         .ColorRole("hair.shadow")
                         .Mirror(ShapeMirrorAxis.X))
                 .Shape("hero.hair.highlight", "Hair Highlight Plane", LowPolyShapeTypes.ExtrudedProfile, highlight =>
                     highlight
-                        .Position(-0.18f, 0.88f, -0.42f)
-                        .Rotation(-8f, 0f, 18f)
-                        .Scale(0.24f, 0.38f, 1f)
+                        .Position(-0.18f, 0.88f, -0.39f)
+                        .Rotation(-8f, 0f, 16f)
+                        .Scale(0.18f, 0.28f, 1f)
                         .ExtrudedProfile(0.025f, 0.004f,
                             new(-0.5f, 0.5f), new(0.18f, 0.38f), new(0.5f, -0.5f), new(-0.08f, -0.2f))
                         .ColorRole("hair.light"));
@@ -315,10 +321,10 @@ namespace ShapeForge.LowPoly
         {
             string prefix = $"hero.arm.{side}";
             hero.Group($"{prefix}.shoulder.pivot", $"{label} Shoulder Pivot", shoulder => shoulder
-                .Position(x, 2.18f, 0f)
+                .Position(x, 2.16f, 0f)
                 .Shape($"{prefix}.sleeve", $"{label} Layered Short Sleeve", LowPolyShapeTypes.ProfileLoft, sleeve => sleeve
                     .Position(0f, -0.17f, 0f)
-                    .Scale(0.27f, 0.34f, 0.3f)
+                    .Scale(0.24f, 0.32f, 0.27f)
                     .ProfileLoft(
                         RoundedProfile(1f, 1f),
                         Section(-0.5f, 0.78f, 0.82f),
@@ -328,22 +334,22 @@ namespace ShapeForge.LowPoly
                     .ProfileSmoothing(1)
                     .ColorRole("jacket"))
                 .Group($"{prefix}.elbow.pivot", $"{label} Elbow Pivot", elbow => elbow
-                    .Position(0f, -0.38f, 0f)
+                    .Position(0f, -0.42f, 0f)
                     .Shape($"{prefix}.forearm", $"{label} Tapered Forearm", LowPolyShapeTypes.LatheProfile, arm => arm
-                        .Position(0f, -0.24f, 0f)
+                        .Position(0f, -0.27f, 0f)
                         .LatheProfile(16, true,
-                            new(0.085f, -0.27f), new(0.11f, -0.16f), new(0.125f, 0.14f), new(0.105f, 0.28f))
+                            new(0.08f, -0.3f), new(0.105f, -0.18f), new(0.118f, 0.16f), new(0.1f, 0.3f))
                         .ProfileSmoothing(1)
                         .ColorRole("skin"))
                     .Shape($"{prefix}.glove", $"{label} Fingerless Glove", LowPolyShapeTypes.LatheProfile, glove => glove
-                        .Position(0f, -0.5f, 0f)
+                        .Position(0f, -0.56f, 0f)
                         .LatheProfile(16, true,
                             new(0.095f, -0.11f), new(0.13f, -0.04f), new(0.132f, 0.13f), new(0.105f, 0.17f))
                         .ProfileSmoothing(1)
                         .ColorRole("glove"))
                     .Shape($"{prefix}.hand", $"{label} Relaxed Hand", LowPolyShapeTypes.Capsule, hand => hand
-                        .Position(0f, -0.69f, -0.01f)
-                        .Scale(0.1f, 0.18f, 0.085f)
+                        .Position(0f, -0.76f, -0.01f)
+                        .Scale(0.095f, 0.17f, 0.08f)
                         .ColorRole("skin"))));
         }
 
@@ -359,7 +365,7 @@ namespace ShapeForge.LowPoly
                 .Position(x, 1.45f, 0f)
                 .Shape($"{prefix}.pants", $"{label} Layered Baggy Shorts", LowPolyShapeTypes.ProfileCage, pants => pants
                     .Position(0f, -0.31f * legLength, 0f)
-                    .Scale(0.38f, 0.62f * legLength, 0.44f)
+                    .Scale(0.31f, 0.58f * legLength, 0.38f)
                     .ProfileCage(
                         Cage(-0.5f, BaggyShortProfile(0.82f)),
                         Cage(-0.1f, BaggyShortProfile(1f)),
@@ -367,20 +373,20 @@ namespace ShapeForge.LowPoly
                     .CageQuality(2, 1, true)
                     .ColorRole("pants"))
                 .Shape($"{prefix}.pocket", $"{label} Cargo Pocket", LowPolyShapeTypes.ExtrudedProfile, pocket => pocket
-                    .Position(side == "left" ? -0.16f : 0.16f, -0.3f * legLength, -0.22f)
-                    .Scale(0.17f, 0.18f, 1f)
+                    .Position(side == "left" ? -0.13f : 0.13f, -0.29f * legLength, -0.2f)
+                    .Scale(0.14f, 0.16f, 1f)
                     .ExtrudedProfile(0.055f, 0.008f,
                         new(-0.5f, 0.5f), new(0.5f, 0.42f), new(0.4f, -0.5f), new(-0.42f, -0.42f))
                     .ColorRole("pants"))
                 .Group($"{prefix}.knee.pivot", $"{label} Knee Pivot", knee => knee
-                    .Position(0f, -0.62f * legLength, 0f)
+                    .Position(0f, -0.6f * legLength, 0f)
                     .Shape($"{prefix}.knee", $"{label} Exposed Knee", LowPolyShapeTypes.Capsule, joint => joint
                         .Position(0f, -0.02f, -0.03f)
                         .Scale(0.1f, 0.09f, 0.115f)
                         .ColorRole("skin.shadow"))
                     .Shape($"{prefix}.boot.shaft", $"{label} Fitted Tall Boot", LowPolyShapeTypes.ProfileCage, boot => boot
                         .Position(0f, -0.34f * legLength, 0.01f)
-                        .Scale(0.24f, 0.58f * legLength, 0.28f)
+                        .Scale(0.21f, 0.58f * legLength, 0.25f)
                         .ProfileCage(
                             Cage(-0.5f, BootShaftProfile(0.82f)),
                             Cage(0f, BootShaftProfile(1f)),
@@ -389,7 +395,7 @@ namespace ShapeForge.LowPoly
                         .ColorRole("boot"))
                     .Shape($"{prefix}.boot", $"{label} Long Toe Boot", LowPolyShapeTypes.ProfileCage, boot => boot
                         .Position(0f, -0.66f * legLength, -0.075f)
-                        .Scale(0.25f, 0.2f, 0.45f)
+                        .Scale(0.22f, 0.18f, 0.4f)
                         .ProfileCage(
                             Cage(-0.5f, BootFootProfile(0.92f)),
                             Cage(0f, BootFootProfile(1f)),
@@ -414,6 +420,71 @@ namespace ShapeForge.LowPoly
                             new(-0.42f, 0.5f), new(0.42f, 0.5f), new(0.5f, -0.36f),
                             new(0.26f, -0.5f), new(-0.26f, -0.5f), new(-0.5f, -0.36f))
                         .ColorRole("sole"))));
+        }
+
+        private static LowPolyReferenceProfileCage CreateAuthoredHeadCage()
+        {
+            ForgeVector2[] profile = HeadProfile();
+            return new LowPolyReferenceProfileCage(
+                new(0f, 2.81f / ReferenceHeight, 0f),
+                new(0.86f / ReferenceHeight, 0.9f / ReferenceHeight, 0.78f / ReferenceHeight),
+                new ShapeProfileCageSection[]
+                {
+                    Cage(-0.5f, TransformProfile(profile, 0.78f, 0.9f, -0.035f)),
+                    Cage(-0.32f, TransformProfile(profile, 0.94f, 0.98f, -0.015f)),
+                    Cage(0f, TransformProfile(profile, 1f, 1f, 0f)),
+                    Cage(0.32f, TransformProfile(profile, 0.93f, 0.98f, 0.01f)),
+                    Cage(0.5f, TransformProfile(profile, 0.74f, 0.88f, 0.025f))
+                });
+        }
+
+        private static LowPolyReferenceProfileCage CreateAuthoredHairCage()
+        {
+            ForgeVector2[] profile = HairCapProfile();
+            return new LowPolyReferenceProfileCage(
+                new(0f, 2.99f / ReferenceHeight, 0.035f / ReferenceHeight),
+                new(1.01f / ReferenceHeight, 0.76f / ReferenceHeight, 0.88f / ReferenceHeight),
+                new ShapeProfileCageSection[]
+                {
+                    Cage(-0.5f, TransformProfile(profile, 0.72f, 0.82f, -0.04f)),
+                    Cage(-0.32f, TransformProfile(profile, 0.94f, 0.96f, -0.01f)),
+                    Cage(0f, TransformProfile(profile, 1f, 1f, 0f)),
+                    Cage(0.32f, TransformProfile(profile, 0.95f, 0.98f, 0.01f)),
+                    Cage(0.5f, TransformProfile(profile, 0.76f, 0.86f, 0.025f))
+                });
+        }
+
+        private static ForgeVector2[] HeadProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(0f, 0.5f), new(0.28f, 0.46f), new(0.45f, 0.31f), new(0.5f, 0.05f),
+                new(0.44f, -0.24f), new(0.28f, -0.44f), new(0f, -0.5f), new(-0.28f, -0.44f),
+                new(-0.44f, -0.24f), new(-0.5f, 0.05f), new(-0.45f, 0.31f), new(-0.28f, 0.46f)
+            };
+        }
+
+        private static ForgeVector2[] HairCapProfile()
+        {
+            return new ForgeVector2[]
+            {
+                new(-0.08f, 0.5f), new(0.22f, 0.47f), new(0.42f, 0.36f), new(0.5f, 0.16f),
+                new(0.47f, -0.12f), new(0.34f, -0.38f), new(0.08f, -0.44f), new(-0.2f, -0.4f),
+                new(-0.42f, -0.24f), new(-0.5f, 0.04f), new(-0.44f, 0.29f), new(-0.3f, 0.44f)
+            };
+        }
+
+        private static ForgeVector2[] TransformProfile(
+            ForgeVector2[] source,
+            float          scaleX,
+            float          scaleY,
+            float          offsetY)
+        {
+            ForgeVector2[] result = new ForgeVector2[source.Length];
+            for (int index = 0; index < result.Length; index++)
+                result[index] = new(source[index].X * scaleX, (source[index].Y * scaleY) + offsetY);
+
+            return result;
         }
 
         private static ShapeRigJoint Joint(

@@ -6,7 +6,7 @@ Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes an
 
 `LowPolyReferenceProfileCageMapper` deterministically combines generic front, side, and optional back silhouettes into Profile Cage sections. Bounded resampling runs only during generation; generated geometry continues through the shared mesh cache with no per-frame work.
 
-The Fantasy Hero is compiled from the independently inspectable `LowPolyFantasyHeroReference`. Its head and unified hair volume use measured three-view cages, while articulated clothing and boots use rounded procedural profiles. `LowPolyStylizedHumanTemplate.Compile` also accepts a caller-supplied reference definition.
+The Fantasy Hero uses authored, semantically aligned profile cages for a coherent rounded head and unified hair volume, while articulated clothing and boots use rounded procedural profiles. `LowPolyStylizedHumanTemplate.Compile` also accepts a caller-supplied multi-view reference definition when measured reconstruction is needed.
 
 Use `LowPolyShapeCapabilityCatalog.Instance` to query all eleven supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
 

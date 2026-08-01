@@ -66,12 +66,12 @@ namespace ShapeForge.LowPoly.Tests
 
             Assert.That(result.Name, Is.EqualTo("Custom Hero"));
             Assert.That(result.Root.Transform.Scale, Is.EqualTo(new ForgeVector3(1.1f, 1.1f, 1.1f)));
-            Assert.That(resultHead.Transform.Scale.X, Is.EqualTo(0.875f * 1.1f).Within(0.0001f));
-            Assert.That(shoulder.Transform.Position.X, Is.EqualTo(0.41f * 1.25f * 0.9f).Within(0.0001f));
-            Assert.That(pants.Transform.Scale.Y, Is.EqualTo(0.62f * 1.15f).Within(0.0001f));
+            Assert.That(resultHead.Transform.Scale.X, Is.EqualTo(0.86f * 1.1f).Within(0.0001f));
+            Assert.That(shoulder.Transform.Position.X, Is.EqualTo(0.36f * 1.25f * 0.9f).Within(0.0001f));
+            Assert.That(pants.Transform.Scale.Y, Is.EqualTo(0.58f * 1.15f).Within(0.0001f));
             Assert.That(resultHair.Transform.Scale, Is.Not.EqualTo(baselineHair.Transform.Scale));
-            Assert.That(resultHair.ProfileCageSections, Has.Count.EqualTo(11));
-            Assert.That(resultHead.ProfileCageSections, Has.Count.EqualTo(9));
+            Assert.That(resultHair.ProfileCageSections, Has.Count.EqualTo(5));
+            Assert.That(resultHead.ProfileCageSections, Has.Count.EqualTo(5));
         }
 
         [Test]

@@ -160,7 +160,7 @@ Schema and Core provide a generic `shapeforge.reference/1.0` contract for any mo
 
 The Low Poly package includes a deterministic reference-measurement pipeline for the Stylized Human template.
 
-The bundled Fantasy Hero now uses aligned front, side, and back silhouettes for its head and primary hair volume rather than inheriting the earlier primitive head construction.
+The bundled Fantasy Hero uses authored, semantically aligned profile cages for a coherent rounded head and primary hair volume. The same template can still consume aligned front, side, and back silhouettes when a caller explicitly supplies a measured reference.
 
 `LowPolyStylizedHumanReferenceMapper` maps normalized observations from a front view and an optional side view into a `LowPolyStylizedHumanSpecification`.
 
