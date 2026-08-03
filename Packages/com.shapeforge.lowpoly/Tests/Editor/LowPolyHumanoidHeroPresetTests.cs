@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using ShapeForge.Unity;
 using UnityEngine;
@@ -5,11 +6,12 @@ using UnityEngine;
 namespace ShapeForge.LowPoly.Tests
 {
     /// <summary>
-    /// Verifies the rigid-part Humanoid validation preset through the Unity generation pipeline.
+    /// Verifies the full Fantasy Hero appearance through the Unity Humanoid generation pipeline.
     /// </summary>
     public sealed class LowPolyHumanoidHeroPresetTests
     {
         private GameObject generatedRoot;
+        private GameObject originalRoot;
         private Avatar     avatar;
 
         [TearDown]
@@ -20,6 +22,19 @@ namespace ShapeForge.LowPoly.Tests
 
             if (generatedRoot != null)
                 Object.DestroyImmediate(generatedRoot);
+            if (originalRoot != null)
+                Object.DestroyImmediate(originalRoot);
+        }
+
+        [Test]
+        public void DefinitionPreservesEveryFantasyHeroAppearanceNode()
+        {
+            ShapeDefinition original = LowPolyHeroPreset.CreateDefinition();
+            ShapeDefinition humanoid = LowPolyHumanoidHeroPreset.CreateDefinition();
+            HashSet<string> originalShapeIds = CollectShapeIds(original.Root);
+            HashSet<string> humanoidShapeIds = CollectShapeIds(humanoid.Root);
+
+            Assert.That(humanoidShapeIds, Is.EquivalentTo(originalShapeIds));
         }
 
         [Test]
@@ -29,37 +44,50 @@ namespace ShapeForge.LowPoly.Tests
 
             ShapeHumanoidRig.ValidateRequiredRoles(definition.Rig);
 
-            ShapeNode chest         = FindNode(definition.Root, "humanoid-hero.chest");
-            ShapeNode leftUpperArm  = FindNode(definition.Root, "humanoid-hero.left-upper-arm");
-            ShapeNode rightUpperArm = FindNode(definition.Root, "humanoid-hero.right-upper-arm");
-            ShapeNode leftArmMesh   = FindNode(definition.Root, "humanoid-hero.left-upper-mesh");
-            ShapeNode rightArmMesh  = FindNode(definition.Root, "humanoid-hero.right-upper-mesh");
-            ShapeNode leftGlove     = FindNode(definition.Root, "humanoid-hero.left-glove");
-            ShapeNode leftBootSole  = FindNode(definition.Root, "humanoid-hero.left-sole");
+            ShapeNode chest         = FindNode(definition.Root, "hero.humanoid.chest");
+            ShapeNode leftUpperArm  = FindNode(definition.Root, "hero.arm.left.shoulder.pivot");
+            ShapeNode rightUpperArm = FindNode(definition.Root, "hero.arm.right.shoulder.pivot");
             Assert.That(chest.Children, Does.Contain(leftUpperArm));
             Assert.That(chest.Children, Does.Contain(rightUpperArm));
-            Assert.That(leftUpperArm.Transform.Position.X, Is.LessThan(0f));
-            Assert.That(rightUpperArm.Transform.Position.X, Is.GreaterThan(0f));
-            Assert.That(leftArmMesh.Transform.EulerAngles.Z, Is.EqualTo(90f));
-            Assert.That(rightArmMesh.Transform.EulerAngles.Z, Is.EqualTo(90f));
-            Assert.That(leftGlove.Appearance.ColorRole, Is.EqualTo("glove"));
-            Assert.That(leftBootSole.Appearance.ColorRole, Is.EqualTo("sole"));
+            Assert.That(leftUpperArm.Transform.EulerAngles.Z, Is.EqualTo(-90f));
+            Assert.That(rightUpperArm.Transform.EulerAngles.Z, Is.EqualTo(90f));
+            Assert.That(definition.Root.Transform.EulerAngles.Y, Is.EqualTo(180f));
         }
 
         [Test]
         public void GenerateBuildsValidRigidHumanoidAvatar()
         {
-            ShapeDefinition      definition = LowPolyHumanoidHeroPreset.CreateDefinition();
+            ShapeDefinition       original   = LowPolyHeroPreset.CreateDefinition();
+            ShapeDefinition       definition = LowPolyHumanoidHeroPreset.CreateDefinition();
             LowPolyModelGenerator generator  = new(new[] { LowPolyHumanoidHeroPreset.CreateStyle() });
+            originalRoot = generator.Generate(original);
 
             generatedRoot = generator.Generate(definition);
             avatar        = UnityHumanoidAvatarBuilder.CreateAvatar(
                 generatedRoot.GetComponent<UnityShapeModel>(),
                 definition.Rig);
 
-            Assert.That(generatedRoot.GetComponentsInChildren<MeshRenderer>(), Has.Length.GreaterThan(18));
+            Assert.That(
+                generatedRoot.GetComponentsInChildren<MeshRenderer>().Length,
+                Is.EqualTo(originalRoot.GetComponentsInChildren<MeshRenderer>().Length));
             Assert.That(avatar.isValid, Is.True);
             Assert.That(avatar.isHuman, Is.True);
+        }
+
+        private static HashSet<string> CollectShapeIds(ShapeNode root)
+        {
+            HashSet<string> ids = new();
+            CollectShapeIds(root, ids);
+            return ids;
+        }
+
+        private static void CollectShapeIds(ShapeNode node, ISet<string> ids)
+        {
+            if (node.Type != ShapeTypes.Group)
+                ids.Add(node.Id);
+
+            foreach (ShapeNode child in node.Children)
+                CollectShapeIds(child, ids);
         }
 
         private static ShapeNode FindNode(ShapeNode node, string id)

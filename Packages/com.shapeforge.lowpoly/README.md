@@ -8,7 +8,7 @@ Built-in Cube, Sphere, Cylinder, and Capsule shapes reuse cached Unity meshes an
 
 The Fantasy Hero uses authored, semantically aligned profile cages for a coherent rounded head and unified hair volume, while articulated clothing and boots use rounded procedural profiles. `LowPolyStylizedHumanTemplate.Compile` also accepts a caller-supplied multi-view reference definition when measured reconstruction is needed.
 
-`LowPolyHumanoidHeroPreset` is a separate rigid-part T-Pose model that carries the Fantasy Hero's short jacket, hood, blue-black hair, gloves, and red-soled boots. It preserves the display-oriented original preset while supplying the complete canonical biped hierarchy required by `UnityHumanoidAvatarBuilder`.
+`LowPolyHumanoidHeroPreset` starts from the complete `LowPolyHeroPreset` definition, preserves every authored appearance node, then reparents its pivots and inserts the missing Chest, Neck, Hand, and Foot bones required by `UnityHumanoidAvatarBuilder`. The original display preset remains unchanged.
 
 Use `LowPolyShapeCapabilityCatalog.Instance` to query all eleven supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
 

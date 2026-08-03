@@ -1,227 +1,182 @@
+using System;
+using System.Collections.Generic;
+
 namespace ShapeForge.LowPoly
 {
     /// <summary>
-    /// Provides a rigid-part biped in a canonical T-Pose for Humanoid Avatar validation.
+    /// Transforms the authored Fantasy Hero into a complete Unity Humanoid-compatible hierarchy.
     /// </summary>
     public static class LowPolyHumanoidHeroPreset
     {
+        private const string ChestId     = "hero.humanoid.chest";
+        private const string NeckId      = "hero.humanoid.neck";
+        private const string LeftHandId  = "hero.humanoid.left.hand";
+        private const string LeftFootId  = "hero.humanoid.left.foot";
+        private const string RightHandId = "hero.humanoid.right.hand";
+        private const string RightFootId = "hero.humanoid.right.foot";
+
         /// <summary>
         /// Gets the shared fantasy-hero style identifier.
         /// </summary>
         public const string StyleId = LowPolyHeroPreset.StyleId;
 
         /// <summary>
-        /// Creates a complete biped hierarchy with arms extended in its authored rest pose.
+        /// Creates the complete Fantasy Hero appearance in a canonical Humanoid T-Pose hierarchy.
         /// </summary>
         public static ShapeDefinition CreateDefinition()
         {
-            return ShapeBuilder
-                .Create("Low Poly Humanoid Hero")
-                .WithStyle(StyleId)
-                .WithRig("humanoid/full",
-                    new ShapeRigJoint(ShapeRigRoles.Root, "humanoid-hero"),
-                    Joint(ShapeRigRoles.Hips, "humanoid-hero.hips"),
-                    Joint(ShapeRigRoles.Spine, "humanoid-hero.spine"),
-                    Joint(ShapeRigRoles.Chest, "humanoid-hero.chest"),
-                    Joint(ShapeRigRoles.Neck, "humanoid-hero.neck"),
-                    Joint(ShapeRigRoles.Head, "humanoid-hero.head"),
-                    Joint(ShapeRigRoles.LeftUpperArm, "humanoid-hero.left-upper-arm"),
-                    Joint(ShapeRigRoles.LeftLowerArm, "humanoid-hero.left-lower-arm"),
-                    Joint(ShapeRigRoles.LeftHand, "humanoid-hero.left-hand"),
-                    Joint(ShapeRigRoles.RightUpperArm, "humanoid-hero.right-upper-arm"),
-                    Joint(ShapeRigRoles.RightLowerArm, "humanoid-hero.right-lower-arm"),
-                    Joint(ShapeRigRoles.RightHand, "humanoid-hero.right-hand"),
-                    Joint(ShapeRigRoles.LeftUpperLeg, "humanoid-hero.left-upper-leg"),
-                    Joint(ShapeRigRoles.LeftLowerLeg, "humanoid-hero.left-lower-leg"),
-                    Joint(ShapeRigRoles.LeftFoot, "humanoid-hero.left-foot"),
-                    Joint(ShapeRigRoles.RightUpperLeg, "humanoid-hero.right-upper-leg"),
-                    Joint(ShapeRigRoles.RightLowerLeg, "humanoid-hero.right-lower-leg"),
-                    Joint(ShapeRigRoles.RightFoot, "humanoid-hero.right-foot"))
-                .Root("humanoid-hero", "Low Poly Humanoid Hero", root => root
-                    .Group("humanoid-hero.hips", "Hips", hips => hips
-                        .Position(0f, 1.1f, 0f)
-                        .Shape("humanoid-hero.pelvis", "Pelvis", LowPolyShapeTypes.Cube, pelvis => pelvis
-                            .Scale(0.5f, 0.22f, 0.28f)
-                            .ColorRole("pants"))
-                        .Shape("humanoid-hero.belt", "Utility Belt", LowPolyShapeTypes.Cube, belt => belt
-                            .Position(0f, 0.08f, -0.02f)
-                            .Scale(0.54f, 0.07f, 0.3f)
-                            .ColorRole("glove"))
-                        .Group("humanoid-hero.spine", "Spine", spine => spine
-                            .Position(0f, 0.25f, 0f)
-                            .Shape("humanoid-hero.abdomen", "Abdomen", LowPolyShapeTypes.Capsule, abdomen => abdomen
-                                .Position(0f, 0.2f, 0f)
-                                .Scale(0.28f, 0.34f, 0.2f)
-                                .ColorRole("shirt"))
-                            .Group("humanoid-hero.chest", "Chest", chest => chest
-                                .Position(0f, 0.48f, 0f)
-                                .Shape("humanoid-hero.torso", "Torso", LowPolyShapeTypes.Frustum, torso => torso
-                                    .Scale(0.72f, 0.48f, 0.32f)
-                                    .Parameter(LowPolyShapeParameters.TopWidth, 1f)
-                                    .Parameter(LowPolyShapeParameters.TopDepth, 1f)
-                                    .Parameter(LowPolyShapeParameters.BottomWidth, 0.78f)
-                                    .Parameter(LowPolyShapeParameters.BottomDepth, 0.88f)
-                                    .ColorRole("jacket"))
-                                .Shape("humanoid-hero.jacket-left", "Left Open Short Jacket",
-                                    LowPolyShapeTypes.ExtrudedProfile, panel => panel
-                                        .Position(-0.2f, 0.02f, -0.18f)
-                                        .Scale(0.3f, 0.44f, 1f)
-                                        .ExtrudedProfile(0.07f, 0.015f,
-                                            new(-0.5f, 0.4f), new(-0.3f, 0.5f), new(0.48f, 0.42f),
-                                            new(0.36f, -0.5f), new(-0.42f, -0.42f))
-                                        .ColorRole("jacket.light"))
-                                .Shape("humanoid-hero.jacket-right", "Right Open Short Jacket",
-                                    LowPolyShapeTypes.ExtrudedProfile, panel => panel
-                                        .Position(0.2f, 0.02f, -0.18f)
-                                        .Scale(0.3f, 0.44f, 1f)
-                                        .ExtrudedProfile(0.07f, 0.015f,
-                                            new(-0.48f, 0.42f), new(0.3f, 0.5f), new(0.5f, 0.4f),
-                                            new(0.42f, -0.42f), new(-0.36f, -0.5f))
-                                        .ColorRole("jacket.light"))
-                                .Shape("humanoid-hero.collar", "Standing Collar",
-                                    LowPolyShapeTypes.ExtrudedProfile, collar => collar
-                                        .Position(-0.11f, 0.31f, -0.18f)
-                                        .Rotation(-8f, 8f, -8f)
-                                        .Scale(0.16f, 0.2f, 1f)
-                                        .ExtrudedProfile(0.12f, 0.012f,
-                                            new(-0.5f, -0.5f), new(-0.3f, 0.48f),
-                                            new(0.18f, 0.5f), new(0.5f, -0.34f))
-                                        .ColorRole("jacket.light")
-                                        .Mirror(ShapeMirrorAxis.X))
-                                .Shape("humanoid-hero.hood", "Folded Back Hood", LowPolyShapeTypes.ProfileSweep,
-                                    hood => hood
-                                        .ProfileSweep(
-                                            new ForgeVector2[]
-                                            {
-                                                new(-0.04f, 0f), new(0f, 0.04f),
-                                                new(0.04f, 0f), new(0f, -0.04f)
-                                            },
-                                            new ForgeVector3[]
-                                            {
-                                                new(-0.3f, 0.3f, 0.15f), new(0f, 0.4f, 0.2f),
-                                                new(0.3f, 0.3f, 0.15f)
-                                            })
-                                        .ColorRole("jacket"))
-                                .Shape("humanoid-hero.pendant", "Chest Pendant",
-                                    LowPolyShapeTypes.ExtrudedProfile, pendant => pendant
-                                        .Position(0f, 0.06f, -0.2f)
-                                        .Scale(0.08f, 0.1f, 1f)
-                                        .ExtrudedProfile(0.025f, 0.004f,
-                                            new(0f, 0.5f), new(0.45f, 0f),
-                                            new(0f, -0.5f), new(-0.45f, 0f))
-                                        .ColorRole("metal"))
-                                .Group("humanoid-hero.neck", "Neck", neck => neck
-                                    .Position(0f, 0.45f, 0f)
-                                    .Shape("humanoid-hero.neck-mesh", "Neck Mesh", LowPolyShapeTypes.Cylinder,
-                                        neckMesh => neckMesh
-                                            .Scale(0.13f, 0.13f, 0.13f)
-                                            .ColorRole("skin"))
-                                    .Group("humanoid-hero.head", "Head", head => head
-                                        .Position(0f, 0.2f, 0f)
-                                        .Shape("humanoid-hero.head-mesh", "Head Mesh", LowPolyShapeTypes.Sphere,
-                                            headMesh => headMesh
-                                                .Position(0f, 0.25f, 0f)
-                                                .Scale(0.34f, 0.4f, 0.3f)
-                                                .ColorRole("skin"))
-                                        .Shape("humanoid-hero.hair", "Hair", LowPolyShapeTypes.Sphere, hair => hair
-                                            .Position(0f, 0.43f, 0.02f)
-                                            .Scale(0.36f, 0.2f, 0.32f)
-                                            .ColorRole("hair"))
-                                        .Shape("humanoid-hero.ear", "Left Ear", LowPolyShapeTypes.Capsule, ear => ear
-                                            .Position(-0.34f, 0.25f, 0f)
-                                            .Scale(0.055f, 0.085f, 0.04f)
-                                            .ColorRole("skin.shadow")
-                                            .Mirror(ShapeMirrorAxis.X))
-                                        .Shape("humanoid-hero.fringe-left", "Diagonal Primary Fringe",
-                                            LowPolyShapeTypes.ExtrudedProfile, fringe => fringe
-                                                .Position(-0.08f, 0.39f, -0.29f)
-                                                .Rotation(0f, 0f, 10f)
-                                                .Scale(0.28f, 0.24f, 1f)
-                                                .ExtrudedProfile(0.05f, 0.008f,
-                                                    new(-0.5f, 0.4f), new(-0.22f, 0.5f),
-                                                    new(0.5f, 0.42f), new(0.2f, -0.5f),
-                                                    new(-0.18f, -0.24f))
-                                                .ColorRole("hair.shadow"))
-                                        .Shape("humanoid-hero.fringe-right", "Diagonal Secondary Fringe",
-                                            LowPolyShapeTypes.ExtrudedProfile, fringe => fringe
-                                                .Position(0.17f, 0.4f, -0.285f)
-                                                .Rotation(0f, 0f, -9f)
-                                                .Scale(0.18f, 0.21f, 1f)
-                                                .ExtrudedProfile(0.045f, 0.008f,
-                                                    new(-0.5f, 0.42f), new(-0.12f, 0.5f),
-                                                    new(0.5f, 0.36f), new(0.08f, -0.5f),
-                                                    new(-0.3f, -0.18f))
-                                                .ColorRole("hair"))))
-                                .Group("humanoid-hero.left-upper-arm", "Left Upper Arm", arm =>
-                                    AddArm(arm, "humanoid-hero.left", "Left", -1f))
-                                .Group("humanoid-hero.right-upper-arm", "Right Upper Arm", arm =>
-                                    AddArm(arm, "humanoid-hero.right", "Right", 1f))))
-                        .Group("humanoid-hero.left-upper-leg", "Left Upper Leg", leg =>
-                            AddLeg(leg, "humanoid-hero.left", "Left", -0.21f))
-                        .Group("humanoid-hero.right-upper-leg", "Right Upper Leg", leg =>
-                            AddLeg(leg, "humanoid-hero.right", "Right", 0.21f))))
-                    .Build();
+            ShapeDefinition definition = LowPolyHeroPreset.CreateDefinition();
+            ShapeNode       root       = definition.Root;
+            ShapeNode       hips       = FindNode(root, "hero.pelvis.pivot");
+            ShapeNode       spine      = FindNode(root, "hero.spine.pivot");
+            ShapeNode       head       = Detach(root, "hero.head.pivot");
+            ShapeNode       leftArm    = Detach(root, "hero.arm.left.shoulder.pivot");
+            ShapeNode       rightArm   = Detach(root, "hero.arm.right.shoulder.pivot");
+            ShapeNode       leftLeg    = Detach(root, "hero.leg.left.hip.pivot");
+            ShapeNode       rightLeg   = Detach(root, "hero.leg.right.hip.pivot");
+
+            ShapeNode chest = Group(ChestId, "Chest", 0f, 0f, 0f);
+            ShapeNode neck  = Group(NeckId, "Neck", 0f, 0.74f, 0f);
+            spine.Add(chest);
+            chest.Add(neck);
+
+            head.Transform.Position = new(0f, 0.14f, 0f);
+            neck.Add(head);
+
+            ReparentArm(chest, leftArm, "left", "Left", -90f);
+            ReparentArm(chest, rightArm, "right", "Right", 90f);
+            ReparentLeg(hips, leftLeg, "left", "Left");
+            ReparentLeg(hips, rightLeg, "right", "Right");
+
+            definition.Name = "Low Poly Humanoid Fantasy Hero";
+            root.Name       = definition.Name;
+            root.Transform.EulerAngles = new(0f, 180f, 0f);
+            definition.Rig  = CreateRig(root.Id);
+            return definition;
         }
 
         /// <summary>
-        /// Creates the shared fantasy-hero palette used by the Humanoid validation preset.
+        /// Creates the exact palette used by the original Fantasy Hero preset.
         /// </summary>
         public static ShapeStyleDefinition CreateStyle()
         {
             return LowPolyHeroPreset.CreateStyle();
         }
 
-        private static void AddArm(ShapeNodeBuilder arm, string prefix, string side, float direction)
+        private static ShapeRigDefinition CreateRig(string rootId)
         {
-            arm.Position(0.5f * direction, 0.25f, 0f)
-                .Shape($"{prefix}-upper-mesh", "Upper Arm Mesh", LowPolyShapeTypes.Capsule, upper => upper
-                    .Position(0.3f * direction, 0f, 0f)
-                    .Rotation(0f, 0f, 90f)
-                    .Scale(0.13f, 0.34f, 0.13f)
-                    .ColorRole("jacket"))
-                .Group($"{prefix}-lower-arm", $"{side} Lower Arm", lower => lower
-                    .Position(0.68f * direction, 0f, 0f)
-                    .Shape($"{prefix}-lower-mesh", "Lower Arm Mesh", LowPolyShapeTypes.Capsule, forearm => forearm
-                        .Position(0.27f * direction, 0f, 0f)
-                        .Rotation(0f, 0f, 90f)
-                        .Scale(0.11f, 0.3f, 0.11f)
-                        .ColorRole("skin"))
-                    .Shape($"{prefix}-glove", $"{side} Fingerless Glove", LowPolyShapeTypes.Cylinder, glove => glove
-                        .Position(0.49f * direction, 0f, 0f)
-                        .Rotation(0f, 0f, 90f)
-                        .Scale(0.13f, 0.12f, 0.13f)
-                        .ColorRole("glove"))
-                    .Group($"{prefix}-hand", $"{side} Hand", hand => hand
-                        .Position(0.58f * direction, 0f, 0f)
-                        .Shape($"{prefix}-hand-mesh", "Hand Mesh", LowPolyShapeTypes.Cube, handMesh => handMesh
-                            .Position(0.12f * direction, 0f, 0f)
-                            .Scale(0.18f, 0.14f, 0.12f)
-                            .ColorRole("skin"))));
+            return new()
+            {
+                Type = "humanoid/full",
+                Joints = new List<ShapeRigJoint>
+                {
+                    Joint(ShapeRigRoles.Root, rootId),
+                    Joint(ShapeRigRoles.Hips, "hero.pelvis.pivot"),
+                    Joint(ShapeRigRoles.Spine, "hero.spine.pivot"),
+                    Joint(ShapeRigRoles.Chest, ChestId),
+                    Joint(ShapeRigRoles.Neck, NeckId),
+                    Joint(ShapeRigRoles.Head, "hero.head.pivot"),
+                    Joint(ShapeRigRoles.LeftUpperArm, "hero.arm.left.shoulder.pivot"),
+                    Joint(ShapeRigRoles.LeftLowerArm, "hero.arm.left.elbow.pivot"),
+                    Joint(ShapeRigRoles.LeftHand, LeftHandId),
+                    Joint(ShapeRigRoles.RightUpperArm, "hero.arm.right.shoulder.pivot"),
+                    Joint(ShapeRigRoles.RightLowerArm, "hero.arm.right.elbow.pivot"),
+                    Joint(ShapeRigRoles.RightHand, RightHandId),
+                    Joint(ShapeRigRoles.LeftUpperLeg, "hero.leg.left.hip.pivot"),
+                    Joint(ShapeRigRoles.LeftLowerLeg, "hero.leg.left.knee.pivot"),
+                    Joint(ShapeRigRoles.LeftFoot, LeftFootId),
+                    Joint(ShapeRigRoles.RightUpperLeg, "hero.leg.right.hip.pivot"),
+                    Joint(ShapeRigRoles.RightLowerLeg, "hero.leg.right.knee.pivot"),
+                    Joint(ShapeRigRoles.RightFoot, RightFootId)
+                }
+            };
         }
 
-        private static void AddLeg(ShapeNodeBuilder leg, string prefix, string side, float x)
+        private static void ReparentArm(
+            ShapeNode chest,
+            ShapeNode upperArm,
+            string    side,
+            string    label,
+            float     rotationZ)
         {
-            leg.Position(x, -0.42f, 0f)
-                .Shape($"{prefix}-upper-leg-mesh", "Upper Leg Mesh", LowPolyShapeTypes.Capsule, upper => upper
-                    .Position(0f, -0.33f, 0f)
-                    .Scale(0.16f, 0.4f, 0.16f)
-                    .ColorRole("pants"))
-                .Group($"{prefix}-lower-leg", $"{side} Lower Leg", lower => lower
-                    .Position(0f, -0.78f, 0f)
-                    .Shape($"{prefix}-lower-leg-mesh", "Lower Leg Mesh", LowPolyShapeTypes.Capsule, shin => shin
-                        .Position(0f, -0.3f, 0f)
-                        .Scale(0.13f, 0.36f, 0.13f)
-                        .ColorRole("boot"))
-                    .Group($"{prefix}-foot", $"{side} Foot", foot => foot
-                        .Position(0f, -0.68f, 0.12f)
-                        .Shape($"{prefix}-foot-mesh", "Foot Mesh", LowPolyShapeTypes.Cube, footMesh => footMesh
-                            .Position(0f, -0.06f, 0.14f)
-                            .Scale(0.18f, 0.12f, 0.34f)
-                            .ColorRole("boot"))
-                        .Shape($"{prefix}-sole", $"{side} Red Boot Sole", LowPolyShapeTypes.Cube, sole => sole
-                            .Position(0f, -0.19f, 0.15f)
-                            .Scale(0.2f, 0.035f, 0.36f)
-                            .ColorRole("sole"))));
+            upperArm.Transform.Position    = new(upperArm.Transform.Position.X, 0.69f, 0f);
+            upperArm.Transform.EulerAngles = new(0f, 0f, rotationZ);
+            chest.Add(upperArm);
+
+            ShapeNode lowerArm = FindNode(upperArm, $"hero.arm.{side}.elbow.pivot");
+            ShapeNode handMesh = Detach(lowerArm, $"hero.arm.{side}.hand");
+            ShapeNode hand     = Group(
+                side == "left" ? LeftHandId : RightHandId,
+                $"{label} Hand",
+                handMesh.Transform.Position.X,
+                handMesh.Transform.Position.Y,
+                handMesh.Transform.Position.Z);
+            handMesh.Transform.Position = ForgeVector3.Zero;
+            hand.Add(handMesh);
+            lowerArm.Add(hand);
+        }
+
+        private static void ReparentLeg(ShapeNode hips, ShapeNode upperLeg, string side, string label)
+        {
+            upperLeg.Transform.Position = new(upperLeg.Transform.Position.X, 0f, upperLeg.Transform.Position.Z);
+            hips.Add(upperLeg);
+
+            ShapeNode lowerLeg = FindNode(upperLeg, $"hero.leg.{side}.knee.pivot");
+            ShapeNode boot     = Detach(lowerLeg, $"hero.leg.{side}.boot");
+            ShapeNode sole     = Detach(lowerLeg, $"hero.leg.{side}.sole");
+            ShapeNode foot     = Group(
+                side == "left" ? LeftFootId : RightFootId,
+                $"{label} Foot",
+                boot.Transform.Position.X,
+                boot.Transform.Position.Y,
+                boot.Transform.Position.Z);
+
+            ForgeVector3 footPosition = foot.Transform.Position;
+            boot.Transform.Position = ForgeVector3.Zero;
+            sole.Transform.Position = new(
+                sole.Transform.Position.X - footPosition.X,
+                sole.Transform.Position.Y - footPosition.Y,
+                sole.Transform.Position.Z - footPosition.Z);
+            foot.Add(boot).Add(sole);
+            lowerLeg.Add(foot);
+        }
+
+        private static ShapeNode Group(string id, string name, float x, float y, float z)
+        {
+            return new(id, name, ShapeTypes.Group)
+            {
+                Transform = new ShapeTransform { Position = new(x, y, z) }
+            };
+        }
+
+        private static ShapeNode Detach(ShapeNode parent, string id)
+        {
+            for (int index = 0; index < parent.Children.Count; index++)
+            {
+                ShapeNode child = parent.Children[index];
+                if (child.Id != id)
+                    continue;
+
+                parent.Children.RemoveAt(index);
+                return child;
+            }
+
+            throw new InvalidOperationException($"Fantasy Hero node '{id}' was not found under '{parent.Id}'.");
+        }
+
+        private static ShapeNode FindNode(ShapeNode node, string id)
+        {
+            if (node.Id == id)
+                return node;
+
+            foreach (ShapeNode child in node.Children)
+            {
+                ShapeNode result = FindNode(child, id);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
         }
 
         private static ShapeRigJoint Joint(string role, string nodeId)
