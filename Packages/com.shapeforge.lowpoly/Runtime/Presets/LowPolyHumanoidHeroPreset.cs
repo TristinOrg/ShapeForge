@@ -51,6 +51,7 @@ namespace ShapeForge.LowPoly
             definition.Name = "Low Poly Humanoid Fantasy Hero";
             root.Name       = definition.Name;
             definition.Rig  = CreateRig(root.Id);
+            OrientAppearanceForward(root, definition.Rig);
             return definition;
         }
 
@@ -146,6 +147,37 @@ namespace ShapeForge.LowPoly
             {
                 Transform = new ShapeTransform { Position = new(x, y, z) }
             };
+        }
+
+        private static void OrientAppearanceForward(ShapeNode root, ShapeRigDefinition rig)
+        {
+            HashSet<string> boneIds = new(StringComparer.Ordinal);
+            foreach (ShapeRigJoint joint in rig.Joints)
+                boneIds.Add(joint.NodeId);
+
+            foreach (ShapeRigJoint joint in rig.Joints)
+            {
+                ShapeNode       bone       = FindNode(root, joint.NodeId);
+                List<ShapeNode> appearance = new();
+                for (int index = bone.Children.Count - 1; index >= 0; index--)
+                {
+                    ShapeNode child = bone.Children[index];
+                    if (boneIds.Contains(child.Id))
+                        continue;
+
+                    appearance.Insert(0, child);
+                    bone.Children.RemoveAt(index);
+                }
+
+                if (appearance.Count == 0)
+                    continue;
+
+                ShapeNode visual = Group($"{bone.Id}.humanoid.visual", $"{bone.Name} Visuals", 0f, 0f, 0f);
+                visual.Transform.EulerAngles = new(0f, 180f, 0f);
+                foreach (ShapeNode child in appearance)
+                    visual.Add(child);
+                bone.Add(visual);
+            }
         }
 
         private static ShapeNode Detach(ShapeNode parent, string id)
