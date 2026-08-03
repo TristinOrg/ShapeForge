@@ -44,6 +44,12 @@ namespace ShapeForge.Unity
             targetsById = null;
         }
 
+        internal bool TryGetTransform(string nodeId, out Transform target)
+        {
+            EnsureLookup();
+            return targetsById.TryGetValue(nodeId, out target);
+        }
+
         private void EnsureLookup()
         {
             if (targetsById != null)

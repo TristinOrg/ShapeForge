@@ -234,12 +234,23 @@ ShapeForge does not define a complete animation format. It provides the structur
 
 - hierarchical group and pivot nodes;
 - stable semantic node IDs;
-- optional rig roles;
+- optional semantic rig roles, including the canonical biped Humanoid roles;
+- authored local transforms as the model's rest pose;
 - joint rotation constraints;
 - `IShapeTransformResolver` and writable `IShapeTransformTarget` interfaces;
 - cached Unity bindings through `UnityShapeModel`.
 
-A future MotionForge package should own clips, tracks, keyframes, curves, interpolation, blending, retargeting, playback, and motion serialization. This keeps model generation portable and avoids coupling Core to Unity animation systems.
+A complete biped semantic rig can be validated through `ShapeHumanoidRig`. The Unity Adapter can then create a valid `Avatar` for a generated rigid-part hierarchy with `UnityHumanoidAvatarBuilder.CreateAvatar`. This is optional: existing articulated presets remain semantic Pivot rigs until they provide every required role and the canonical bone hierarchy.
+
+MotionForge should be an LLM-friendly, engine-neutral motion layer rather than a replacement for Unity Animator, Godot AnimationTree, or Unreal Animation Blueprint. It should own structured motion intent, semantic composition, constraints, a versioned Motion IR, deterministic compilation, validation, and serialization. Engine adapters should translate that IR into native clips or runtime pose targets and delegate native playback, blending, IK, retargeting, and optimization to the host engine.
+
+```text
+LLM / user intent
+    -> MotionForge intent
+    -> MotionForge IR
+    -> engine adapter
+    -> native animation system
+```
 
 The Low Poly package includes small transform-based animation examples for the robot, workbench, and hero. They use one centralized player, cache all targets, allocate no per-part behaviours, and serve only as integration demonstrations.
 
