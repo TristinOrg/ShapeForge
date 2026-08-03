@@ -50,6 +50,14 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyShibuyaCrossingPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Humanoid T-Pose Hero", false, 15)]
+        private static void GenerateHumanoidHero()
+        {
+            Generate(
+                LowPolyHumanoidHeroPreset.CreateDefinition(),
+                LowPolyHumanoidHeroPreset.CreateStyle());
+        }
+
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
         private static void GenerateAnimatedWorkbench()
         {
