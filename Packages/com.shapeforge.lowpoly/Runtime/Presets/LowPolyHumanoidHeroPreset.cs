@@ -124,19 +124,19 @@ namespace ShapeForge.LowPoly
             ShapeNode lowerLeg = FindNode(upperLeg, $"hero.leg.{side}.knee.pivot");
             ShapeNode boot     = Detach(lowerLeg, $"hero.leg.{side}.boot");
             ShapeNode sole     = Detach(lowerLeg, $"hero.leg.{side}.sole");
+            ForgeVector3 bootPosition = boot.Transform.Position;
             ShapeNode foot     = Group(
                 side == "left" ? LeftFootId : RightFootId,
                 $"{label} Foot",
-                boot.Transform.Position.X,
-                boot.Transform.Position.Y,
-                boot.Transform.Position.Z);
+                -bootPosition.X,
+                bootPosition.Y,
+                -bootPosition.Z);
 
-            ForgeVector3 footPosition = foot.Transform.Position;
             boot.Transform.Position = ForgeVector3.Zero;
             sole.Transform.Position = new(
-                sole.Transform.Position.X - footPosition.X,
-                sole.Transform.Position.Y - footPosition.Y,
-                sole.Transform.Position.Z - footPosition.Z);
+                sole.Transform.Position.X - bootPosition.X,
+                sole.Transform.Position.Y - bootPosition.Y,
+                sole.Transform.Position.Z - bootPosition.Z);
             foot.Add(boot).Add(sole);
             lowerLeg.Add(foot);
         }

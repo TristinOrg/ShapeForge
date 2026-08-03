@@ -47,6 +47,8 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode chest         = FindNode(definition.Root, "hero.humanoid.chest");
             ShapeNode hips          = FindNode(definition.Root, "hero.pelvis.pivot");
             ShapeNode headVisuals   = FindNode(definition.Root, "hero.head.pivot.humanoid.visual");
+            ShapeNode leftFoot      = FindNode(definition.Root, "hero.humanoid.left.foot");
+            ShapeNode rightFoot     = FindNode(definition.Root, "hero.humanoid.right.foot");
             ShapeNode leftUpperArm  = FindNode(definition.Root, "hero.arm.left.shoulder.pivot");
             ShapeNode rightUpperArm = FindNode(definition.Root, "hero.arm.right.shoulder.pivot");
             Assert.That(chest.Children, Does.Contain(leftUpperArm));
@@ -57,6 +59,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(hips.Transform.EulerAngles.Y, Is.Zero);
             Assert.That(headVisuals.Transform.EulerAngles.Y, Is.EqualTo(180f));
             Assert.That(FindNode(headVisuals, "hero.hair.fringe.primary"), Is.Not.Null);
+            Assert.That(leftFoot.Transform.Position.Z, Is.GreaterThan(0f));
+            Assert.That(rightFoot.Transform.Position.Z, Is.GreaterThan(0f));
         }
 
         [Test]
