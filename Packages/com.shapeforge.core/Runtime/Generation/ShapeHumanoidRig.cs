@@ -42,6 +42,22 @@ namespace ShapeForge
             if (rig == null)
                 throw new ArgumentNullException(nameof(rig));
 
+            if (rig.Joints == null)
+                throw new ShapeValidationException("Humanoid rig requires a joint collection.");
+
+            HashSet<string> roles = new(StringComparer.Ordinal);
+            foreach (ShapeRigJoint joint in rig.Joints)
+            {
+                if (joint == null || string.IsNullOrWhiteSpace(joint.Role) ||
+                    string.IsNullOrWhiteSpace(joint.NodeId))
+                {
+                    throw new ShapeValidationException("Every humanoid rig joint requires a role and node ID.");
+                }
+
+                if (!roles.Add(joint.Role))
+                    throw new ShapeValidationException($"Duplicate humanoid rig role '{joint.Role}'.");
+            }
+
             ShapeRigIndex index = new(rig);
             foreach (string role in requiredRoles)
             {

@@ -225,5 +225,16 @@ namespace ShapeForge.Tests
 
             Assert.That(exception.Message, Does.Contain(ShapeRigRoles.Spine));
         }
+
+        [Test]
+        public void HumanoidRigRejectsMalformedJointCollection()
+        {
+            ShapeRigDefinition rig = new()
+            {
+                Joints = null
+            };
+
+            Assert.Throws<ShapeValidationException>(() => ShapeHumanoidRig.ValidateRequiredRoles(rig));
+        }
     }
 }
