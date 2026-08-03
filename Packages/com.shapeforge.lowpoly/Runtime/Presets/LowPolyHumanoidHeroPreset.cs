@@ -60,28 +60,30 @@ namespace ShapeForge.LowPoly
                                     .ColorRole("jacket"))
                                 .Group("humanoid-hero.neck", "Neck", neck => neck
                                     .Position(0f, 0.45f, 0f)
-                                    .Shape("humanoid-hero.neck-mesh", "Neck Mesh", LowPolyShapeTypes.Cylinder, neckMesh => neckMesh
-                                        .Scale(0.13f, 0.13f, 0.13f)
-                                        .ColorRole("skin"))
+                                    .Shape("humanoid-hero.neck-mesh", "Neck Mesh", LowPolyShapeTypes.Cylinder,
+                                        neckMesh => neckMesh
+                                            .Scale(0.13f, 0.13f, 0.13f)
+                                            .ColorRole("skin"))
                                     .Group("humanoid-hero.head", "Head", head => head
                                         .Position(0f, 0.2f, 0f)
-                                        .Shape("humanoid-hero.head-mesh", "Head Mesh", LowPolyShapeTypes.Sphere, headMesh => headMesh
-                                            .Position(0f, 0.25f, 0f)
-                                            .Scale(0.34f, 0.4f, 0.3f)
-                                            .ColorRole("skin"))
+                                        .Shape("humanoid-hero.head-mesh", "Head Mesh", LowPolyShapeTypes.Sphere,
+                                            headMesh => headMesh
+                                                .Position(0f, 0.25f, 0f)
+                                                .Scale(0.34f, 0.4f, 0.3f)
+                                                .ColorRole("skin"))
                                         .Shape("humanoid-hero.hair", "Hair", LowPolyShapeTypes.Sphere, hair => hair
                                             .Position(0f, 0.43f, 0.02f)
                                             .Scale(0.36f, 0.2f, 0.32f)
                                             .ColorRole("hair"))))
                                 .Group("humanoid-hero.left-upper-arm", "Left Upper Arm", arm =>
-                                    AddArm(arm, "humanoid-hero.left", 90f))
+                                    AddArm(arm, "humanoid-hero.left", "Left", -1f))
                                 .Group("humanoid-hero.right-upper-arm", "Right Upper Arm", arm =>
-                                    AddArm(arm, "humanoid-hero.right", -90f))))
+                                    AddArm(arm, "humanoid-hero.right", "Right", 1f))))
                         .Group("humanoid-hero.left-upper-leg", "Left Upper Leg", leg =>
-                            AddLeg(leg, "humanoid-hero.left", -0.21f))
+                            AddLeg(leg, "humanoid-hero.left", "Left", -0.21f))
                         .Group("humanoid-hero.right-upper-leg", "Right Upper Leg", leg =>
-                            AddLeg(leg, "humanoid-hero.right", 0.21f)))
-                .Build();
+                            AddLeg(leg, "humanoid-hero.right", "Right", 0.21f))))
+                    .Build();
         }
 
         /// <summary>
@@ -92,42 +94,41 @@ namespace ShapeForge.LowPoly
             return LowPolyHeroPreset.CreateStyle();
         }
 
-        private static void AddArm(ShapeNodeBuilder arm, string prefix, float rotationZ)
+        private static void AddArm(ShapeNodeBuilder arm, string prefix, string side, float direction)
         {
-            arm.Position(rotationZ > 0f ? -0.5f : 0.5f, 0.25f, 0f)
-                .Rotation(0f, 0f, rotationZ)
+            arm.Position(0.5f * direction, 0.25f, 0f)
                 .Shape($"{prefix}-upper-mesh", "Upper Arm Mesh", LowPolyShapeTypes.Capsule, upper => upper
-                    .Position(0f, 0.3f, 0f)
+                    .Position(0.3f * direction, 0f, 0f)
                     .Scale(0.13f, 0.34f, 0.13f)
                     .ColorRole("jacket"))
-                .Group($"{prefix}-lower-arm", "Lower Arm", lower => lower
-                    .Position(0f, 0.68f, 0f)
+                .Group($"{prefix}-lower-arm", $"{side} Lower Arm", lower => lower
+                    .Position(0.68f * direction, 0f, 0f)
                     .Shape($"{prefix}-lower-mesh", "Lower Arm Mesh", LowPolyShapeTypes.Capsule, forearm => forearm
-                        .Position(0f, 0.27f, 0f)
+                        .Position(0.27f * direction, 0f, 0f)
                         .Scale(0.11f, 0.3f, 0.11f)
                         .ColorRole("skin"))
-                    .Group($"{prefix}-hand", "Hand", hand => hand
-                        .Position(0f, 0.58f, 0f)
+                    .Group($"{prefix}-hand", $"{side} Hand", hand => hand
+                        .Position(0.58f * direction, 0f, 0f)
                         .Shape($"{prefix}-hand-mesh", "Hand Mesh", LowPolyShapeTypes.Cube, handMesh => handMesh
-                            .Position(0f, 0.12f, 0f)
+                            .Position(0.12f * direction, 0f, 0f)
                             .Scale(0.14f, 0.18f, 0.12f)
                             .ColorRole("skin"))));
         }
 
-        private static void AddLeg(ShapeNodeBuilder leg, string prefix, float x)
+        private static void AddLeg(ShapeNodeBuilder leg, string prefix, string side, float x)
         {
             leg.Position(x, -0.42f, 0f)
                 .Shape($"{prefix}-upper-leg-mesh", "Upper Leg Mesh", LowPolyShapeTypes.Capsule, upper => upper
                     .Position(0f, -0.33f, 0f)
                     .Scale(0.16f, 0.4f, 0.16f)
                     .ColorRole("pants"))
-                .Group($"{prefix}-lower-leg", "Lower Leg", lower => lower
+                .Group($"{prefix}-lower-leg", $"{side} Lower Leg", lower => lower
                     .Position(0f, -0.78f, 0f)
                     .Shape($"{prefix}-lower-leg-mesh", "Lower Leg Mesh", LowPolyShapeTypes.Capsule, shin => shin
                         .Position(0f, -0.3f, 0f)
                         .Scale(0.13f, 0.36f, 0.13f)
                         .ColorRole("boot"))
-                    .Group($"{prefix}-foot", "Foot", foot => foot
+                    .Group($"{prefix}-foot", $"{side} Foot", foot => foot
                         .Position(0f, -0.68f, 0.12f)
                         .Shape($"{prefix}-foot-mesh", "Foot Mesh", LowPolyShapeTypes.Cube, footMesh => footMesh
                             .Position(0f, -0.06f, 0.14f)

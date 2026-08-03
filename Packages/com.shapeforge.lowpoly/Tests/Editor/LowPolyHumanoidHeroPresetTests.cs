@@ -34,8 +34,8 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode rightUpperArm = FindNode(definition.Root, "humanoid-hero.right-upper-arm");
             Assert.That(chest.Children, Does.Contain(leftUpperArm));
             Assert.That(chest.Children, Does.Contain(rightUpperArm));
-            Assert.That(leftUpperArm.Transform.EulerAngles.Z, Is.EqualTo(90f));
-            Assert.That(rightUpperArm.Transform.EulerAngles.Z, Is.EqualTo(-90f));
+            Assert.That(leftUpperArm.Transform.Position.X, Is.LessThan(0f));
+            Assert.That(rightUpperArm.Transform.Position.X, Is.GreaterThan(0f));
         }
 
         [Test]
