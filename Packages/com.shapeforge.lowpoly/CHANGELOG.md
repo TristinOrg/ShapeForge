@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Fixed preset-generated procedural meshes disappearing after converting the hierarchy to a Prefab.
+
 ## [0.1.0] - 2026-08-01
 
 - Added eleven cached primitive and procedural shape capabilities.

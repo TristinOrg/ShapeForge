@@ -10,6 +10,8 @@ Use `UnityShapeModelGenerator.Prepare` when generating the same immutable defini
 
 The generator accepts optional complexity limits and supports failure-safe regeneration. An existing hierarchy remains intact unless its replacement completes successfully.
 
+Before saving an Editor-generated hierarchy as a Prefab, call `UnityGeneratedModelAssetStore.PersistMeshes`. It stores each unique transient mesh once in a shared asset container and rewires the hierarchy, so Prefab reloads retain procedural geometry without runtime reconstruction. Official Low Poly preset menu commands perform this step automatically.
+
 `ShapeJsonSerializer.Serialize(ShapeCapabilityCatalogDocument)` exports any backend capability catalog as compact, versioned JSON for external authoring tools and LLM context.
 
 The same serializer exports `ShapeTemplateCatalogDocument` discovery metadata. Template-specific specification serialization remains owned by the package that defines that specification.

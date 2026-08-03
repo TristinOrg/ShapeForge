@@ -1,4 +1,5 @@
 using ShapeForge.Unity;
+using ShapeForge.Unity.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -86,6 +87,7 @@ namespace ShapeForge.LowPoly.Editor
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
             GameObject generated = generator.Generate(definition);
+            UnityGeneratedModelAssetStore.PersistMeshes(generated);
 
             if (motionPreset.HasValue)
             {

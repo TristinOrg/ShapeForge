@@ -1,0 +1,11 @@
+{
+  "name": "ShapeForge.Unity.Editor",
+  "rootNamespace": "ShapeForge.Unity.Editor",
+  "references": [
+    "ShapeForge.Core",
+    "ShapeForge.Unity"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ]
+}

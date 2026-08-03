@@ -5,6 +5,7 @@
     "ShapeForge.Schema",
     "ShapeForge.Core",
     "ShapeForge.Unity",
+    "ShapeForge.Unity.Editor",
     "ShapeForge.LowPoly"
   ],
   "includePlatforms": [

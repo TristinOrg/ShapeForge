@@ -24,4 +24,6 @@ For a large number of instances, create a `LowPolyGenerationBatch` and call `Gen
 
 Use `ShapeForge > Generate` in the Unity Editor to preview the articulated Sentinel Robot, Fantasy Hero, detailed Inventor Workbench, compact Japanese Town, and dense Shibuya Crossing presets with full Undo support. Shibuya combines diagonal scramble markings, four commercial towers, media screens, signals, signage, and a lightweight crossing crowd. The animated variants add mechanical and human walking examples that control cached `IShapeTransformTarget` instances without defining a ShapeForge animation format; a future motion system remains responsible for clips, tracks, interpolation, and serialization.
 
+Preset menu commands persist their procedural meshes under `Assets/ShapeForge/Generated` before returning the hierarchy. Keep the generated mesh asset alongside any Prefab created from that hierarchy; built-in Unity primitive meshes are not duplicated.
+
 Use `ShapeForge > Diagnostics > Benchmark JSON Generation` to measure the end-to-end JSON generation path, managed heap growth, and shared render resources on the current Editor machine. Treat results as a local baseline, not a cross-platform guarantee.
