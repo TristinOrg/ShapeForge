@@ -119,7 +119,8 @@ namespace ShapeForge.Unity
                 bones[index] = new HumanBone
                 {
                     humanName = HumanTrait.BoneName[(int)mapping.Bone],
-                    boneName  = transformsByRole[mapping.Role].name
+                    boneName  = transformsByRole[mapping.Role].name,
+                    limit     = new HumanLimit { useDefaultValues = true }
                 };
             }
 

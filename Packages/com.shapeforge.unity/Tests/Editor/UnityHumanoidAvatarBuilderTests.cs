@@ -34,6 +34,9 @@ namespace ShapeForge.Unity.Tests
 
             Assert.That(avatar.isValid, Is.True);
             Assert.That(avatar.isHuman, Is.True);
+            Assert.That(
+                avatar.humanDescription.human,
+                Has.All.Matches<HumanBone>(bone => bone.limit.useDefaultValues));
         }
 
         [Test]
