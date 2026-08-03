@@ -43,6 +43,10 @@ namespace ShapeForge.LowPoly
                         .Shape("humanoid-hero.pelvis", "Pelvis", LowPolyShapeTypes.Cube, pelvis => pelvis
                             .Scale(0.5f, 0.22f, 0.28f)
                             .ColorRole("pants"))
+                        .Shape("humanoid-hero.belt", "Utility Belt", LowPolyShapeTypes.Cube, belt => belt
+                            .Position(0f, 0.08f, -0.02f)
+                            .Scale(0.54f, 0.07f, 0.3f)
+                            .ColorRole("glove"))
                         .Group("humanoid-hero.spine", "Spine", spine => spine
                             .Position(0f, 0.25f, 0f)
                             .Shape("humanoid-hero.abdomen", "Abdomen", LowPolyShapeTypes.Capsule, abdomen => abdomen
@@ -58,6 +62,54 @@ namespace ShapeForge.LowPoly
                                     .Parameter(LowPolyShapeParameters.BottomWidth, 0.78f)
                                     .Parameter(LowPolyShapeParameters.BottomDepth, 0.88f)
                                     .ColorRole("jacket"))
+                                .Shape("humanoid-hero.jacket-left", "Left Open Short Jacket",
+                                    LowPolyShapeTypes.ExtrudedProfile, panel => panel
+                                        .Position(-0.2f, 0.02f, -0.18f)
+                                        .Scale(0.3f, 0.44f, 1f)
+                                        .ExtrudedProfile(0.07f, 0.015f,
+                                            new(-0.5f, 0.4f), new(-0.3f, 0.5f), new(0.48f, 0.42f),
+                                            new(0.36f, -0.5f), new(-0.42f, -0.42f))
+                                        .ColorRole("jacket.light"))
+                                .Shape("humanoid-hero.jacket-right", "Right Open Short Jacket",
+                                    LowPolyShapeTypes.ExtrudedProfile, panel => panel
+                                        .Position(0.2f, 0.02f, -0.18f)
+                                        .Scale(0.3f, 0.44f, 1f)
+                                        .ExtrudedProfile(0.07f, 0.015f,
+                                            new(-0.48f, 0.42f), new(0.3f, 0.5f), new(0.5f, 0.4f),
+                                            new(0.42f, -0.42f), new(-0.36f, -0.5f))
+                                        .ColorRole("jacket.light"))
+                                .Shape("humanoid-hero.collar", "Standing Collar",
+                                    LowPolyShapeTypes.ExtrudedProfile, collar => collar
+                                        .Position(-0.11f, 0.31f, -0.18f)
+                                        .Rotation(-8f, 8f, -8f)
+                                        .Scale(0.16f, 0.2f, 1f)
+                                        .ExtrudedProfile(0.12f, 0.012f,
+                                            new(-0.5f, -0.5f), new(-0.3f, 0.48f),
+                                            new(0.18f, 0.5f), new(0.5f, -0.34f))
+                                        .ColorRole("jacket.light")
+                                        .Mirror(ShapeMirrorAxis.X))
+                                .Shape("humanoid-hero.hood", "Folded Back Hood", LowPolyShapeTypes.ProfileSweep,
+                                    hood => hood
+                                        .ProfileSweep(
+                                            new ForgeVector2[]
+                                            {
+                                                new(-0.04f, 0f), new(0f, 0.04f),
+                                                new(0.04f, 0f), new(0f, -0.04f)
+                                            },
+                                            new ForgeVector3[]
+                                            {
+                                                new(-0.3f, 0.3f, 0.15f), new(0f, 0.4f, 0.2f),
+                                                new(0.3f, 0.3f, 0.15f)
+                                            })
+                                        .ColorRole("jacket"))
+                                .Shape("humanoid-hero.pendant", "Chest Pendant",
+                                    LowPolyShapeTypes.ExtrudedProfile, pendant => pendant
+                                        .Position(0f, 0.06f, -0.2f)
+                                        .Scale(0.08f, 0.1f, 1f)
+                                        .ExtrudedProfile(0.025f, 0.004f,
+                                            new(0f, 0.5f), new(0.45f, 0f),
+                                            new(0f, -0.5f), new(-0.45f, 0f))
+                                        .ColorRole("metal"))
                                 .Group("humanoid-hero.neck", "Neck", neck => neck
                                     .Position(0f, 0.45f, 0f)
                                     .Shape("humanoid-hero.neck-mesh", "Neck Mesh", LowPolyShapeTypes.Cylinder,
@@ -74,7 +126,32 @@ namespace ShapeForge.LowPoly
                                         .Shape("humanoid-hero.hair", "Hair", LowPolyShapeTypes.Sphere, hair => hair
                                             .Position(0f, 0.43f, 0.02f)
                                             .Scale(0.36f, 0.2f, 0.32f)
-                                            .ColorRole("hair"))))
+                                            .ColorRole("hair"))
+                                        .Shape("humanoid-hero.ear", "Left Ear", LowPolyShapeTypes.Capsule, ear => ear
+                                            .Position(-0.34f, 0.25f, 0f)
+                                            .Scale(0.055f, 0.085f, 0.04f)
+                                            .ColorRole("skin.shadow")
+                                            .Mirror(ShapeMirrorAxis.X))
+                                        .Shape("humanoid-hero.fringe-left", "Diagonal Primary Fringe",
+                                            LowPolyShapeTypes.ExtrudedProfile, fringe => fringe
+                                                .Position(-0.08f, 0.39f, -0.29f)
+                                                .Rotation(0f, 0f, 10f)
+                                                .Scale(0.28f, 0.24f, 1f)
+                                                .ExtrudedProfile(0.05f, 0.008f,
+                                                    new(-0.5f, 0.4f), new(-0.22f, 0.5f),
+                                                    new(0.5f, 0.42f), new(0.2f, -0.5f),
+                                                    new(-0.18f, -0.24f))
+                                                .ColorRole("hair.shadow"))
+                                        .Shape("humanoid-hero.fringe-right", "Diagonal Secondary Fringe",
+                                            LowPolyShapeTypes.ExtrudedProfile, fringe => fringe
+                                                .Position(0.17f, 0.4f, -0.285f)
+                                                .Rotation(0f, 0f, -9f)
+                                                .Scale(0.18f, 0.21f, 1f)
+                                                .ExtrudedProfile(0.045f, 0.008f,
+                                                    new(-0.5f, 0.42f), new(-0.12f, 0.5f),
+                                                    new(0.5f, 0.36f), new(0.08f, -0.5f),
+                                                    new(-0.3f, -0.18f))
+                                                .ColorRole("hair"))))
                                 .Group("humanoid-hero.left-upper-arm", "Left Upper Arm", arm =>
                                     AddArm(arm, "humanoid-hero.left", "Left", -1f))
                                 .Group("humanoid-hero.right-upper-arm", "Right Upper Arm", arm =>
@@ -109,6 +186,11 @@ namespace ShapeForge.LowPoly
                         .Rotation(0f, 0f, 90f)
                         .Scale(0.11f, 0.3f, 0.11f)
                         .ColorRole("skin"))
+                    .Shape($"{prefix}-glove", $"{side} Fingerless Glove", LowPolyShapeTypes.Cylinder, glove => glove
+                        .Position(0.49f * direction, 0f, 0f)
+                        .Rotation(0f, 0f, 90f)
+                        .Scale(0.13f, 0.12f, 0.13f)
+                        .ColorRole("glove"))
                     .Group($"{prefix}-hand", $"{side} Hand", hand => hand
                         .Position(0.58f * direction, 0f, 0f)
                         .Shape($"{prefix}-hand-mesh", "Hand Mesh", LowPolyShapeTypes.Cube, handMesh => handMesh
@@ -135,7 +217,11 @@ namespace ShapeForge.LowPoly
                         .Shape($"{prefix}-foot-mesh", "Foot Mesh", LowPolyShapeTypes.Cube, footMesh => footMesh
                             .Position(0f, -0.06f, 0.14f)
                             .Scale(0.18f, 0.12f, 0.34f)
-                            .ColorRole("boot"))));
+                            .ColorRole("boot"))
+                        .Shape($"{prefix}-sole", $"{side} Red Boot Sole", LowPolyShapeTypes.Cube, sole => sole
+                            .Position(0f, -0.19f, 0.15f)
+                            .Scale(0.2f, 0.035f, 0.36f)
+                            .ColorRole("sole"))));
         }
 
         private static ShapeRigJoint Joint(string role, string nodeId)
