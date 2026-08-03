@@ -1,6 +1,7 @@
 using ShapeForge.Unity;
 using ShapeForge.Unity.Editor;
 using UnityEditor;
+using UnityEditor.Animations;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly.Editor
@@ -10,6 +11,8 @@ namespace ShapeForge.LowPoly.Editor
     /// </summary>
     internal static class LowPolyPresetMenu
     {
+        private const string GeneratedAssetFolder = "Assets/ShapeForge/Generated";
+
         [MenuItem("ShapeForge/Generate/Inventor Workbench", false, 10)]
         private static void GenerateWorkbench()
         {
@@ -58,6 +61,33 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyHumanoidHeroPreset.CreateStyle());
         }
 
+        [MenuItem("ShapeForge/Generate/Animated Humanoid T-Pose Hero From Selected Clip", false, 16)]
+        private static void GenerateAnimatedHumanoidHero()
+        {
+            AnimationClip clip = Selection.activeObject as AnimationClip;
+            if (clip == null || !clip.humanMotion)
+            {
+                EditorUtility.DisplayDialog(
+                    "Select a Humanoid AnimationClip",
+                    "Select an imported Humanoid AnimationClip in the Project window before generating this preview.",
+                    "OK");
+                return;
+            }
+
+            ShapeDefinition definition = LowPolyHumanoidHeroPreset.CreateDefinition();
+            GameObject generated = Generate(definition, LowPolyHumanoidHeroPreset.CreateStyle());
+            Avatar     avatar    = UnityHumanoidAvatarBuilder.CreateAvatar(
+                generated.GetComponent<UnityShapeModel>(),
+                definition.Rig);
+
+            string             avatarPath  = CreateAsset(avatar, "Humanoid Hero Avatar");
+            AnimatorController controller = CreatePreviewController(clip);
+            Animator           animator    = Undo.AddComponent<Animator>(generated);
+            animator.avatar                    = AssetDatabase.LoadAssetAtPath<Avatar>(avatarPath);
+            animator.runtimeAnimatorController = controller;
+            Selection.activeGameObject         = generated;
+        }
+
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
         private static void GenerateAnimatedWorkbench()
         {
@@ -85,7 +115,7 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyMotionPreset.HumanHeroWalk);
         }
 
-        private static void Generate(
+        private static GameObject Generate(
             ShapeDefinition      definition,
             ShapeStyleDefinition style,
             LowPolyMotionPreset? motionPreset = null)
@@ -106,6 +136,27 @@ namespace ShapeForge.LowPoly.Editor
             Undo.RegisterCreatedObjectUndo(generated, $"Generate {generated.name}");
             Selection.activeGameObject = generated;
             EditorGUIUtility.PingObject(generated);
+            return generated;
+        }
+
+        private static string CreateAsset(Avatar avatar, string name)
+        {
+            string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{GeneratedAssetFolder}/{name}.asset");
+            AssetDatabase.CreateAsset(avatar, assetPath);
+            AssetDatabase.SaveAssets();
+            return assetPath;
+        }
+
+        private static AnimatorController CreatePreviewController(AnimationClip clip)
+        {
+            string assetPath = AssetDatabase.GenerateUniqueAssetPath(
+                $"{GeneratedAssetFolder}/{clip.name} Humanoid Preview.controller");
+            AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(assetPath);
+            AnimatorState state = controller.layers[0].stateMachine.AddState("Preview");
+            state.motion = clip;
+            controller.layers[0].stateMachine.defaultState = state;
+            AssetDatabase.SaveAssets();
+            return controller;
         }
     }
 }
