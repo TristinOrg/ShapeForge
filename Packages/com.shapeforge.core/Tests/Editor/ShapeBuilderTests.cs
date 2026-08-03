@@ -208,5 +208,22 @@ namespace ShapeForge.Tests
 
             Assert.Throws<ShapeValidationException>(() => builder.Build());
         }
+
+        [Test]
+        public void HumanoidRigRequiresEveryCanonicalRole()
+        {
+            ShapeRigDefinition rig = new()
+            {
+                Joints = new ShapeRigJoint[]
+                {
+                    new(ShapeRigRoles.Hips, "hips")
+                }
+            };
+
+            ShapeValidationException exception = Assert.Throws<ShapeValidationException>(() =>
+                ShapeHumanoidRig.ValidateRequiredRoles(rig));
+
+            Assert.That(exception.Message, Does.Contain(ShapeRigRoles.Spine));
+        }
     }
 }

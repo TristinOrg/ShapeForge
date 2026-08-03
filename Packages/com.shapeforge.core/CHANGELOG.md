@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Added canonical biped Humanoid rig roles and engine-neutral required-role validation.
+
 ## [0.1.0] - 2026-08-01
 
 - Added fluent shape authoring, validation, style inheritance, and palette resolution.
