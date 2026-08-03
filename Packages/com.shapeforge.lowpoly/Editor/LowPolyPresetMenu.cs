@@ -84,6 +84,7 @@ namespace ShapeForge.LowPoly.Editor
             AnimatorController controller = CreatePreviewController(clip);
             Animator           animator    = Undo.AddComponent<Animator>(generated);
             animator.avatar                    = AssetDatabase.LoadAssetAtPath<Avatar>(avatarPath);
+            animator.applyRootMotion           = true;
             animator.runtimeAnimatorController = controller;
             Selection.activeGameObject         = generated;
         }

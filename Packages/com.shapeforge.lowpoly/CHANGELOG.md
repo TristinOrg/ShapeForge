@@ -5,6 +5,7 @@
 - Fixed preset-generated procedural meshes disappearing after converting the hierarchy to a Prefab.
 - Added a rigid-part T-Pose Humanoid Hero preset for Unity Avatar validation.
 - Added an Editor preview command that binds a selected Humanoid clip to the T-Pose Hero.
+- Enabled root motion for Humanoid preview clips that contain locomotion or rotation.
 
 ## [0.1.0] - 2026-08-01
 
