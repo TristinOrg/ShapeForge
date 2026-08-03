@@ -50,7 +50,6 @@ namespace ShapeForge.LowPoly
 
             definition.Name = "Low Poly Humanoid Fantasy Hero";
             root.Name       = definition.Name;
-            root.Transform.EulerAngles = new(0f, 180f, 0f);
             definition.Rig  = CreateRig(root.Id);
             return definition;
         }
