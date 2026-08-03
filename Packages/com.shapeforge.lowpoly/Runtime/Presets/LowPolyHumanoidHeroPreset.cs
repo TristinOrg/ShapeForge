@@ -99,19 +99,21 @@ namespace ShapeForge.LowPoly
             arm.Position(0.5f * direction, 0.25f, 0f)
                 .Shape($"{prefix}-upper-mesh", "Upper Arm Mesh", LowPolyShapeTypes.Capsule, upper => upper
                     .Position(0.3f * direction, 0f, 0f)
+                    .Rotation(0f, 0f, 90f)
                     .Scale(0.13f, 0.34f, 0.13f)
                     .ColorRole("jacket"))
                 .Group($"{prefix}-lower-arm", $"{side} Lower Arm", lower => lower
                     .Position(0.68f * direction, 0f, 0f)
                     .Shape($"{prefix}-lower-mesh", "Lower Arm Mesh", LowPolyShapeTypes.Capsule, forearm => forearm
                         .Position(0.27f * direction, 0f, 0f)
+                        .Rotation(0f, 0f, 90f)
                         .Scale(0.11f, 0.3f, 0.11f)
                         .ColorRole("skin"))
                     .Group($"{prefix}-hand", $"{side} Hand", hand => hand
                         .Position(0.58f * direction, 0f, 0f)
                         .Shape($"{prefix}-hand-mesh", "Hand Mesh", LowPolyShapeTypes.Cube, handMesh => handMesh
                             .Position(0.12f * direction, 0f, 0f)
-                            .Scale(0.14f, 0.18f, 0.12f)
+                            .Scale(0.18f, 0.14f, 0.12f)
                             .ColorRole("skin"))));
         }
 

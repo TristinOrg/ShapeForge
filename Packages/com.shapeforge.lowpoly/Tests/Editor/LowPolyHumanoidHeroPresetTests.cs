@@ -32,10 +32,14 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode chest         = FindNode(definition.Root, "humanoid-hero.chest");
             ShapeNode leftUpperArm  = FindNode(definition.Root, "humanoid-hero.left-upper-arm");
             ShapeNode rightUpperArm = FindNode(definition.Root, "humanoid-hero.right-upper-arm");
+            ShapeNode leftArmMesh   = FindNode(definition.Root, "humanoid-hero.left-upper-mesh");
+            ShapeNode rightArmMesh  = FindNode(definition.Root, "humanoid-hero.right-upper-mesh");
             Assert.That(chest.Children, Does.Contain(leftUpperArm));
             Assert.That(chest.Children, Does.Contain(rightUpperArm));
             Assert.That(leftUpperArm.Transform.Position.X, Is.LessThan(0f));
             Assert.That(rightUpperArm.Transform.Position.X, Is.GreaterThan(0f));
+            Assert.That(leftArmMesh.Transform.EulerAngles.Z, Is.EqualTo(90f));
+            Assert.That(rightArmMesh.Transform.EulerAngles.Z, Is.EqualTo(90f));
         }
 
         [Test]
