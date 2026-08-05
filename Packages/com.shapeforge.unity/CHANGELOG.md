@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Added ShapePatch JSON serialization for compact external and LLM-authored edits.
 - Added an Editor mesh asset store for making generated hierarchies safe to serialize as Prefabs.
 - Added validated rigid-part Humanoid Avatar creation from complete semantic rigs.
 - Fixed generated Humanoid Avatars clamping muscle-driven bones to a static pose.

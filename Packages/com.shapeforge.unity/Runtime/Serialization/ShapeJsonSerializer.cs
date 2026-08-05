@@ -47,6 +47,35 @@ namespace ShapeForge.Unity
         }
 
         /// <summary>
+        /// Serializes an ordered ShapePatch document for external editing tools.
+        /// </summary>
+        public string Serialize(ShapePatchDocument document)
+        {
+            if (document == null)
+                throw new ArgumentNullException(nameof(document));
+
+            return JsonConvert.SerializeObject(document, Settings);
+        }
+
+        /// <summary>
+        /// Deserializes a versioned ShapePatch document for atomic application by ShapePatchApplier.
+        /// </summary>
+        public ShapePatchDocument DeserializePatch(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("ShapePatch JSON cannot be empty.", nameof(json));
+
+            ShapePatchDocument document = JsonConvert.DeserializeObject<ShapePatchDocument>(json, Settings) ??
+                                          throw new JsonSerializationException("ShapePatch JSON produced no document.");
+            if (!string.Equals(document.Schema, ShapePatchDocument.CurrentSchema, StringComparison.Ordinal))
+                throw new JsonSerializationException($"Unsupported ShapePatch schema '{document.Schema}'.");
+            if (document.Operations == null)
+                throw new JsonSerializationException("ShapePatch JSON requires an operation collection.");
+
+            return document;
+        }
+
+        /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>
         public string Serialize(ShapeStyleDefinition definition)

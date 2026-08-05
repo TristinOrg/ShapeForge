@@ -186,6 +186,20 @@ string              json       = serializer.Serialize(definition);
 ShapeDefinition     restored   = serializer.DeserializeShape(json);
 ```
 
+For iterative LLM edits, exchange a small `shapeforge.patch/1.0` document instead of regenerating the complete model. Patches address stable node IDs and support add, remove, move/reorder, and authored-value update operations:
+
+```csharp
+ShapePatchDocument patch   = serializer.DeserializePatch(patchJson);
+ShapePatchResult   result  = new ShapePatchApplier().TryApply(restored, patch);
+
+if (result.Succeeded)
+    restored = result.Definition;
+else
+    Report(result.Diagnostics);
+```
+
+`ShapePatchApplier` works on a deep copy and publishes the result only after final validation succeeds. The source definition therefore remains unchanged after an invalid operation or invalid final model. `ShapeDefinitionValidator.Analyze` provides the same structured diagnostic format for complete documents, while `ShapeDefinitionDiffer.Compare` provides deterministic semantic changes for review, tests, and tooling.
+
 Published Draft 2020-12 contracts live in:
 
 - `Packages/com.shapeforge.schema/Documentation~/Schemas`

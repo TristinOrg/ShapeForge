@@ -99,6 +99,33 @@ namespace ShapeForge.Unity.Tests
         }
 
         [Test]
+        public void PatchRoundTripPreservesReadableOperations()
+        {
+            ShapePatchDocument source = new();
+            source.Operations.Add(new()
+            {
+                Kind   = ShapePatchOperationKind.UpdateNode,
+                NodeId = "body",
+                Update = new ShapeNodeUpdate
+                {
+                    Name       = "Updated Body",
+                    MirrorAxis = ShapeMirrorAxis.X,
+                    Parameters = new() { ["width"] = 0.8f }
+                }
+            });
+            ShapeJsonSerializer serializer = new();
+
+            string             json   = serializer.Serialize(source);
+            ShapePatchDocument result = serializer.DeserializePatch(json);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.patch/1.0\""));
+            Assert.That(json, Does.Contain("\"kind\":\"updateNode\""));
+            Assert.That(json, Does.Contain("\"parameters\":{\"width\":0.8"));
+            Assert.That(result.Operations.Count, Is.EqualTo(1));
+            Assert.That(result.Operations[0].Update.MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
+        }
+
+        [Test]
         public void TemplateCatalogSerializesReadableDiscoveryData()
         {
             ShapeTemplateDescriptor descriptor = new(
