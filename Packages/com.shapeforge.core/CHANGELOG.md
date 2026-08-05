@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Added canonical biped Humanoid rig roles and engine-neutral required-role validation.
+- Added machine-readable definition diagnostics with stable codes and document paths.
 
 ## [0.1.0] - 2026-08-01
 

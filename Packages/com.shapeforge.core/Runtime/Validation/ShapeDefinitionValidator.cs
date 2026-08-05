@@ -9,6 +9,36 @@ namespace ShapeForge
     public sealed class ShapeDefinitionValidator
     {
         /// <summary>
+        /// Analyzes a definition without throwing for authored validation failures.
+        /// </summary>
+        public ShapeDiagnosticReport Analyze(ShapeDefinition definition)
+        {
+            return Analyze(definition, ShapeValidationLimits.Default);
+        }
+
+        /// <summary>
+        /// Analyzes a definition against explicit authored-complexity limits.
+        /// </summary>
+        public ShapeDiagnosticReport Analyze(ShapeDefinition definition, ShapeValidationLimits limits)
+        {
+            if (limits == null)
+                throw new ArgumentNullException(nameof(limits));
+
+            if (definition == null)
+                return Error("shape.definition.required", "A shape definition is required.");
+
+            try
+            {
+                Validate(definition, limits);
+                return ShapeDiagnosticReport.Success;
+            }
+            catch (ShapeValidationException exception)
+            {
+                return Error(exception.Code, exception.Message, exception.NodeId, exception.Path);
+            }
+        }
+
+        /// <summary>
         /// Validates schema compatibility, node identity, and required node data.
         /// </summary>
         public void Validate(ShapeDefinition definition)
@@ -28,14 +58,21 @@ namespace ShapeForge
                 throw new ArgumentNullException(nameof(limits));
 
             if (!string.Equals(definition.Schema, ShapeDefinition.CurrentSchema, StringComparison.Ordinal))
-                throw new ShapeValidationException($"Unsupported shape schema '{definition.Schema}'.");
+                throw new ShapeValidationException(
+                    "shape.schema.unsupported",
+                    $"Unsupported shape schema '{definition.Schema}'.",
+                    path: "/schema");
 
             if (definition.Root != null && definition.Root.MirrorAxis != ShapeMirrorAxis.None)
-                throw new ShapeValidationException("The root node cannot create a mirrored sibling.");
+                throw new ShapeValidationException(
+                    "shape.root.mirror",
+                    "The root node cannot create a mirrored sibling.",
+                    definition.Root.Id,
+                    "/root/mirrorAxis");
 
             HashSet<string> nodeIds = new(StringComparer.Ordinal);
             ValidationState state   = new(limits);
-            ValidateNode(definition.Root, nodeIds, state, 1);
+            ValidateNode(definition.Root, nodeIds, state, 1, "/root");
             ValidateRig(definition.Rig, nodeIds);
         }
 
@@ -95,18 +132,29 @@ namespace ShapeForge
             ShapeNode       node,
             HashSet<string> nodeIds,
             ValidationState state,
-            int             depth)
+            int             depth,
+            string          path)
         {
             if (node == null)
-                throw new ShapeValidationException("Shape definitions cannot contain null nodes.");
+                throw new ShapeValidationException(
+                    "shape.node.required",
+                    "Shape definitions cannot contain null nodes.",
+                    path: path);
 
             state.AddNode(depth);
 
             if (string.IsNullOrWhiteSpace(node.Id))
-                throw new ShapeValidationException("Every shape node requires a stable ID.");
+                throw new ShapeValidationException(
+                    "shape.node.id.required",
+                    "Every shape node requires a stable ID.",
+                    path: $"{path}/id");
 
             if (!nodeIds.Add(node.Id))
-                throw new ShapeValidationException($"Duplicate shape node ID '{node.Id}'.");
+                throw new ShapeValidationException(
+                    "shape.node.id.duplicate",
+                    $"Duplicate shape node ID '{node.Id}'.",
+                    node.Id,
+                    $"{path}/id");
 
             if (string.IsNullOrWhiteSpace(node.Type))
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a type.");
@@ -208,8 +256,17 @@ namespace ShapeForge
             if (node.Children == null)
                 throw new ShapeValidationException($"Shape node '{node.Id}' requires a child collection.");
 
-            foreach (ShapeNode child in node.Children)
-                ValidateNode(child, nodeIds, state, depth + 1);
+            for (int index = 0; index < node.Children.Count; index++)
+                ValidateNode(node.Children[index], nodeIds, state, depth + 1, $"{path}/children/{index}");
+        }
+
+        private static ShapeDiagnosticReport Error(
+            string code,
+            string message,
+            string nodeId = null,
+            string path = null)
+        {
+            return new(new[] { new ShapeDiagnostic(code, ShapeDiagnosticSeverity.Error, message, nodeId, path) });
         }
 
         private static void ValidateTransform(ShapeNode node)

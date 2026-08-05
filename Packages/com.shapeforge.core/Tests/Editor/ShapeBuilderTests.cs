@@ -150,6 +150,39 @@ namespace ShapeForge.Tests
         }
 
         [Test]
+        public void AnalyzerReturnsSuccessForValidDefinition()
+        {
+            ShapeDefinition definition = ShapeBuilder
+                .Create("Valid")
+                .Root("root", "Root")
+                .Build();
+
+            ShapeDiagnosticReport report = new ShapeDefinitionValidator().Analyze(definition);
+
+            Assert.That(report.IsValid, Is.True);
+            Assert.That(report.Diagnostics, Is.Empty);
+        }
+
+        [Test]
+        public void AnalyzerReturnsStableNodeContextWithoutThrowing()
+        {
+            ShapeNode root = new("duplicate", "Root", ShapeTypes.Group);
+            root.Add(new("duplicate", "Child", ShapeTypes.Group));
+            ShapeDefinition definition = new()
+            {
+                Root = root
+            };
+
+            ShapeDiagnosticReport report = new ShapeDefinitionValidator().Analyze(definition);
+
+            Assert.That(report.IsValid, Is.False);
+            Assert.That(report.Diagnostics.Count, Is.EqualTo(1));
+            Assert.That(report.Diagnostics[0].Code, Is.EqualTo("shape.node.id.duplicate"));
+            Assert.That(report.Diagnostics[0].NodeId, Is.EqualTo("duplicate"));
+            Assert.That(report.Diagnostics[0].Path, Is.EqualTo("/root/children/0/id"));
+        }
+
+        [Test]
         public void BuildCreatesResolvableSemanticRig()
         {
             ShapeDefinition definition = ShapeBuilder
