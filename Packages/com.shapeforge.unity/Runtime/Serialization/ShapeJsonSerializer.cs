@@ -102,6 +102,20 @@ namespace ShapeForge.Unity
             return policy;
         }
 
+        /// <summary>Deserializes and validates a versioned reference assessment.</summary>
+        public ShapeReferenceAssessment DeserializeReferenceAssessment(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Reference-assessment JSON cannot be empty.", nameof(json));
+
+            ShapeReferenceAssessment assessment = JsonConvert.DeserializeObject<ShapeReferenceAssessment>(json, Settings) ??
+                                                  throw new JsonSerializationException("Reference-assessment JSON produced no assessment.");
+            ShapeDiagnosticReport report = new ShapeReferenceAssessmentValidator().Analyze(assessment);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return assessment;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>
