@@ -76,6 +76,33 @@ namespace ShapeForge.Unity
         }
 
         /// <summary>
+        /// Serializes a declarative game-asset quality policy for external authoring tools.
+        /// </summary>
+        public string Serialize(ShapeQualityPolicy policy)
+        {
+            if (policy == null)
+                throw new ArgumentNullException(nameof(policy));
+
+            return JsonConvert.SerializeObject(policy, Settings);
+        }
+
+        /// <summary>
+        /// Deserializes a versioned ShapeForge quality-policy document.
+        /// </summary>
+        public ShapeQualityPolicy DeserializeQualityPolicy(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Quality-policy JSON cannot be empty.", nameof(json));
+
+            ShapeQualityPolicy policy = JsonConvert.DeserializeObject<ShapeQualityPolicy>(json, Settings) ??
+                                        throw new JsonSerializationException("Quality-policy JSON produced no policy.");
+            if (!string.Equals(policy.Schema, ShapeQualityPolicy.CurrentSchema, StringComparison.Ordinal))
+                throw new JsonSerializationException($"Unsupported quality-policy schema '{policy.Schema}'.");
+
+            return policy;
+        }
+
+        /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>
         public string Serialize(ShapeStyleDefinition definition)

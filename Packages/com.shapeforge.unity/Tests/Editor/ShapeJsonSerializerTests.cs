@@ -126,6 +126,31 @@ namespace ShapeForge.Unity.Tests
         }
 
         [Test]
+        public void QualityPolicyRoundTripPreservesSemanticRequirements()
+        {
+            ShapeQualityPolicy source = new()
+            {
+                Id                    = "hero/runtime",
+                RequiredRigType       = "humanoid/basic",
+                MaximumNodeCount      = 128,
+                MaximumHierarchyDepth = 16
+            };
+            source.RequiredNodeIds.Add("weapon/socket");
+            source.RequiredShapeTypes.Add("lowpoly/grip");
+            source.RequiredRigRoles.Add(ShapeRigRoles.RightHand);
+            ShapeJsonSerializer serializer = new();
+
+            string             json   = serializer.Serialize(source);
+            ShapeQualityPolicy result = serializer.DeserializeQualityPolicy(json);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.quality/1.0\""));
+            Assert.That(json, Does.Contain("\"requiredNodeIds\":[\"weapon/socket\"]"));
+            Assert.That(json, Does.Contain("\"requiredRigRoles\":[\"humanoid/right-hand\"]"));
+            Assert.That(result.Id, Is.EqualTo("hero/runtime"));
+            Assert.That(result.MaximumHierarchyDepth, Is.EqualTo(16));
+        }
+
+        [Test]
         public void TemplateCatalogSerializesReadableDiscoveryData()
         {
             ShapeTemplateDescriptor descriptor = new(

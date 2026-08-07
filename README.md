@@ -200,6 +200,26 @@ else
 
 `ShapePatchApplier` works on a deep copy and publishes the result only after final validation succeeds. The source definition therefore remains unchanged after an invalid operation or invalid final model. `ShapeDefinitionValidator.Analyze` provides the same structured diagnostic format for complete documents, while `ShapeDefinitionDiffer.Compare` provides deterministic semantic changes for review, tests, and tooling.
 
+Use a versioned `shapeforge.quality/1.0` policy as the acceptance boundary for a game-ready asset. A policy can require stable nodes, shape capabilities, a rig type, semantic rig roles, and structural complexity limits:
+
+```csharp
+ShapeQualityPolicy policy = serializer.DeserializeQualityPolicy(policyJson);
+ShapeQualityReport quality = new ShapeQualityGate().Evaluate(restored, policy);
+
+if (!quality.Passed)
+    RequestPatch(quality.Diagnostics, quality.Metrics);
+```
+
+This forms a deterministic authoring loop:
+
+```text
+Definition -> Quality Gate -> diagnostics -> LLM-authored Patch
+     ^                                      |
+     +------------- atomic apply <----------+
+```
+
+Quality Gate checks semantic completeness; it does not claim visual similarity. A later Render Compare layer can contribute visual diagnostics to the same correction loop without coupling Core to a vision provider or rendering engine.
+
 Published Draft 2020-12 contracts live in:
 
 - `Packages/com.shapeforge.schema/Documentation~/Schemas`
