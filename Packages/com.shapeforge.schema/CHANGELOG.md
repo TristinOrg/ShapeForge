@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Added versioned, engine-neutral ShapePatch contracts for structural and authored-value edits.
+- Added a versioned quality-policy contract for semantic and structural asset requirements.
 
 ## [0.1.0] - 2026-08-01
 

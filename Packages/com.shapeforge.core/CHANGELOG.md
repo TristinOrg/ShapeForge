@@ -6,6 +6,7 @@
 - Added machine-readable definition diagnostics with stable codes and document paths.
 - Added deterministic definition diffs for node additions, removals, moves, and authored values.
 - Added atomic ShapePatch application with structured failure diagnostics.
+- Added declarative game-asset quality gates with structural metrics and stable diagnostics.
 
 ## [0.1.0] - 2026-08-01
 
