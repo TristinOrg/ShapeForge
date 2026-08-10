@@ -11,6 +11,7 @@
 - Added semantic detail inventory validation and definition coverage analysis.
 - Added provider-neutral render comparison validation and weighted score aggregation.
 - Added resumable construction-pass scheduling and atomic ShapePatch execution.
+- Added engine-neutral anchors, damage zones, collider/LOD rules, and stable-node analysis.
 
 ## [0.1.0] - 2026-08-01
 
