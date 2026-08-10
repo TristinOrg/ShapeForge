@@ -113,7 +113,10 @@ def run_repository(_: argparse.Namespace) -> int:
 
 
 def run_image_compare(args: argparse.Namespace) -> int:
-    from tools.shapeforge_image_compare import compare_manifests
+    try:
+        from tools.shapeforge_image_compare import compare_manifests
+    except ModuleNotFoundError:
+        from shapeforge_image_compare import compare_manifests
 
     result = compare_manifests(Path(args.reference).resolve(), Path(args.candidate).resolve())
     output = json.dumps(result, indent=2, ensure_ascii=False)
@@ -123,6 +126,20 @@ def run_image_compare(args: argparse.Namespace) -> int:
         output_path.write_text(output + "\n", encoding="utf-8")
     else:
         print(output)
+    return 0
+
+
+def run_image_reconstruction(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_reconstruct_images import cli_invoke, reconstruct_images
+    except ModuleNotFoundError:
+        from shapeforge_reconstruct_images import cli_invoke, reconstruct_images
+
+    result = reconstruct_images(
+        Path(args.source), Path(args.reference), Path(args.capture), Path(args.output), Path(args.work),
+        args.max_iterations, args.target_score, args.min_improvement, cli_invoke,
+    )
+    print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
 
@@ -227,6 +244,16 @@ def parser() -> argparse.ArgumentParser:
     image_compare.add_argument("candidate", help="Candidate Render Capture manifest")
     image_compare.add_argument("-o", "--output", help="Output Render Compare JSON")
     image_compare.set_defaults(handler=run_image_compare)
+    image_reconstruct = commands.add_parser("image-reconstruct")
+    image_reconstruct.add_argument("source", help="Initial ShapeDefinition JSON")
+    image_reconstruct.add_argument("reference", help="Reference Images manifest")
+    image_reconstruct.add_argument("capture", help="Render Capture template")
+    image_reconstruct.add_argument("-o", "--output", required=True, help="Best output ShapeDefinition")
+    image_reconstruct.add_argument("--work", required=True, help="Iteration artifacts folder")
+    image_reconstruct.add_argument("--max-iterations", type=int, default=8)
+    image_reconstruct.add_argument("--target-score", type=float, default=0.9)
+    image_reconstruct.add_argument("--min-improvement", type=float, default=0.005)
+    image_reconstruct.set_defaults(handler=run_image_reconstruction)
     repository = commands.add_parser("repository")
     repository.set_defaults(handler=run_repository)
     verify = commands.add_parser("verify")

@@ -80,6 +80,28 @@ def compare_images(reference: Image.Image, candidate: Image.Image) -> tuple[dict
     return scores, observations
 
 
+def measure_manifest_aspects(reference_path: Path, candidate_path: Path) -> dict[str, dict[str, float]]:
+    """Return raw foreground aspect ratios for deterministic global proportion patches."""
+    reference = _read_json(reference_path)
+    candidate = _read_json(candidate_path)
+    reference_views = _index_views(reference.get("images"), "reference")
+    candidate_views = _index_views(candidate.get("images"), "candidate")
+    result = {}
+    for view_id, reference_view in reference_views.items():
+        if view_id not in candidate_views:
+            continue
+        reference_image = _load_view(reference_path.parent, reference_view["imagePath"])
+        candidate_image = _load_view(candidate_path.parent, candidate_views[view_id]["imagePath"])
+        _, _, reference_box = _prepare(reference_image)
+        _, _, candidate_box = _prepare(candidate_image)
+        result[view_id] = {
+            "reference": reference_box[0] / max(reference_box[1], 1),
+            "candidate": candidate_box[0] / max(candidate_box[1], 1),
+            "weight": float(reference_view.get("weight", 1.0)),
+        }
+    return result
+
+
 def _prepare(image: Image.Image) -> tuple[np.ndarray, np.ndarray, tuple[int, int]]:
     rgba = np.asarray(image.convert("RGBA"), dtype=np.uint8)
     mask = _foreground_mask(rgba)

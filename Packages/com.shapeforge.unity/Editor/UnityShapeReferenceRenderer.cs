@@ -51,7 +51,7 @@ namespace ShapeForge.Unity.Editor
                     string fileName = $"{Sanitize(view.Id)}.png";
                     string fullPath = Path.GetFullPath(Path.Combine(outputFolder, fileName));
                     RenderPng(camera, request.Width, request.Height, fullPath);
-                    manifest.Images.Add(new() { ViewId = view.Id, ImagePath = fileName });
+                    manifest.Images.Add(new() { ViewId = view.Id, ImagePath = fullPath.Replace('\\', '/') });
                 }
                 return manifest;
             }

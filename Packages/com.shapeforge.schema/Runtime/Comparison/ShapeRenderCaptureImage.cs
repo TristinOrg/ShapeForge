@@ -10,7 +10,7 @@ namespace ShapeForge
     {
         /// <summary>Gets or sets the stable view identifier.</summary>
         public string ViewId { get; set; } = string.Empty;
-        /// <summary>Gets or sets the normalized portable PNG path.</summary>
+        /// <summary>Gets or sets the normalized PNG filesystem path.</summary>
         public string ImagePath { get; set; } = string.Empty;
     }
 }
