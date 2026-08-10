@@ -241,6 +241,22 @@ External models should output semantic node IDs, meaningful part names, palette 
 
 ShapeForge contains no OpenAI, Gemini, or other provider client. Applications own provider selection, credentials, prompting, retries, and content policy.
 
+## Automation CLI
+
+`tools/shapeforge.py` keeps orchestration in Python while executing model rules through the authoritative ShapeForge C# assemblies inside Unity:
+
+```text
+python tools/shapeforge.py validate model.json
+python tools/shapeforge.py diff before.json after.json
+python tools/shapeforge.py patch model.json change.json -o updated.json
+python tools/shapeforge.py quality model.json policy.json
+python tools/shapeforge.py assess assessment.json
+python tools/shapeforge.py repository
+python tools/shapeforge.py verify
+```
+
+Document commands require the Unity MCP server. `verify` refreshes assets and runs the three ShapeForge EditMode test assemblies while excluding Unity package tests. It rejects zero-test runs, survives temporary MCP reconnects, and automatically selects the connected ShapeForge Editor when multiple Unity projects are open. Use `--instance Name@hash` only when automatic selection is ambiguous. The CLI has no third-party Python dependency and never reimplements Core validation or patch semantics.
+
 ## Reference-image boundary
 
 Schema and Core provide the generic `shapeforge.reference/1.0` contract for aligned front, side, and optional back observations. Coverage analysis reports missing views and cross-view height disagreement.

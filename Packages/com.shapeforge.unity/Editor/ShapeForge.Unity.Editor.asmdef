@@ -2,6 +2,7 @@
   "name": "ShapeForge.Unity.Editor",
   "rootNamespace": "ShapeForge.Unity.Editor",
   "references": [
+    "ShapeForge.Schema",
     "ShapeForge.Core",
     "ShapeForge.Unity"
   ],

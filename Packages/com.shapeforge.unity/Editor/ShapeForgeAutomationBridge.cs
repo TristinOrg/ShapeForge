@@ -46,7 +46,7 @@ namespace ShapeForge.Unity.Editor
             {
                 case "validate":
                 {
-                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    ShapeDefinition definition = JsonConvert.DeserializeObject<ShapeDefinition>(Read(request.Source), Settings);
                     ShapeDiagnosticReport report = new ShapeDefinitionValidator().Analyze(definition);
                     return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }
@@ -76,7 +76,8 @@ namespace ShapeForge.Unity.Editor
                 }
                 case "assess":
                 {
-                    ShapeReferenceAssessment assessment = serializer.DeserializeReferenceAssessment(Read(request.Source));
+                    ShapeReferenceAssessment assessment =
+                        JsonConvert.DeserializeObject<ShapeReferenceAssessment>(Read(request.Source), Settings);
                     ShapeDiagnosticReport report = new ShapeReferenceAssessmentValidator().Analyze(assessment);
                     return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }

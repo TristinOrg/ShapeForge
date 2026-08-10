@@ -25,6 +25,8 @@
 .vscode/
 .idea/
 .gradle/
+__pycache__/
+*.py[cod]
 
 *.apk
 *.aab
@@ -32,4 +34,3 @@
 
 # Local AI collaboration instructions.
 AGENTS.md
-
