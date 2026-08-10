@@ -276,6 +276,8 @@ Render Compare remains provider-neutral. External tools render reference/candida
 
 Game Semantic Metadata is also portable. A `shapeforge.game-metadata/1.0` document binds sockets, grips, interaction and IK anchors, damage zones, collider rules, LOD membership, and gameplay tags to stable node IDs. Core validates those bindings; the Unity adapter compiles them into child transforms, native colliders, `LODGroup`, and a cached runtime manifest. This keeps gameplay intent readable and editable without placing Unity types in Core.
 
+The official Low Poly semantic library now covers the ordered Hair, Armor, Weapon, Building, and Vehicle categories alongside the stylized-human template. Catalog descriptors expose bounded dimensions for tool discovery. Each template compiles stable node IDs and can publish a matching Detail Inventory and Quality Policy; versioned JSON Schema and representative specifications live under `Packages/com.shapeforge.lowpoly/Documentation~/Templates`.
+
 Construction Plans organize generation into resumable dependency-ordered passes: Structure, Primary Forms, Secondary Forms, Details, Appearance, Gameplay Semantics, and Final Quality. Each pass owns an atomic ShapePatch and an optional post-pass quality-policy ID. The evaluator derives ready and blocked passes; the executor applies one ready patch to cloned state and advances the plan only on success.
 
 ## Semantic templates
