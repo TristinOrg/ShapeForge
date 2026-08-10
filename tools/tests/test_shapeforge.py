@@ -51,7 +51,8 @@ class ShapeForgeCliTests(unittest.TestCase):
         help_text = shapeforge.parser().format_help()
         for command in (
             "validate", "diff", "patch", "quality", "assess", "inventory", "compare",
-            "plan", "step", "repository", "verify"
+            "plan", "step", "render", "image-compare", "reconstruct", "discover",
+            "repository", "verify"
         ):
             self.assertIn(command, help_text)
 

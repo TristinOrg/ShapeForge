@@ -112,6 +112,20 @@ def run_repository(_: argparse.Namespace) -> int:
     return subprocess.run([sys.executable, ROOT / ".github/scripts/validate_repository.py"], cwd=ROOT).returncode
 
 
+def run_image_compare(args: argparse.Namespace) -> int:
+    from tools.shapeforge_image_compare import compare_manifests
+
+    result = compare_manifests(Path(args.reference).resolve(), Path(args.candidate).resolve())
+    output = json.dumps(result, indent=2, ensure_ascii=False)
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(output + "\n", encoding="utf-8")
+    else:
+        print(output)
+    return 0
+
+
 def run_verify(args: argparse.Namespace) -> int:
     client = McpClient(args.instance)
     client.call("read_console", {"action": "clear"})
@@ -208,6 +222,11 @@ def parser() -> argparse.ArgumentParser:
     discover = commands.add_parser("discover")
     discover.add_argument("-o", "--output")
     discover.set_defaults(handler=run_document, source=None, other=None, argument=None)
+    image_compare = commands.add_parser("image-compare")
+    image_compare.add_argument("reference", help="Reference Images manifest")
+    image_compare.add_argument("candidate", help="Candidate Render Capture manifest")
+    image_compare.add_argument("-o", "--output", help="Output Render Compare JSON")
+    image_compare.set_defaults(handler=run_image_compare)
     repository = commands.add_parser("repository")
     repository.set_defaults(handler=run_repository)
     verify = commands.add_parser("verify")
