@@ -148,6 +148,36 @@ namespace ShapeForge.Unity.Editor
                     };
                     return Result(true, data);
                 }
+                case "render":
+                {
+                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    ShapeRenderCaptureRequest capture =
+                        serializer.DeserializeRenderCaptureRequest(Read(request.Other));
+                    string outputFolder = string.IsNullOrWhiteSpace(request.Argument)
+                        ? Path.Combine("Library", "ShapeForgeAutomation", "renders")
+                        : Path.GetFullPath(request.Argument);
+                    UnityEngine.GameObject generated = null;
+                    try
+                    {
+                        foreach (IShapeAutomationModelCompiler compiler in ShapeAutomationCatalogRegistry.GetModelCompilers())
+                        {
+                            if (!compiler.CanCompile(definition))
+                                continue;
+                            generated = compiler.Compile(definition);
+                            break;
+                        }
+                        if (generated == null)
+                            throw new InvalidOperationException("No registered automation compiler supports this definition.");
+                        ShapeRenderCaptureManifest manifest =
+                            UnityShapeReferenceRenderer.Render(generated, capture, outputFolder);
+                        return Result(true, JToken.FromObject(manifest, JsonSerializer.Create(Settings)));
+                    }
+                    finally
+                    {
+                        if (generated != null)
+                            UnityEngine.Object.DestroyImmediate(generated);
+                    }
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }

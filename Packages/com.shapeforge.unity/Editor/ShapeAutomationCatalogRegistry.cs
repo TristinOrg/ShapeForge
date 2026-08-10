@@ -35,6 +35,19 @@ namespace ShapeForge.Unity.Editor
             return result;
         }
 
+        /// <summary>Gets registered temporary model compilers in stable provider order.</summary>
+        public static IReadOnlyList<IShapeAutomationModelCompiler> GetModelCompilers()
+        {
+            IReadOnlyList<IShapeAutomationCatalogProvider> providers = GetProviders();
+            List<IShapeAutomationModelCompiler> result = new();
+            foreach (IShapeAutomationCatalogProvider provider in providers)
+            {
+                if (provider is IShapeAutomationModelCompiler compiler)
+                    result.Add(compiler);
+            }
+            return result;
+        }
+
         /// <summary>Publishes the always-available engine-neutral Core catalog.</summary>
         private sealed class CoreCatalogProvider : IShapeAutomationCatalogProvider
         {

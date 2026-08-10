@@ -22,6 +22,7 @@ namespace ShapeForge.Unity.Tests
             string constructionSchema = ReadText("Schemas/shapeforge.construction-plan-1.0.schema.json");
             string gameSchema = ReadText("Schemas/shapeforge.game-metadata-1.0.schema.json");
             string reconstructionSchema = ReadText("Schemas/shapeforge.reconstruction-1.0.schema.json");
+            string captureSchema = ReadText("Schemas/shapeforge.render-capture-1.0.schema.json");
 
             Assert.That(shapeSchema, Does.Contain($"\"const\": \"{ShapeDefinition.CurrentSchema}\""));
             Assert.That(styleSchema, Does.Contain($"\"const\": \"{ShapeStyleDefinition.CurrentSchema}\""));
@@ -33,6 +34,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(constructionSchema, Does.Contain($"\"const\": \"{ShapeConstructionPlan.CurrentSchema}\""));
             Assert.That(gameSchema, Does.Contain($"\"const\": \"{ShapeGameMetadata.CurrentSchema}\""));
             Assert.That(reconstructionSchema, Does.Contain($"\"const\": \"{ShapeReconstructionWorkflow.CurrentSchema}\""));
+            Assert.That(captureSchema, Does.Contain($"\"const\": \"{ShapeRenderCaptureRequest.CurrentSchema}\""));
             Assert.That(shapeSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
             Assert.That(styleSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
             Assert.That(patchSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
@@ -53,6 +55,7 @@ namespace ShapeForge.Unity.Tests
             string              constructionJson = ReadText("Examples/minimal-construction-plan.json");
             string              gameJson = ReadText("Examples/minimal-game-metadata.json");
             string              reconstructionJson = ReadText("Examples/minimal-reconstruction.json");
+            string              captureJson = ReadText("Examples/minimal-render-capture.json");
 
             ShapeDefinition      shape = serializer.DeserializeShape(shapeJson);
             ShapeStyleDefinition style = serializer.DeserializeStyle(styleJson);
@@ -65,6 +68,7 @@ namespace ShapeForge.Unity.Tests
             ShapeGameMetadata game = serializer.DeserializeGameMetadata(gameJson);
             ShapeReconstructionWorkflow reconstruction =
                 serializer.DeserializeReconstructionWorkflow(reconstructionJson);
+            ShapeRenderCaptureRequest capture = serializer.DeserializeRenderCaptureRequest(captureJson);
 
             Assert.That(shape.Root.Id, Is.EqualTo("model"));
             Assert.That(style.Id, Is.EqualTo("example/default"));
@@ -76,6 +80,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(construction.Passes[1].DependsOn[0], Is.EqualTo("structure"));
             Assert.That(game.Anchors[0].NodeId, Is.EqualTo("model"));
             Assert.That(reconstruction.Definition.Root.Id, Is.EqualTo("model"));
+            Assert.That(capture.Views, Has.Count.EqualTo(3));
         }
 
         private static string ReadText(string relativePath)

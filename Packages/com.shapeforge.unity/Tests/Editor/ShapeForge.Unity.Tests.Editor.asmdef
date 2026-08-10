@@ -4,7 +4,8 @@
   "references": [
     "ShapeForge.Schema",
     "ShapeForge.Core",
-    "ShapeForge.Unity"
+    "ShapeForge.Unity",
+    "ShapeForge.Unity.Editor"
   ],
   "includePlatforms": [
     "Editor"

@@ -144,6 +144,20 @@ namespace ShapeForge.Unity
             return comparison;
         }
 
+        /// <summary>Deserializes and validates an engine-neutral render-capture request.</summary>
+        public ShapeRenderCaptureRequest DeserializeRenderCaptureRequest(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Render-capture JSON cannot be empty.", nameof(json));
+
+            ShapeRenderCaptureRequest request = JsonConvert.DeserializeObject<ShapeRenderCaptureRequest>(json, Settings) ??
+                                                throw new JsonSerializationException("Render-capture JSON produced no request.");
+            ShapeDiagnosticReport report = new ShapeRenderCaptureRequestValidator().Analyze(request);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return request;
+        }
+
         /// <summary>Deserializes and validates a resumable construction plan.</summary>
         public ShapeConstructionPlan DeserializeConstructionPlan(string json)
         {
