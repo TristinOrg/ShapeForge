@@ -117,6 +117,13 @@ namespace ShapeForge.Unity.Editor
                     }
                     return Result(result.Succeeded, data);
                 }
+                case "game":
+                {
+                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    ShapeGameMetadata metadata  = serializer.DeserializeGameMetadata(Read(request.Other));
+                    ShapeGameMetadataReport report = new ShapeGameMetadataAnalyzer().Analyze(definition, metadata);
+                    return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }

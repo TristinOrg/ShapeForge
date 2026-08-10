@@ -180,7 +180,7 @@ def parser() -> argparse.ArgumentParser:
     commands = result.add_subparsers(dest="command", required=True)
     for name, other in (("validate", None), ("diff", "after"), ("patch", "patch"),
                         ("quality", "policy"), ("assess", None), ("inventory", "inventory"),
-                        ("compare", None)):
+                        ("compare", None), ("game", "metadata")):
         command = commands.add_parser(name)
         command.add_argument("source")
         if other:

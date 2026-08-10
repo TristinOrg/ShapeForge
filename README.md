@@ -257,6 +257,7 @@ python tools/shapeforge.py inventory model.json inventory.json
 python tools/shapeforge.py compare comparison.json
 python tools/shapeforge.py plan construction-plan.json
 python tools/shapeforge.py step model.json construction-plan.json --pass structure -o result.json
+python tools/shapeforge.py game model.json game-metadata.json
 python tools/shapeforge.py repository
 python tools/shapeforge.py verify
 ```
@@ -272,6 +273,8 @@ The Low Poly reference mapper can turn compatible semantic silhouettes into Prof
 Reference Assessment records camera, confidence, visible features, and uncertainty before construction. A `shapeforge.detail-inventory/1.0` document then lists every semantic part, its category and parent, repetition, confidence, and expected stable node ID. `ShapeDetailCoverageAnalyzer` reports required details as errors and unresolved optional details as warnings, so staged builders and LLMs can request focused patches instead of silently dropping features.
 
 Render Compare remains provider-neutral. External tools render reference/candidate views and supply a `shapeforge.render-compare/1.0` observation document. Core validates named views, normalized silhouette/proportion/color/detail scores, confidence, and localized discrepancies, then aggregates them deterministically. Discrepancies can target stable ShapeDefinition nodes and Detail Inventory IDs and carry correction hints suitable for the next ShapePatch. ShapeForge does not perform hidden image inference in Core.
+
+Game Semantic Metadata is also portable. A `shapeforge.game-metadata/1.0` document binds sockets, grips, interaction and IK anchors, damage zones, collider rules, LOD membership, and gameplay tags to stable node IDs. Core validates those bindings; the Unity adapter compiles them into child transforms, native colliders, `LODGroup`, and a cached runtime manifest. This keeps gameplay intent readable and editable without placing Unity types in Core.
 
 Construction Plans organize generation into resumable dependency-ordered passes: Structure, Primary Forms, Secondary Forms, Details, Appearance, Gameplay Semantics, and Final Quality. Each pass owns an atomic ShapePatch and an optional post-pass quality-policy ID. The evaluator derives ready and blocked passes; the executor applies one ready patch to cloned state and advances the plan only on success.
 

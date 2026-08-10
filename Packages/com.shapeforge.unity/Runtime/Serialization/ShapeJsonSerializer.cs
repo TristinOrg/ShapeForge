@@ -158,6 +158,20 @@ namespace ShapeForge.Unity
             return plan;
         }
 
+        /// <summary>Deserializes and validates portable game-semantic metadata.</summary>
+        public ShapeGameMetadata DeserializeGameMetadata(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Game-metadata JSON cannot be empty.", nameof(json));
+
+            ShapeGameMetadata metadata = JsonConvert.DeserializeObject<ShapeGameMetadata>(json, Settings) ??
+                                         throw new JsonSerializationException("Game-metadata JSON produced no metadata.");
+            ShapeDiagnosticReport report = new ShapeGameMetadataValidator().Analyze(metadata);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return metadata;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>
