@@ -259,6 +259,7 @@ python tools/shapeforge.py plan construction-plan.json
 python tools/shapeforge.py step model.json construction-plan.json --pass structure -o result.json
 python tools/shapeforge.py game model.json game-metadata.json
 python tools/shapeforge.py reconstruct reconstruction.json -o next-step.json
+python tools/shapeforge.py discover -o catalogs.json
 python tools/shapeforge.py repository
 python tools/shapeforge.py verify
 ```

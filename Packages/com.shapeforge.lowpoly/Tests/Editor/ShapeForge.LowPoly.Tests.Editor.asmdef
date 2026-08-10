@@ -6,7 +6,8 @@
     "ShapeForge.Core",
     "ShapeForge.Unity",
     "ShapeForge.Unity.Editor",
-    "ShapeForge.LowPoly"
+    "ShapeForge.LowPoly",
+    "ShapeForge.LowPoly.Editor"
   ],
   "includePlatforms": [
     "Editor"

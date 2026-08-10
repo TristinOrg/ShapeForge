@@ -79,7 +79,9 @@ def run_document(args: argparse.Namespace) -> int:
     WORK.mkdir(parents=True, exist_ok=True)
     result_path = WORK / "result.json"
     result_path.unlink(missing_ok=True)
-    request = {"command": args.command, "source": str(Path(args.source).resolve())}
+    request = {"command": args.command}
+    if getattr(args, "source", None):
+        request["source"] = str(Path(args.source).resolve())
     if getattr(args, "other", None):
         request["other"] = str(Path(args.other).resolve())
     if getattr(args, "argument", None):
@@ -197,6 +199,9 @@ def parser() -> argparse.ArgumentParser:
     step.add_argument("--pass", dest="argument", required=True, help="Ready pass ID")
     step.add_argument("-o", "--output")
     step.set_defaults(handler=run_document)
+    discover = commands.add_parser("discover")
+    discover.add_argument("-o", "--output")
+    discover.set_defaults(handler=run_document, source=None, other=None, argument=None)
     repository = commands.add_parser("repository")
     repository.set_defaults(handler=run_repository)
     verify = commands.add_parser("verify")

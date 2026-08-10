@@ -131,6 +131,23 @@ namespace ShapeForge.Unity.Editor
                     ShapeReconstructionStepResult result = new ShapeReconstructionOrchestrator().Advance(workflow);
                     return Result(result.Succeeded, JToken.FromObject(result, JsonSerializer.Create(Settings)));
                 }
+                case "discover":
+                {
+                    JsonSerializer json = JsonSerializer.Create(Settings);
+                    JArray capabilities = new();
+                    JArray templates    = new();
+                    foreach (IShapeAutomationCatalogProvider provider in ShapeAutomationCatalogRegistry.GetProviders())
+                    {
+                        capabilities.Add(JToken.FromObject(provider.CreateCapabilities(), json));
+                        templates.Add(JToken.FromObject(provider.CreateTemplates(), json));
+                    }
+                    JObject data = new()
+                    {
+                        ["capabilities"] = capabilities,
+                        ["templates"]    = templates
+                    };
+                    return Result(true, data);
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }
