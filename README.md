@@ -281,6 +281,12 @@ The official Low Poly semantic library now covers the ordered Hair, Armor, Weapo
 
 Reconstruction Orchestration persists Assessment, Detail Inventory, Construction Plan, Render Compare, reviewed ShapePatch, and Quality Policy as one `shapeforge.reconstruction/1.0` workflow. `ShapeReconstructionOrchestrator` advances exactly one deterministic stage, applies corrections transactionally, and stops at an authored iteration bound. Python only transports requests to the C# implementation; providers remain outside ShapeForge.
 
+### MotionForge boundary
+
+ShapeForge owns stable node IDs, semantic rig roles, authored local rest poses, joint rotation limits, and writable transform targets. `ShapeMotionBindingResolver` validates those contracts once and caches role-to-target bindings for an external motion system. It can clamp offsets and restore the authored rest pose without knowing about clips.
+
+MotionForge should own motion intent, clips, tracks, keyframes, curves, interpolation, composition, and serialization. Engine adapters should own playback, blending, IK, retargeting, and runtime optimization. None of those concerns belong in ShapeForge Core.
+
 Construction Plans organize generation into resumable dependency-ordered passes: Structure, Primary Forms, Secondary Forms, Details, Appearance, Gameplay Semantics, and Final Quality. Each pass owns an atomic ShapePatch and an optional post-pass quality-policy ID. The evaluator derives ready and blocked passes; the executor applies one ready patch to cloned state and advances the plan only on success.
 
 ## Semantic templates
