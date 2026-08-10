@@ -171,6 +171,38 @@ namespace ShapeForge.Unity.Tests
         }
 
         [Test]
+        public void RenderComparisonRoundTripPreservesScoresAndTargets()
+        {
+            ShapeRenderComparison source = new()
+            {
+                ReferenceId = "hero/reference",
+                CandidateId = "hero/revision"
+            };
+            source.Views.Add(new()
+            {
+                ViewId = "front", Confidence = 0.9f,
+                Scores = new ShapeComparisonScores
+                {
+                    Silhouette = 0.8f, Proportion = 0.7f, Color = 0.6f, Detail = 0.5f
+                }
+            });
+            source.Discrepancies.Add(new()
+            {
+                Id = "head", ViewId = "front", NodeId = "head",
+                Severity = ShapeVisualDiscrepancySeverity.Warning, Message = "Head is too wide."
+            });
+            ShapeJsonSerializer serializer = new();
+
+            string json = serializer.SerializeSpecification(source);
+            ShapeRenderComparison result = serializer.DeserializeRenderComparison(json);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.render-compare/1.0\""));
+            Assert.That(json, Does.Contain("\"severity\":\"warning\""));
+            Assert.That(result.Views[0].Scores.Proportion, Is.EqualTo(0.7f));
+            Assert.That(result.Discrepancies[0].NodeId, Is.EqualTo("head"));
+        }
+
+        [Test]
         public void TemplateCatalogSerializesReadableDiscoveryData()
         {
             ShapeTemplateDescriptor descriptor = new(

@@ -88,6 +88,12 @@ namespace ShapeForge.Unity.Editor
                     ShapeDetailCoverageReport report = new ShapeDetailCoverageAnalyzer().Analyze(definition, inventory);
                     return Result(report.Passed, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }
+                case "compare":
+                {
+                    ShapeRenderComparison comparison = serializer.DeserializeRenderComparison(Read(request.Source));
+                    ShapeRenderCompareReport report = new ShapeRenderCompareAggregator().Aggregate(comparison);
+                    return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }

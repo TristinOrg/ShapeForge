@@ -130,6 +130,20 @@ namespace ShapeForge.Unity
             return inventory;
         }
 
+        /// <summary>Deserializes and validates provider-neutral render comparison observations.</summary>
+        public ShapeRenderComparison DeserializeRenderComparison(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Render-comparison JSON cannot be empty.", nameof(json));
+
+            ShapeRenderComparison comparison = JsonConvert.DeserializeObject<ShapeRenderComparison>(json, Settings) ??
+                                               throw new JsonSerializationException("Render-comparison JSON produced no comparison.");
+            ShapeDiagnosticReport report = new ShapeRenderComparisonValidator().Analyze(comparison);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return comparison;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>

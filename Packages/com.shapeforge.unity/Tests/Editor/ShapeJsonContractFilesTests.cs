@@ -18,6 +18,7 @@ namespace ShapeForge.Unity.Tests
             string qualitySchema = ReadText("Schemas/shapeforge.quality-1.0.schema.json");
             string assessmentSchema = ReadText("Schemas/shapeforge.reference-assessment-1.0.schema.json");
             string inventorySchema = ReadText("Schemas/shapeforge.detail-inventory-1.0.schema.json");
+            string comparisonSchema = ReadText("Schemas/shapeforge.render-compare-1.0.schema.json");
 
             Assert.That(shapeSchema, Does.Contain($"\"const\": \"{ShapeDefinition.CurrentSchema}\""));
             Assert.That(styleSchema, Does.Contain($"\"const\": \"{ShapeStyleDefinition.CurrentSchema}\""));
@@ -25,6 +26,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(qualitySchema, Does.Contain($"\"const\": \"{ShapeQualityPolicy.CurrentSchema}\""));
             Assert.That(assessmentSchema, Does.Contain($"\"const\": \"{ShapeReferenceAssessment.CurrentSchema}\""));
             Assert.That(inventorySchema, Does.Contain($"\"const\": \"{ShapeDetailInventory.CurrentSchema}\""));
+            Assert.That(comparisonSchema, Does.Contain($"\"const\": \"{ShapeRenderComparison.CurrentSchema}\""));
             Assert.That(shapeSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
             Assert.That(styleSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
             Assert.That(patchSchema, Does.Contain("https://json-schema.org/draft/2020-12/schema"));
@@ -41,6 +43,7 @@ namespace ShapeForge.Unity.Tests
             string              qualityJson = ReadText("Examples/minimal-quality-policy.json");
             string              assessmentJson = ReadText("Examples/minimal-reference-assessment.json");
             string              inventoryJson = ReadText("Examples/minimal-detail-inventory.json");
+            string              comparisonJson = ReadText("Examples/minimal-render-comparison.json");
 
             ShapeDefinition      shape = serializer.DeserializeShape(shapeJson);
             ShapeStyleDefinition style = serializer.DeserializeStyle(styleJson);
@@ -48,6 +51,7 @@ namespace ShapeForge.Unity.Tests
             ShapeQualityPolicy   quality = serializer.DeserializeQualityPolicy(qualityJson);
             ShapeReferenceAssessment assessment = serializer.DeserializeReferenceAssessment(assessmentJson);
             ShapeDetailInventory inventory = serializer.DeserializeDetailInventory(inventoryJson);
+            ShapeRenderComparison comparison = serializer.DeserializeRenderComparison(comparisonJson);
 
             Assert.That(shape.Root.Id, Is.EqualTo("model"));
             Assert.That(style.Id, Is.EqualTo("example/default"));
@@ -55,6 +59,7 @@ namespace ShapeForge.Unity.Tests
             Assert.That(quality.Id, Is.EqualTo("example/runtime-prop"));
             Assert.That(assessment.VisibleFeatures[0], Is.EqualTo("shoulder armor"));
             Assert.That(inventory.Details[0].Id, Is.EqualTo("body"));
+            Assert.That(comparison.Views[0].ViewId, Is.EqualTo("front"));
         }
 
         private static string ReadText(string relativePath)

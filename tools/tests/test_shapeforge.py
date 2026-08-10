@@ -50,7 +50,8 @@ class ShapeForgeCliTests(unittest.TestCase):
     def test_parser_exposes_all_commands(self):
         help_text = shapeforge.parser().format_help()
         for command in (
-            "validate", "diff", "patch", "quality", "assess", "inventory", "repository", "verify"
+            "validate", "diff", "patch", "quality", "assess", "inventory", "compare",
+            "repository", "verify"
         ):
             self.assertIn(command, help_text)
 

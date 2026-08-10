@@ -254,6 +254,7 @@ python tools/shapeforge.py patch model.json change.json -o updated.json
 python tools/shapeforge.py quality model.json policy.json
 python tools/shapeforge.py assess assessment.json
 python tools/shapeforge.py inventory model.json inventory.json
+python tools/shapeforge.py compare comparison.json
 python tools/shapeforge.py repository
 python tools/shapeforge.py verify
 ```
@@ -267,6 +268,8 @@ Schema and Core provide the generic `shapeforge.reference/1.0` contract for alig
 The Low Poly reference mapper can turn compatible semantic silhouettes into Profile Cage sections. This is deterministic geometric assistance, not image-to-3D reconstruction: hidden topology, clothing folds, textures, facial identity, and unobserved depth are not invented automatically.
 
 Reference Assessment records camera, confidence, visible features, and uncertainty before construction. A `shapeforge.detail-inventory/1.0` document then lists every semantic part, its category and parent, repetition, confidence, and expected stable node ID. `ShapeDetailCoverageAnalyzer` reports required details as errors and unresolved optional details as warnings, so staged builders and LLMs can request focused patches instead of silently dropping features.
+
+Render Compare remains provider-neutral. External tools render reference/candidate views and supply a `shapeforge.render-compare/1.0` observation document. Core validates named views, normalized silhouette/proportion/color/detail scores, confidence, and localized discrepancies, then aggregates them deterministically. Discrepancies can target stable ShapeDefinition nodes and Detail Inventory IDs and carry correction hints suitable for the next ShapePatch. ShapeForge does not perform hidden image inference in Core.
 
 ## Semantic templates
 
