@@ -12,8 +12,6 @@ namespace ShapeForge.LowPoly.Tests
     public sealed class LowPolyPrefabPersistenceTests
     {
         private const string TestFolder = "Assets/ShapeForgePrefabTests";
-        private const string PrefabPath = TestFolder + "/GeneratedHero.prefab";
-
         private GameObject generatedRoot;
         private GameObject prefabRoot;
 
@@ -36,22 +34,21 @@ namespace ShapeForge.LowPoly.Tests
             UnityShapeModelGenerator generator = new(
                 new IUnityShapeGenerator[] { new LowPolyPrimitiveGenerator() },
                 resolver);
-            generatedRoot = generator.Generate(LowPolyHeroPreset.CreateDefinition());
+            ShapeDefinition definition = LowPolyHeroPreset.CreateDefinition();
+            generatedRoot = generator.Generate(definition);
 
             AssetDatabase.CreateFolder("Assets", "ShapeForgePrefabTests");
-            string meshAssetPath = UnityGeneratedModelAssetStore.PersistMeshes(generatedRoot, TestFolder);
-            Assert.That(meshAssetPath, Is.Not.Null);
+            UnityShapePrefabCompilationResult compilation =
+                UnityShapePrefabCompiler.Compile(generatedRoot, definition, TestFolder);
+            Assert.That(compilation.MeshAssetPath, Is.Not.Null);
             Transform generatedHair = generatedRoot.transform.Find("Head Pivot/Reference Unified Hair Volume");
             Assert.That(AssetDatabase.Contains(generatedHair.GetComponent<MeshFilter>().sharedMesh), Is.True);
             Color expectedColor = generatedHair.GetComponent<Renderer>().sharedMaterial.color;
 
-            PrefabUtility.SaveAsPrefabAsset(generatedRoot, PrefabPath);
             Object.DestroyImmediate(generatedRoot);
             generatedRoot = null;
-            AssetDatabase.SaveAssets();
-            AssetDatabase.ImportAsset(PrefabPath, ImportAssetOptions.ForceSynchronousImport);
 
-            prefabRoot = PrefabUtility.LoadPrefabContents(PrefabPath);
+            prefabRoot = PrefabUtility.LoadPrefabContents(compilation.PrefabPath);
             Transform  hair         = prefabRoot.transform.Find("Head Pivot/Reference Unified Hair Volume");
             Renderer   hairRenderer = hair.GetComponent<Renderer>();
             MeshFilter hairFilter   = hair.GetComponent<MeshFilter>();
@@ -65,6 +62,11 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(color.b, Is.EqualTo(expectedColor.b).Within(0.0001f));
             Assert.That(color.a, Is.EqualTo(expectedColor.a).Within(0.0001f));
             Assert.That(prefabRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(42));
+            UnityShapeAssetManifest assetManifest = prefabRoot.GetComponent<UnityShapeAssetManifest>();
+            Assert.That(assetManifest.Schema, Is.EqualTo(ShapeDefinition.CurrentSchema));
+            Assert.That(assetManifest.NodeCount, Is.EqualTo(prefabRoot.GetComponent<UnityShapeModel>().BindingCount));
+            Assert.That(assetManifest.Fingerprint, Has.Length.EqualTo(64));
+            Assert.That(assetManifest.DefinitionJson, Does.Contain("\"schema\":\"shapeforge.shape/1.0\""));
         }
     }
 }
