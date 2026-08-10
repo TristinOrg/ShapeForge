@@ -176,7 +176,7 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--instance", help="Unity MCP instance, for example ShapeForge@abc123")
     commands = result.add_subparsers(dest="command", required=True)
     for name, other in (("validate", None), ("diff", "after"), ("patch", "patch"),
-                        ("quality", "policy"), ("assess", None)):
+                        ("quality", "policy"), ("assess", None), ("inventory", "inventory")):
         command = commands.add_parser(name)
         command.add_argument("source")
         if other:

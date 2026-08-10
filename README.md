@@ -251,6 +251,7 @@ python tools/shapeforge.py diff before.json after.json
 python tools/shapeforge.py patch model.json change.json -o updated.json
 python tools/shapeforge.py quality model.json policy.json
 python tools/shapeforge.py assess assessment.json
+python tools/shapeforge.py inventory model.json inventory.json
 python tools/shapeforge.py repository
 python tools/shapeforge.py verify
 ```
@@ -262,6 +263,8 @@ Document commands require the Unity MCP server. `verify` refreshes assets and ru
 Schema and Core provide the generic `shapeforge.reference/1.0` contract for aligned front, side, and optional back observations. Coverage analysis reports missing views and cross-view height disagreement.
 
 The Low Poly reference mapper can turn compatible semantic silhouettes into Profile Cage sections. This is deterministic geometric assistance, not image-to-3D reconstruction: hidden topology, clothing folds, textures, facial identity, and unobserved depth are not invented automatically.
+
+Reference Assessment records camera, confidence, visible features, and uncertainty before construction. A `shapeforge.detail-inventory/1.0` document then lists every semantic part, its category and parent, repetition, confidence, and expected stable node ID. `ShapeDetailCoverageAnalyzer` reports required details as errors and unresolved optional details as warnings, so staged builders and LLMs can request focused patches instead of silently dropping features.
 
 ## Semantic templates
 

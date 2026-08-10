@@ -116,6 +116,20 @@ namespace ShapeForge.Unity
             return assessment;
         }
 
+        /// <summary>Deserializes and validates a versioned semantic detail inventory.</summary>
+        public ShapeDetailInventory DeserializeDetailInventory(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Detail-inventory JSON cannot be empty.", nameof(json));
+
+            ShapeDetailInventory inventory = JsonConvert.DeserializeObject<ShapeDetailInventory>(json, Settings) ??
+                                             throw new JsonSerializationException("Detail-inventory JSON produced no inventory.");
+            ShapeDiagnosticReport report = new ShapeDetailInventoryValidator().Analyze(inventory);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return inventory;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>

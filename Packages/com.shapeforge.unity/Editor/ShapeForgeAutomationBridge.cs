@@ -81,6 +81,13 @@ namespace ShapeForge.Unity.Editor
                     ShapeDiagnosticReport report = new ShapeReferenceAssessmentValidator().Analyze(assessment);
                     return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }
+                case "inventory":
+                {
+                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    ShapeDetailInventory inventory = serializer.DeserializeDetailInventory(Read(request.Other));
+                    ShapeDetailCoverageReport report = new ShapeDetailCoverageAnalyzer().Analyze(definition, inventory);
+                    return Result(report.Passed, JToken.FromObject(report, JsonSerializer.Create(Settings)));
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }

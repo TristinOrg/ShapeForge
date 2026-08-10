@@ -151,6 +151,26 @@ namespace ShapeForge.Unity.Tests
         }
 
         [Test]
+        public void DetailInventoryRoundTripPreservesConstructionMetadata()
+        {
+            ShapeDetailInventory source = new() { Subject = "fantasy hero" };
+            source.Details.Add(new()
+            {
+                Id = "weapon", Name = "Weapon", Category = "accessory",
+                TargetNodeId = "weapon/socket", Confidence = 0.8f
+            });
+            source.Details[0].Tags.Add("accessory-pass");
+            ShapeJsonSerializer serializer = new();
+
+            string json = serializer.SerializeSpecification(source);
+            ShapeDetailInventory result = serializer.DeserializeDetailInventory(json);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.detail-inventory/1.0\""));
+            Assert.That(result.Details[0].TargetNodeId, Is.EqualTo("weapon/socket"));
+            Assert.That(result.Details[0].Tags[0], Is.EqualTo("accessory-pass"));
+        }
+
+        [Test]
         public void TemplateCatalogSerializesReadableDiscoveryData()
         {
             ShapeTemplateDescriptor descriptor = new(
