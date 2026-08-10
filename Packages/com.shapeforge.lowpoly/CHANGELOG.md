@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Registered Low Poly as an optional automation compiler for deterministic reference captures.
 - Fixed preset-generated procedural meshes disappearing after converting the hierarchy to a Prefab.
 - Added a rigid-part T-Pose Humanoid Hero preset for Unity Avatar validation.
 - Added an Editor preview command that binds a selected Humanoid clip to the T-Pose Hero.

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Added bounded reference-image and multi-view render-capture validation.
 - Added canonical biped Humanoid rig roles and engine-neutral required-role validation.
 - Added machine-readable definition diagnostics with stable codes and document paths.
 - Added deterministic definition diffs for node additions, removals, moves, and authored values.

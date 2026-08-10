@@ -116,6 +116,20 @@ namespace ShapeForge.Unity
             return assessment;
         }
 
+        /// <summary>Deserializes and validates a named reference-image manifest.</summary>
+        public ShapeReferenceImageSet DeserializeReferenceImageSet(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Reference-image JSON cannot be empty.", nameof(json));
+
+            ShapeReferenceImageSet reference = JsonConvert.DeserializeObject<ShapeReferenceImageSet>(json, Settings) ??
+                                               throw new JsonSerializationException("Reference-image JSON produced no manifest.");
+            ShapeDiagnosticReport report = new ShapeReferenceImageSetValidator().Analyze(reference);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return reference;
+        }
+
         /// <summary>Deserializes and validates a versioned semantic detail inventory.</summary>
         public ShapeDetailInventory DeserializeDetailInventory(string json)
         {

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Added transparent orthographic reference rendering and automation model-compiler discovery.
 - Added ShapePatch JSON serialization for compact external and LLM-authored edits.
 - Added quality-policy JSON serialization for external asset acceptance workflows.
 - Added validated reference-assessment JSON ingestion.
