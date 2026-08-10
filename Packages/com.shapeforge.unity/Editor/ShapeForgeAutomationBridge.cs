@@ -124,6 +124,13 @@ namespace ShapeForge.Unity.Editor
                     ShapeGameMetadataReport report = new ShapeGameMetadataAnalyzer().Analyze(definition, metadata);
                     return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }
+                case "reconstruct":
+                {
+                    ShapeReconstructionWorkflow workflow =
+                        serializer.DeserializeReconstructionWorkflow(Read(request.Source));
+                    ShapeReconstructionStepResult result = new ShapeReconstructionOrchestrator().Advance(workflow);
+                    return Result(result.Succeeded, JToken.FromObject(result, JsonSerializer.Create(Settings)));
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }

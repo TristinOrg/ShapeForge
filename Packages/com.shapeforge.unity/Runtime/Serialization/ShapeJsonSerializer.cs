@@ -172,6 +172,21 @@ namespace ShapeForge.Unity
             return metadata;
         }
 
+        /// <summary>Deserializes and validates a resumable reconstruction workflow.</summary>
+        public ShapeReconstructionWorkflow DeserializeReconstructionWorkflow(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Reconstruction-workflow JSON cannot be empty.", nameof(json));
+
+            ShapeReconstructionWorkflow workflow =
+                JsonConvert.DeserializeObject<ShapeReconstructionWorkflow>(json, Settings) ??
+                throw new JsonSerializationException("Reconstruction-workflow JSON produced no workflow.");
+            ShapeDiagnosticReport report = new ShapeReconstructionWorkflowValidator().Analyze(workflow);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return workflow;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>
