@@ -144,6 +144,20 @@ namespace ShapeForge.Unity
             return comparison;
         }
 
+        /// <summary>Deserializes and validates a resumable construction plan.</summary>
+        public ShapeConstructionPlan DeserializeConstructionPlan(string json)
+        {
+            if (string.IsNullOrWhiteSpace(json))
+                throw new ArgumentException("Construction-plan JSON cannot be empty.", nameof(json));
+
+            ShapeConstructionPlan plan = JsonConvert.DeserializeObject<ShapeConstructionPlan>(json, Settings) ??
+                                         throw new JsonSerializationException("Construction-plan JSON produced no plan.");
+            ShapeDiagnosticReport report = new ShapeConstructionPlanValidator().Analyze(plan);
+            if (!report.IsValid)
+                throw new JsonSerializationException(report.Diagnostics[0].Message);
+            return plan;
+        }
+
         /// <summary>
         /// Serializes a style definition using the versioned ShapeForge JSON contract.
         /// </summary>

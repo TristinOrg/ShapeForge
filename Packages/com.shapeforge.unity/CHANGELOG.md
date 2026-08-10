@@ -8,6 +8,7 @@
 - Added a file-based Editor automation bridge for the ShapeForge Python CLI.
 - Added validated detail-inventory JSON ingestion and automation coverage reporting.
 - Added provider-neutral render-comparison JSON ingestion and CLI aggregation.
+- Added construction-plan JSON scheduling and atomic CLI step execution.
 - Added an Editor mesh asset store for making generated hierarchies safe to serialize as Prefabs.
 - Added validated rigid-part Humanoid Avatar creation from complete semantic rigs.
 - Fixed generated Humanoid Avatars clamping muscle-driven bones to a static pose.

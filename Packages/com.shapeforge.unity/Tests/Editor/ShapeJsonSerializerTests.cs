@@ -203,6 +203,31 @@ namespace ShapeForge.Unity.Tests
         }
 
         [Test]
+        public void ConstructionPlanRoundTripPreservesDependenciesAndPatch()
+        {
+            ShapeConstructionPlan source = new() { Id = "hero/build" };
+            source.Passes.Add(new()
+            {
+                Id = "structure", Name = "Structure", Kind = ShapeConstructionPassKind.Structure
+            });
+            ShapeConstructionPass details = new()
+            {
+                Id = "details", Name = "Details", Kind = ShapeConstructionPassKind.Details
+            };
+            details.DependsOn.Add("structure");
+            source.Passes.Add(details);
+            ShapeJsonSerializer serializer = new();
+
+            string json = serializer.SerializeSpecification(source);
+            ShapeConstructionPlan result = serializer.DeserializeConstructionPlan(json);
+
+            Assert.That(json, Does.Contain("\"schema\":\"shapeforge.construction-plan/1.0\""));
+            Assert.That(json, Does.Contain("\"kind\":\"structure\""));
+            Assert.That(result.Passes[1].DependsOn[0], Is.EqualTo("structure"));
+            Assert.That(result.Passes[0].Patch.Schema, Is.EqualTo(ShapePatchDocument.CurrentSchema));
+        }
+
+        [Test]
         public void TemplateCatalogSerializesReadableDiscoveryData()
         {
             ShapeTemplateDescriptor descriptor = new(

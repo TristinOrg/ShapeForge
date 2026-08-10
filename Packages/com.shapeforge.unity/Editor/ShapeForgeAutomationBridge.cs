@@ -94,6 +94,29 @@ namespace ShapeForge.Unity.Editor
                     ShapeRenderCompareReport report = new ShapeRenderCompareAggregator().Aggregate(comparison);
                     return Result(report.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
                 }
+                case "plan":
+                {
+                    ShapeConstructionPlan plan = serializer.DeserializeConstructionPlan(Read(request.Source));
+                    ShapeConstructionPlanReport report = new ShapeConstructionPlanEvaluator().Evaluate(plan);
+                    return Result(report.Diagnostics.IsValid, JToken.FromObject(report, JsonSerializer.Create(Settings)));
+                }
+                case "step":
+                {
+                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    ShapeConstructionPlan plan = serializer.DeserializeConstructionPlan(Read(request.Other));
+                    ShapeConstructionStepResult result = new ShapeConstructionPlanExecutor().Apply(
+                        definition, plan, request.Argument);
+                    JObject data = new()
+                    {
+                        ["diagnostics"] = JToken.FromObject(result.Diagnostics, JsonSerializer.Create(Settings))
+                    };
+                    if (result.Succeeded)
+                    {
+                        data["definition"] = JToken.Parse(serializer.Serialize(result.Definition));
+                        data["plan"] = JToken.FromObject(result.Plan, JsonSerializer.Create(Settings));
+                    }
+                    return Result(result.Succeeded, data);
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }
@@ -120,6 +143,7 @@ namespace ShapeForge.Unity.Editor
             public string Command { get; set; }
             public string Source { get; set; }
             public string Other { get; set; }
+            public string Argument { get; set; }
         }
 
         [Serializable]

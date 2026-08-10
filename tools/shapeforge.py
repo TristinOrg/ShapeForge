@@ -36,7 +36,8 @@ class McpClient:
         result = self._request("tools/call", {"name": name, "arguments": arguments})
         content = result.get("result", {}).get("structuredContent", {})
         content = content.get("result", content)
-        if retry and "session not available" in (content.get("error") or "").lower():
+        reason = (content.get("data") or {}).get("reason") if isinstance(content.get("data"), dict) else None
+        if retry and reason != "no_unity_session" and "session not available" in (content.get("error") or "").lower():
             for _ in range(10):
                 time.sleep(1)
                 try:
@@ -81,6 +82,8 @@ def run_document(args: argparse.Namespace) -> int:
     request = {"command": args.command, "source": str(Path(args.source).resolve())}
     if getattr(args, "other", None):
         request["other"] = str(Path(args.other).resolve())
+    if getattr(args, "argument", None):
+        request["argument"] = args.argument
     (WORK / "request.json").write_text(json.dumps(request), encoding="utf-8")
     client = McpClient(args.instance)
     response = client.call("execute_menu_item", {"menu_path": "ShapeForge/Automation/Process Request"})
@@ -184,6 +187,16 @@ def parser() -> argparse.ArgumentParser:
             command.add_argument("other", metavar=other)
         command.add_argument("-o", "--output")
         command.set_defaults(handler=run_document)
+    plan = commands.add_parser("plan")
+    plan.add_argument("source")
+    plan.add_argument("-o", "--output")
+    plan.set_defaults(handler=run_document, other=None, argument=None)
+    step = commands.add_parser("step")
+    step.add_argument("source", help="ShapeDefinition JSON")
+    step.add_argument("other", metavar="plan", help="Construction Plan JSON")
+    step.add_argument("--pass", dest="argument", required=True, help="Ready pass ID")
+    step.add_argument("-o", "--output")
+    step.set_defaults(handler=run_document)
     repository = commands.add_parser("repository")
     repository.set_defaults(handler=run_repository)
     verify = commands.add_parser("verify")
