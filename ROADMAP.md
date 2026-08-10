@@ -81,13 +81,13 @@ Every milestone should include, where applicable:
 - C# Editor bridge and Python document commands — `46fc66d`.
 - Repository verification, Unity test orchestration, instance selection, reconnect handling, and Python tests — `9cd471d`.
 
-Current validation note: the final Unity session disconnected while automation was being hardened. Python tests and repository validation pass. After reconnecting Unity MCP, run `python tools/shapeforge.py verify`; do not mark the live verification debt cleared unless it executes at least one test and succeeds.
+Current validation note: the Unity MCP HTTP server is reachable, but the Editor reports `Unity session not available`. Python tests and repository validation pass. A temporary MSBuild import compiled all Core, Unity, and Low Poly test assemblies successfully on 2026-08-10, then was removed. After reconnecting the Editor session, run `python tools/shapeforge.py verify`; do not mark the live execution debt cleared unless it executes at least one test and succeeds.
 
 ## Ordered milestones
 
 ### M1 — Render Compare IR
 
-Status: In progress — [#2](https://github.com/TristinOrg/ShapeForge/issues/2).
+Status: Implemented; live EditMode execution pending — [#2](https://github.com/TristinOrg/ShapeForge/issues/2). Commits `7388c62`, `0ddde54`.
 
 Goal: represent visual comparison results without coupling Core to cameras, renderers, or vision providers.
 
@@ -103,7 +103,7 @@ Deliverables:
 
 ### M2 — Construction Pass System
 
-Status: Planned — [#3](https://github.com/TristinOrg/ShapeForge/issues/3).
+Status: Implemented; live EditMode execution pending — [#3](https://github.com/TristinOrg/ShapeForge/issues/3). Commits `fb66be1`, `1ccdc22`.
 
 Goal: build and review assets in deterministic passes rather than one monolithic generation.
 
@@ -117,7 +117,7 @@ Deliverables include versioned pass plans, dependencies, completion state, per-p
 
 ### M3 — Game Semantic Metadata
 
-Status: Planned — [#4](https://github.com/TristinOrg/ShapeForge/issues/4).
+Status: Implemented; live EditMode execution pending — [#4](https://github.com/TristinOrg/ShapeForge/issues/4). Commits `b28ce6e`, `784d7f0`, `cf75cb1`.
 
 Goal: make generated output directly useful as a game asset rather than only a model.
 
@@ -134,7 +134,7 @@ Core owns engine-neutral contracts and validation. Engine packages compile them 
 
 ### M4 — Semantic Template Library
 
-Status: Planned — [#5](https://github.com/TristinOrg/ShapeForge/issues/5).
+Status: Implemented; live EditMode execution pending — [#5](https://github.com/TristinOrg/ShapeForge/issues/5). Commits `12cb22d`, `0cc90ba`.
 
 Expand reusable templates only after the metadata foundation exists:
 
@@ -148,13 +148,13 @@ Each library must publish discovery metadata, bounded parameters, detail invento
 
 ### M5 — Reconstruction Orchestration
 
-Status: Planned — [#6](https://github.com/TristinOrg/ShapeForge/issues/6).
+Status: Implemented; live EditMode execution pending — [#6](https://github.com/TristinOrg/ShapeForge/issues/6). Commits `24d1925`, `ce6bacf`.
 
 Compose Reference Assessment, Detail Inventory, passes, Render Compare, Patch, and Quality Gate into a provider-neutral reconstruction workflow. ShapeForge must not own provider credentials, prompting clients, or hidden vision logic.
 
 ### M6 — MotionForge boundary integration
 
-Status: Planned — [#7](https://github.com/TristinOrg/ShapeForge/issues/7).
+Status: Implemented; live EditMode execution pending — [#7](https://github.com/TristinOrg/ShapeForge/issues/7). Commit `56cd954`.
 
 ShapeForge continues to own rest pose, stable nodes, semantic rig roles, constraints, and transform targets. MotionForge should own engine-neutral motion intent/IR, tracks, keyframes, curves, composition, and serialization. Native adapters own playback, blending, IK, retargeting, and optimization.
 
@@ -162,7 +162,7 @@ Do not place complete animation formats or Unity Animator ownership in ShapeForg
 
 ### M7 — Engine adapters and export
 
-Status: Planned — [#8](https://github.com/TristinOrg/ShapeForge/issues/8).
+Status: In progress — [#8](https://github.com/TristinOrg/ShapeForge/issues/8). Unity Prefab compilation and adapter conformance are implemented in `eb652b2` and `d431b7b`; Godot, Unreal, glTF, and licensed FBX/USD paths remain.
 
 Develop only after Core contracts stabilize:
 
@@ -175,7 +175,7 @@ Develop only after Core contracts stabilize:
 
 ### M8 — ShapeForge Agent and MCP
 
-Status: Planned last — [#9](https://github.com/TristinOrg/ShapeForge/issues/9).
+Status: Implemented over the mature local workflows; live MCP execution pending — [#9](https://github.com/TristinOrg/ShapeForge/issues/9). Commit `a29d133` plus the earlier automation commits.
 
 Expose stable workflows only after their local APIs and Python orchestration are mature:
 
@@ -198,9 +198,8 @@ MCP must remain a thin orchestration surface, not a second implementation of Sha
 
 ## Immediate continuation
 
-1. Reconnect the ShapeForge Unity MCP session.
-2. Run `python tools/shapeforge.py verify` and record the result here.
-3. Implement M1 Render Compare IR in two commits:
-   - Schema/Core contracts, aggregation, diagnostics, and tests;
-   - JSON Schema/example, Unity serialization, CLI integration, and documentation.
-4. Update this file before beginning M2.
+1. In Unity, start the MCP Editor session and run `python tools/shapeforge.py verify`.
+2. Fix any live EditMode failures before changing implemented milestone statuses to Done.
+3. Continue M7 with a geometry-preserving glTF exporter and conformance fixture.
+4. Add real Godot and Unreal adapters only with their toolchains available for end-to-end validation.
+5. Treat FBX/USD as optional until the selected exporters and licenses are recorded.
