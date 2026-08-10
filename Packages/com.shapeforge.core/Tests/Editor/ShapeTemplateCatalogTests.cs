@@ -54,6 +54,20 @@ namespace ShapeForge.Tests
                 new ExampleTemplate()));
         }
 
+        [Test]
+        public void DescriptorPublishesValidatedBoundedParameters()
+        {
+            ShapeTemplateParameterDescriptor parameter = new("length", "Overall length.", 1f, 0.1f, 10f);
+            ShapeTemplateDescriptor descriptor = new(
+                "example/bounded", "Bounded.", "prop", "example/spec/1.0",
+                new[] { ShapeTypes.Group }, new[] { parameter }, "example");
+
+            Assert.That(descriptor.Parameters, Has.Count.EqualTo(1));
+            Assert.That(descriptor.Parameters[0].Maximum, Is.EqualTo(10f));
+            Assert.Throws<ArgumentOutOfRangeException>(() =>
+                new ShapeTemplateParameterDescriptor("bad", "Bad.", 2f, 0f, 1f));
+        }
+
         private sealed class ExampleSpecification
         {
             public string Name { get; set; }
