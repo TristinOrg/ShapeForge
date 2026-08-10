@@ -10,6 +10,7 @@
 - Published a Draft 2020-12 detail-inventory schema and minimal example.
 - Added versioned render-comparison observations, scores, and localized discrepancies.
 - Published a Draft 2020-12 render-comparison schema and multi-view example.
+- Added versioned construction plans with dependencies, state, patches, and quality-policy references.
 
 ## [0.1.0] - 2026-08-01
 

@@ -10,6 +10,7 @@
 - Added structured reference-assessment validation for safe downstream generation.
 - Added semantic detail inventory validation and definition coverage analysis.
 - Added provider-neutral render comparison validation and weighted score aggregation.
+- Added resumable construction-pass scheduling and atomic ShapePatch execution.
 
 ## [0.1.0] - 2026-08-01
 
