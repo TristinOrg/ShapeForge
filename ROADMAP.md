@@ -82,13 +82,13 @@ Every milestone should include, where applicable:
 - C# Editor bridge and Python document commands — `46fc66d`.
 - Repository verification, Unity test orchestration, instance selection, reconnect handling, and Python tests — `9cd471d`.
 
-Current validation note: the Unity MCP HTTP server is reachable, but the Editor reports `Unity session not available`. Python tests and repository validation pass. A temporary MSBuild import compiled all Core, Unity, and Low Poly test assemblies successfully on 2026-08-10, then was removed. After reconnecting the Editor session, run `python tools/shapeforge.py verify`; do not mark the live execution debt cleared unless it executes at least one test and succeeds.
+Current validation note: on 2026-08-12 the connected Unity Editor completed all three first-party EditMode assemblies with 22/22 tests passing and no compilation errors. Python tests and repository validation also pass.
 
 ## Ordered milestones
 
 ### M1 — Render Compare IR
 
-Status: Implemented; live EditMode execution pending — [#2](https://github.com/TristinOrg/ShapeForge/issues/2). Commits `7388c62`, `0ddde54`.
+Status: Done — [#2](https://github.com/TristinOrg/ShapeForge/issues/2). Commits `7388c62`, `0ddde54`; live validation `792eb37`.
 
 Goal: represent visual comparison results without coupling Core to cameras, renderers, or vision providers.
 
@@ -104,7 +104,7 @@ Deliverables:
 
 ### M2 — Construction Pass System
 
-Status: Implemented; live EditMode execution pending — [#3](https://github.com/TristinOrg/ShapeForge/issues/3). Commits `fb66be1`, `1ccdc22`.
+Status: Done — [#3](https://github.com/TristinOrg/ShapeForge/issues/3). Commits `fb66be1`, `1ccdc22`; live validation `792eb37`.
 
 Goal: build and review assets in deterministic passes rather than one monolithic generation.
 
@@ -118,7 +118,7 @@ Deliverables include versioned pass plans, dependencies, completion state, per-p
 
 ### M3 — Game Semantic Metadata
 
-Status: Implemented; live EditMode execution pending — [#4](https://github.com/TristinOrg/ShapeForge/issues/4). Commits `b28ce6e`, `784d7f0`, `cf75cb1`.
+Status: Done — [#4](https://github.com/TristinOrg/ShapeForge/issues/4). Commits `b28ce6e`, `784d7f0`, `cf75cb1`; live validation `792eb37`.
 
 Goal: make generated output directly useful as a game asset rather than only a model.
 
@@ -135,7 +135,7 @@ Core owns engine-neutral contracts and validation. Engine packages compile them 
 
 ### M4 — Semantic Template Library
 
-Status: Implemented; live EditMode execution pending — [#5](https://github.com/TristinOrg/ShapeForge/issues/5). Commits `12cb22d`, `0cc90ba`.
+Status: Done — [#5](https://github.com/TristinOrg/ShapeForge/issues/5). Commits `12cb22d`, `0cc90ba`; live validation `792eb37`.
 
 Expand reusable templates only after the metadata foundation exists:
 
@@ -149,13 +149,13 @@ Each library must publish discovery metadata, bounded parameters, detail invento
 
 ### M5 — Reconstruction Orchestration
 
-Status: Implemented; live EditMode execution pending — [#6](https://github.com/TristinOrg/ShapeForge/issues/6). Commits `24d1925`, `ce6bacf`.
+Status: Done — [#6](https://github.com/TristinOrg/ShapeForge/issues/6). Commits `24d1925`, `ce6bacf`; live validation `792eb37`.
 
 Compose Reference Assessment, Detail Inventory, passes, Render Compare, Patch, and Quality Gate into a provider-neutral reconstruction workflow. ShapeForge must not own provider credentials, prompting clients, or hidden vision logic.
 
 ### M6 — MotionForge boundary integration
 
-Status: Implemented; live EditMode execution pending — [#7](https://github.com/TristinOrg/ShapeForge/issues/7). Commit `56cd954`.
+Status: Done — [#7](https://github.com/TristinOrg/ShapeForge/issues/7). Commit `56cd954`; live validation `792eb37`.
 
 ShapeForge continues to own rest pose, stable nodes, semantic rig roles, constraints, and transform targets. MotionForge should own engine-neutral motion intent/IR, tracks, keyframes, curves, composition, and serialization. Native adapters own playback, blending, IK, retargeting, and optimization.
 
@@ -163,20 +163,19 @@ Do not place complete animation formats or Unity Animator ownership in ShapeForg
 
 ### M7 — Engine adapters and export
 
-Status: In progress — [#8](https://github.com/TristinOrg/ShapeForge/issues/8). Unity Prefab compilation and adapter conformance are implemented in `eb652b2` and `d431b7b`; Godot, Unreal, glTF, and licensed FBX/USD paths remain.
+Status: Portable export scope done; multi-engine adapters deferred — [#8](https://github.com/TristinOrg/ShapeForge/issues/8). Unity Prefab compilation and adapter conformance are implemented in `eb652b2` and `d431b7b`; self-contained GLB export in `94cd8b9`; the licensed external FBX/USD tool boundary in `c3863b3`.
 
 Develop only after Core contracts stabilize:
 
 1. finish Unity native Prefab compilation and asset metadata;
 2. define an adapter conformance suite;
-3. Godot scene adapter;
-4. Unreal Actor adapter;
-5. glTF export;
-6. FBX/USD export where licensing and toolchains permit.
+3. export geometry-preserving GLB with stable semantic node metadata;
+4. delegate FBX/USD conversion through an explicit, verified external toolchain;
+5. defer Godot and Unreal adapters until their toolchains and real consuming projects are available for end-to-end validation.
 
 ### M8 — ShapeForge Agent and MCP
 
-Status: Implemented over the mature local workflows; live MCP execution pending — [#9](https://github.com/TristinOrg/ShapeForge/issues/9). Commit `a29d133` plus the earlier automation commits.
+Status: Done — [#9](https://github.com/TristinOrg/ShapeForge/issues/9). Commit `a29d133` plus the earlier automation commits; live MCP validation `792eb37`.
 
 Expose stable workflows only after their local APIs and Python orchestration are mature:
 
@@ -199,8 +198,8 @@ MCP must remain a thin orchestration surface, not a second implementation of Sha
 
 ## Immediate continuation
 
-1. In Unity, start the MCP Editor session and run `python tools/shapeforge.py verify`.
-2. Fix any live EditMode failures before changing implemented milestone statuses to Done.
-3. Continue M7 with a geometry-preserving glTF exporter and conformance fixture.
-4. Add real Godot and Unreal adapters only with their toolchains available for end-to-end validation.
-5. Treat FBX/USD as optional until the selected exporters and licenses are recorded.
+1. Keep `python tools/shapeforge.py repository` and `python tools/shapeforge.py verify` green as contracts evolve.
+2. Exercise reference reconstruction against a broader curated image corpus and record measurable failure modes.
+3. Harden GLB compatibility with external validator fixtures and real consuming pipelines.
+4. Add Godot or Unreal adapters only when the target toolchain and a real project are available for end-to-end validation.
+5. Record the chosen converter, version, command, and license before publishing FBX/USD artifacts.

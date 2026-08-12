@@ -256,6 +256,8 @@ python tools/shapeforge.py assess assessment.json
 python tools/shapeforge.py inventory model.json inventory.json
 python tools/shapeforge.py compare comparison.json
 python tools/shapeforge.py render model.json capture.json --images Library/ShapeForge/Renders -o capture-manifest.json
+python tools/shapeforge.py export-glb model.json --asset Library/ShapeForge/model.glb -o export-report.json
+python tools/shapeforge.py export-external Library/ShapeForge/model.glb --asset Exports/model.fbx --converter blender --background --python convert.py -- {input} {output}
 python tools/shapeforge.py image-compare reference-images.json capture-manifest.json -o comparison.json
 python tools/shapeforge.py image-reconstruct model.json reference-images.json capture.json -o best-model.json --work Library/ShapeForge/Reconstruction
 python tools/shapeforge.py plan construction-plan.json
@@ -266,6 +268,13 @@ python tools/shapeforge.py discover -o catalogs.json
 python tools/shapeforge.py repository
 python tools/shapeforge.py verify
 ```
+
+GLB is the portable, self-contained ShapeForge interchange output. It preserves geometry, hierarchy,
+materials, transforms, and stable node IDs. FBX and USD-family files are deliberately delegated to an
+explicitly configured external converter: ShapeForge passes literal arguments without a shell and
+accepts success only when a non-empty target asset is created. This keeps third-party SDKs, licenses,
+and tool versions outside Core. The example command is a contract illustration; the converter script
+and supported Blender version belong to the consuming pipeline.
 
 Document and render commands require the Unity MCP server. `image-compare` uses Python locally; install its bounded dependencies with `python -m pip install -r tools/requirements-image.txt`. `image-reconstruct` invokes Unity rendering and the authoritative C# Compare/Patch operations while Python owns only image measurement and orchestration. `verify` refreshes assets and runs the three ShapeForge EditMode test assemblies while excluding Unity package tests. It rejects zero-test runs, survives temporary MCP reconnects, and automatically selects the connected ShapeForge Editor when multiple Unity projects are open. Use `--instance Name@hash` only when automatic selection is ambiguous.
 
