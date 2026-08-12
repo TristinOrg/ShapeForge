@@ -143,6 +143,17 @@ def run_image_reconstruction(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_external_export(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_external_export import export_external
+    except ModuleNotFoundError:
+        from shapeforge_external_export import export_external
+
+    result = export_external(Path(args.source), Path(args.asset), args.converter, args.timeout)
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
 def run_verify(args: argparse.Namespace) -> int:
     client = McpClient(args.instance)
     client.call("read_console", {"action": "clear"})
@@ -243,6 +254,13 @@ def parser() -> argparse.ArgumentParser:
     export_glb.add_argument("--asset", dest="argument", required=True, help="Output .glb path")
     export_glb.add_argument("-o", "--output", help="Output export report")
     export_glb.set_defaults(handler=run_document, other=None)
+    external = commands.add_parser("export-external")
+    external.add_argument("source", help="ShapeForge GLB")
+    external.add_argument("--asset", required=True, help="Output .fbx or USD-family asset")
+    external.add_argument("--converter", nargs="+", required=True,
+                          help="Executable and arguments containing {input} and {output}")
+    external.add_argument("--timeout", type=int, default=300)
+    external.set_defaults(handler=run_external_export)
     discover = commands.add_parser("discover")
     discover.add_argument("-o", "--output")
     discover.set_defaults(handler=run_document, source=None, other=None, argument=None)
