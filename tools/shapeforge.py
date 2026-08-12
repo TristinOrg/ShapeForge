@@ -192,7 +192,9 @@ def run_verify(args: argparse.Namespace) -> int:
         summary = (job_data.get("result") or {}).get("summary", {})
         total += summary.get("total", 0)
         passed += summary.get("passed", 0)
-        failures.extend((job_data.get("progress") or {}).get("failures_so_far", []))
+        failed = summary.get("failed", max(summary.get("total", 0) - summary.get("passed", 0), 0))
+        if failed > 0:
+            failures.extend((job_data.get("progress") or {}).get("failures_so_far", []))
     print(f"EditMode: {passed}/{total} passed")
     print("Compilation errors: 0")
     if failures or total == 0:

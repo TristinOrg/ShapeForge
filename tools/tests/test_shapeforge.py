@@ -46,6 +46,14 @@ class FakeVerifyClient:
         raise AssertionError(name)
 
 
+class FakeVerifyClientWithStaleFailure(FakeVerifyClient):
+    def call(self, name, arguments):
+        result = super().call(name, arguments)
+        if name == "get_test_job":
+            result["data"]["progress"]["failures_so_far"] = [{"full_name": "Old.Test", "message": "old"}]
+        return result
+
+
 class ShapeForgeCliTests(unittest.TestCase):
     def test_parser_exposes_all_commands(self):
         help_text = shapeforge.parser().format_help()
@@ -80,6 +88,12 @@ class ShapeForgeCliTests(unittest.TestCase):
             self.assertEqual(shapeforge.run_verify(args), 0)
         self.assertEqual(len(FakeVerifyClient.filters), 3)
         self.assertIn("EditMode: 6/6 passed", output.getvalue())
+
+    def test_verify_ignores_stale_failures_for_successful_job(self):
+        FakeVerifyClient.filters.clear()
+        args = argparse.Namespace(instance=None, tests=["Current.Test"], timeout=30, settle=0)
+        with patch.object(shapeforge, "McpClient", FakeVerifyClientWithStaleFailure):
+            self.assertEqual(shapeforge.run_verify(args), 0)
 
     def test_verify_rejects_zero_test_false_positive(self):
         class EmptyClient(FakeVerifyClient):

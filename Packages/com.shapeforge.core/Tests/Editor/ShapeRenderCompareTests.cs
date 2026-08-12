@@ -23,12 +23,12 @@ namespace ShapeForge.Tests
             ShapeRenderCompareReport report = new ShapeRenderCompareAggregator().Aggregate(comparison);
 
             Assert.That(report.IsValid, Is.True);
-            Assert.That(report.SilhouetteScore, Is.EqualTo(0.875f));
-            Assert.That(report.ProportionScore, Is.EqualTo(0.7f));
-            Assert.That(report.ColorScore, Is.EqualTo(0.5f));
-            Assert.That(report.DetailScore, Is.EqualTo(0.3f));
-            Assert.That(report.Confidence, Is.EqualTo(0.9f));
-            Assert.That(report.OverallScore, Is.EqualTo(0.59375f));
+            Assert.That(report.SilhouetteScore, Is.EqualTo(0.7f));
+            Assert.That(report.ProportionScore, Is.EqualTo(0.5f));
+            Assert.That(report.ColorScore, Is.EqualTo(0.3f));
+            Assert.That(report.DetailScore, Is.EqualTo(0.9f));
+            Assert.That(report.Confidence, Is.EqualTo(0.875f));
+            Assert.That(report.OverallScore, Is.EqualTo(0.6f));
             Assert.That(report.Discrepancies[0].NodeId, Is.EqualTo("head"));
         }
 

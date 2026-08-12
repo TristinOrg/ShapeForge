@@ -14,8 +14,8 @@ namespace ShapeForge.LowPoly.Tests
             ShapeForge.LowPoly.Editor.LowPolyAutomationCatalogProvider provider = new();
 
             Assert.That(provider.CreateCapabilities().Shapes, Is.Not.Empty);
-            Assert.That(provider.CreateTemplates().Templates, Has.Count.GreaterThanOrEqualTo(6));
-            Assert.That(ShapeAutomationCatalogRegistry.GetProviders(), Has.Count.GreaterThanOrEqualTo(2));
+            Assert.That(provider.CreateTemplates().Templates.Count, Is.GreaterThanOrEqualTo(6));
+            Assert.That(ShapeAutomationCatalogRegistry.GetProviders().Count, Is.GreaterThanOrEqualTo(2));
         }
     }
 }
