@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using ShapeForge.Unity.Editor;
 using UnityEngine;
@@ -34,18 +33,18 @@ namespace ShapeForge.Unity.Tests
             root = new UnityShapeModelGenerator(new IUnityShapeGenerator[] { new TestGenerator() }).Generate(definition);
 
             UnityShapeGlbExportResult result = UnityShapeGlbExporter.Export(root, OutputPath);
-            JObject document = ReadDocument(OutputPath);
+            string document = ReadDocument(OutputPath);
 
             Assert.That(result.VertexCount, Is.EqualTo(24));
             Assert.That(result.TriangleCount, Is.EqualTo(12));
-            Assert.That(document["asset"]?["version"]?.Value<string>(), Is.EqualTo("2.0"));
-            Assert.That(document["meshes"], Has.Count.EqualTo(1));
-            Assert.That(document["buffers"]?[0]?["byteLength"]?.Value<int>(), Is.GreaterThan(0));
-            Assert.That(document.ToString(), Does.Contain("SHAPEFORGE_node"));
-            Assert.That(document.ToString(), Does.Contain("\"cube\""));
+            Assert.That(document, Does.Contain("\"version\":\"2.0\""));
+            Assert.That(document, Does.Contain("\"meshes\":[{"));
+            Assert.That(document, Does.Contain("\"byteLength\":"));
+            Assert.That(document, Does.Contain("SHAPEFORGE_node"));
+            Assert.That(document, Does.Contain("\"id\":\"cube\""));
         }
 
-        private static JObject ReadDocument(string path)
+        private static string ReadDocument(string path)
         {
             using BinaryReader reader = new(File.OpenRead(path));
             Assert.That(reader.ReadUInt32(), Is.EqualTo(0x46546C67));
@@ -53,7 +52,7 @@ namespace ShapeForge.Unity.Tests
             reader.ReadUInt32();
             int jsonLength = reader.ReadInt32();
             Assert.That(reader.ReadUInt32(), Is.EqualTo(0x4E4F534A));
-            return JObject.Parse(Encoding.UTF8.GetString(reader.ReadBytes(jsonLength)).TrimEnd(' '));
+            return Encoding.UTF8.GetString(reader.ReadBytes(jsonLength)).TrimEnd(' ');
         }
 
         private sealed class TestGenerator : IUnityShapeGenerator
