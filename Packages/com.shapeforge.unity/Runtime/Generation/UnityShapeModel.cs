@@ -50,6 +50,22 @@ namespace ShapeForge.Unity
             return targetsById.TryGetValue(nodeId, out target);
         }
 
+        /// <summary>Tries to resolve a generated Transform back to its stable ShapeForge node ID.</summary>
+        public bool TryGetNodeId(Transform target, out string nodeId)
+        {
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+            for (int index = 0; index < targets.Count; index++)
+            {
+                if (targets[index] != target)
+                    continue;
+                nodeId = nodeIds[index];
+                return true;
+            }
+            nodeId = null;
+            return false;
+        }
+
         private void EnsureLookup()
         {
             if (targetsById != null)

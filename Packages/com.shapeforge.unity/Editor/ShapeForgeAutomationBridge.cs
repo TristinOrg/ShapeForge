@@ -178,6 +178,32 @@ namespace ShapeForge.Unity.Editor
                             UnityEngine.Object.DestroyImmediate(generated);
                     }
                 }
+                case "export-glb":
+                {
+                    ShapeDefinition definition = serializer.DeserializeShape(Read(request.Source));
+                    if (string.IsNullOrWhiteSpace(request.Argument))
+                        throw new InvalidOperationException("GLB export requires an output path.");
+                    UnityEngine.GameObject generated = null;
+                    try
+                    {
+                        foreach (IShapeAutomationModelCompiler compiler in ShapeAutomationCatalogRegistry.GetModelCompilers())
+                        {
+                            if (!compiler.CanCompile(definition))
+                                continue;
+                            generated = compiler.Compile(definition);
+                            break;
+                        }
+                        if (generated == null)
+                            throw new InvalidOperationException("No registered automation compiler supports this definition.");
+                        UnityShapeGlbExportResult result = UnityShapeGlbExporter.Export(generated, request.Argument);
+                        return Result(true, JToken.FromObject(result, JsonSerializer.Create(Settings)));
+                    }
+                    finally
+                    {
+                        if (generated != null)
+                            UnityEngine.Object.DestroyImmediate(generated);
+                    }
+                }
                 default:
                     throw new InvalidOperationException($"Unknown automation command '{request.Command}'.");
             }
