@@ -27,8 +27,8 @@ namespace ShapeForge.LowPoly
                 throw new ShapeValidationException("A stylized human requires a style ID.");
 
             if (specification.Proportions == null || specification.Head == null ||
-                specification.Face == null || specification.Hair == null)
-                throw new ShapeValidationException("A stylized human requires proportions, head, face, and hair data.");
+                specification.Face == null || specification.Hair == null || specification.Outfit == null)
+                throw new ShapeValidationException("A stylized human requires proportions, head, face, hair, and outfit data.");
 
             ValidateRange(specification.OverallScale, 0.5f, 2f, "overallScale");
             ValidateRange(specification.Proportions.HeadScale, 0.7f, 1.4f, "proportions.headScale");
@@ -49,6 +49,9 @@ namespace ShapeForge.LowPoly
             ValidateRange(specification.Hair.SideburnLength, 0f, 1f, "hair.sideburnLength");
             ValidateRange(specification.Hair.SpikeLength, 0.6f, 1.5f, "hair.spikeLength");
             ValidateRange(specification.Hair.BackSpikeVolume, 0.6f, 1.5f, "hair.backSpikeVolume");
+            ValidateRange(specification.Outfit.DetailScale, 0.6f, 1.5f, "outfit.detailScale");
+            ValidateRange(specification.Outfit.ShortsVolume, 0.75f, 1.35f, "outfit.shortsVolume");
+            ValidateRange(specification.Outfit.BootHeight, 0.75f, 1.25f, "outfit.bootHeight");
         }
 
         private static void ValidateRange(float value, float minimum, float maximum, string path)

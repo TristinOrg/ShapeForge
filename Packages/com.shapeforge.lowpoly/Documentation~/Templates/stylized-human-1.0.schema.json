@@ -55,6 +55,16 @@
         "spikeLength": { "type": "number", "minimum": 0.6, "maximum": 1.5 },
         "backSpikeVolume": { "type": "number", "minimum": 0.6, "maximum": 1.5 }
       }
+    },
+    "outfit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detailScale", "shortsVolume", "bootHeight"],
+      "properties": {
+        "detailScale": { "type": "number", "minimum": 0.6, "maximum": 1.5 },
+        "shortsVolume": { "type": "number", "minimum": 0.75, "maximum": 1.35 },
+        "bootHeight": { "type": "number", "minimum": 0.75, "maximum": 1.25 }
+      }
     }
   }
 }

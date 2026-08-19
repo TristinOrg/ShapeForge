@@ -59,15 +59,15 @@ namespace ShapeForge.LowPoly
                 .Root("hero", specification.Name, hero =>
                 {
                     hero.Scale(specification.OverallScale, specification.OverallScale, specification.OverallScale);
-                    AddBody(hero, proportions);
+                    AddBody(hero, proportions, specification.Outfit);
                     AddHead(
                         hero, headCage, hairCage, proportions.HeadScale,
                         specification.Head, specification.Face, specification.Hair);
                     float shoulderX = 0.36f * proportions.ShoulderWidth * proportions.BodyWidth;
-                    AddArm(hero, "left", "Left", -shoulderX);
-                    AddArm(hero, "right", "Right", shoulderX);
-                    AddLeg(hero, "left", "Left", -0.18f * proportions.BodyWidth, proportions.LegLength);
-                    AddLeg(hero, "right", "Right", 0.18f * proportions.BodyWidth, proportions.LegLength);
+                    AddArm(hero, "left", "Left", -shoulderX, specification.Outfit);
+                    AddArm(hero, "right", "Right", shoulderX, specification.Outfit);
+                    AddLeg(hero, "left", "Left", -0.18f * proportions.BodyWidth, proportions.LegLength, specification.Outfit);
+                    AddLeg(hero, "right", "Right", 0.18f * proportions.BodyWidth, proportions.LegLength, specification.Outfit);
                 })
                 .Build();
         }
@@ -95,10 +95,14 @@ namespace ShapeForge.LowPoly
             return style;
         }
 
-        private static void AddBody(ShapeNodeBuilder hero, LowPolyStylizedHumanProportions proportions)
+        private static void AddBody(
+            ShapeNodeBuilder proportionsParent,
+            LowPolyStylizedHumanProportions proportions,
+            LowPolyStylizedHumanOutfit      outfit)
         {
             float bodyWidth = proportions.BodyWidth;
-            hero.Group("hero.pelvis.pivot", "Pelvis Pivot", pelvis => pelvis
+            float detail    = outfit.DetailScale;
+            proportionsParent.Group("hero.pelvis.pivot", "Pelvis Pivot", pelvis => pelvis
                 .Position(0f, 1.45f, 0f)
                 .Shape("hero.pelvis", "Tailored Shorts Waist", LowPolyShapeTypes.ProfileCage, waist => waist
                     .Scale(0.58f * bodyWidth, 0.28f, 0.4f)
@@ -163,7 +167,23 @@ namespace ShapeForge.LowPoly
                         .Scale(0.08f, 0.11f, 1f)
                         .ExtrudedProfile(0.025f, 0.004f,
                             new(0f, 0.5f), new(0.45f, 0f), new(0f, -0.5f), new(-0.45f, 0f))
-                        .ColorRole("metal"))));
+                        .ColorRole("metal"))
+                    .Shape("hero.shirt.neckline", "Layered Shirt Neckline", LowPolyShapeTypes.ProfileSweep, neckline => neckline
+                        .ProfileSweep(SmallDiamondProfile(), new ForgeVector3[]
+                        {
+                            new(-0.16f, 0.84f, -0.25f), new(0f, 0.77f, -0.27f), new(0.16f, 0.84f, -0.25f)
+                        })
+                        .Scale(detail, detail, detail)
+                        .SweepQuality(1, true)
+                        .ColorRole("jacket.light"))
+                    .Shape("hero.jacket.epaulette.left", "Left Jacket Epaulette", LowPolyShapeTypes.ExtrudedProfile, tab => tab
+                        .Position(-0.31f * bodyWidth, 0.84f, -0.08f)
+                        .Rotation(78f, 0f, -8f)
+                        .Scale(0.18f * detail, 0.1f * detail, 1f)
+                        .ExtrudedProfile(0.045f, 0.006f,
+                            new(-0.5f, 0.4f), new(0.35f, 0.5f), new(0.5f, -0.36f), new(-0.4f, -0.5f))
+                        .ColorRole("jacket.light")
+                        .Mirror(ShapeMirrorAxis.X))));
         }
 
         private static void AddHead(
@@ -394,7 +414,12 @@ namespace ShapeForge.LowPoly
             });
         }
 
-        private static void AddArm(ShapeNodeBuilder hero, string side, string label, float x)
+        private static void AddArm(
+            ShapeNodeBuilder hero,
+            string           side,
+            string           label,
+            float            x,
+            LowPolyStylizedHumanOutfit outfit)
         {
             string prefix = $"hero.arm.{side}";
             hero.Group($"{prefix}.shoulder.pivot", $"{label} Shoulder Pivot", shoulder => shoulder
@@ -418,15 +443,36 @@ namespace ShapeForge.LowPoly
                             new(0.08f, -0.3f), new(0.105f, -0.18f), new(0.118f, 0.16f), new(0.1f, 0.3f))
                         .ProfileSmoothing(1)
                         .ColorRole("skin"))
+                    .Shape($"{prefix}.sleeve.band", $"{label} Sleeve Band", LowPolyShapeTypes.LatheProfile, band => band
+                        .Position(0f, -0.04f, 0f)
+                        .Scale(outfit.DetailScale, outfit.DetailScale, outfit.DetailScale)
+                        .LatheProfile(12, true,
+                            new(0.12f, -0.035f), new(0.125f, 0f), new(0.12f, 0.035f))
+                        .ColorRole("jacket.light"))
                     .Shape($"{prefix}.glove", $"{label} Fingerless Glove", LowPolyShapeTypes.LatheProfile, glove => glove
                         .Position(0f, -0.56f, 0f)
                         .LatheProfile(16, true,
                             new(0.095f, -0.11f), new(0.13f, -0.04f), new(0.132f, 0.13f), new(0.105f, 0.17f))
                         .ProfileSmoothing(1)
                         .ColorRole("glove"))
+                    .Shape($"{prefix}.glove.cuff", $"{label} Glove Wrist Cuff", LowPolyShapeTypes.LatheProfile, cuff => cuff
+                        .Position(0f, -0.48f, 0f)
+                        .LatheProfile(12, true,
+                            new(0.115f, -0.045f), new(0.14f * outfit.DetailScale, 0f), new(0.115f, 0.045f))
+                        .ColorRole("glove"))
                     .Shape($"{prefix}.hand", $"{label} Relaxed Hand", LowPolyShapeTypes.Capsule, hand => hand
                         .Position(0f, -0.76f, -0.01f)
                         .Scale(0.095f, 0.17f, 0.08f)
+                        .ColorRole("skin"))
+                    .Shape($"{prefix}.finger.outer", $"{label} Exposed Outer Fingers", LowPolyShapeTypes.Capsule, finger => finger
+                        .Position(-0.055f, -0.82f, -0.035f)
+                        .Scale(0.026f, 0.085f, 0.025f)
+                        .Rotation(8f, 0f, -4f)
+                        .ColorRole("skin"))
+                    .Shape($"{prefix}.finger.inner", $"{label} Exposed Inner Fingers", LowPolyShapeTypes.Capsule, finger => finger
+                        .Position(0.055f, -0.82f, -0.035f)
+                        .Scale(0.026f, 0.08f, 0.025f)
+                        .Rotation(6f, 0f, 4f)
                         .ColorRole("skin"))));
         }
 
@@ -435,14 +481,15 @@ namespace ShapeForge.LowPoly
             string           side,
             string           label,
             float            x,
-            float            legLength)
+            float            legLength,
+            LowPolyStylizedHumanOutfit outfit)
         {
             string prefix = $"hero.leg.{side}";
             hero.Group($"{prefix}.hip.pivot", $"{label} Hip Pivot", hip => hip
                 .Position(x, 1.45f, 0f)
                 .Shape($"{prefix}.pants", $"{label} Layered Baggy Shorts", LowPolyShapeTypes.ProfileCage, pants => pants
                     .Position(0f, -0.31f * legLength, 0f)
-                    .Scale(0.31f, 0.58f * legLength, 0.38f)
+                    .Scale(0.31f * outfit.ShortsVolume, 0.58f * legLength, 0.38f * outfit.ShortsVolume)
                     .ProfileCage(
                         Cage(-0.5f, BaggyShortProfile(0.82f)),
                         Cage(-0.1f, BaggyShortProfile(1f)),
@@ -463,7 +510,7 @@ namespace ShapeForge.LowPoly
                         .ColorRole("skin.shadow"))
                     .Shape($"{prefix}.boot.shaft", $"{label} Fitted Tall Boot", LowPolyShapeTypes.ProfileCage, boot => boot
                         .Position(0f, -0.34f * legLength, 0.01f)
-                        .Scale(0.21f, 0.58f * legLength, 0.25f)
+                        .Scale(0.21f, 0.58f * legLength * outfit.BootHeight, 0.25f)
                         .ProfileCage(
                             Cage(-0.5f, BootShaftProfile(0.82f)),
                             Cage(0f, BootShaftProfile(1f)),
@@ -488,6 +535,18 @@ namespace ShapeForge.LowPoly
                             new(-0.055f, -0.16f, 0f), new(0.05f, -0.22f, 0f)
                         })
                         .SweepQuality(1, true)
+                        .ColorRole("jacket.light"))
+                    .Shape($"{prefix}.boot.cuff", $"{label} Boot Top Cuff", LowPolyShapeTypes.LatheProfile, cuff => cuff
+                        .Position(0f, -0.08f * legLength, 0.01f)
+                        .LatheProfile(12, true,
+                            new(0.115f, -0.04f), new(0.135f * outfit.DetailScale, 0f), new(0.115f, 0.04f))
+                        .ColorRole("boot"))
+                    .Shape($"{prefix}.boot.toe-panel", $"{label} Boot Toe Panel", LowPolyShapeTypes.ExtrudedProfile, panel => panel
+                        .Position(0f, -0.62f * legLength, -0.27f)
+                        .Rotation(78f, 0f, 0f)
+                        .Scale(0.14f * outfit.DetailScale, 0.2f, 1f)
+                        .ExtrudedProfile(0.035f, 0.006f,
+                            new(-0.45f, 0.5f), new(0.45f, 0.5f), new(0.5f, -0.35f), new(0f, -0.5f), new(-0.5f, -0.35f))
                         .ColorRole("jacket.light"))
                     .Shape($"{prefix}.sole", $"{label} Red Boot Sole", LowPolyShapeTypes.ExtrudedProfile, sole => sole
                         .Position(0f, -0.765f * legLength, -0.09f)

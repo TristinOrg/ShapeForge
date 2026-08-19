@@ -65,6 +65,12 @@ namespace ShapeForge.LowPoly.Tests
                     EyeSpacing  = 0.9f,
                     EyeOpenness = 0.75f,
                     MouthWidth  = 0.8f
+                },
+                Outfit       = new()
+                {
+                    DetailScale  = 1.2f,
+                    ShortsVolume = 1.1f,
+                    BootHeight   = 1.08f
                 }
             };
 
@@ -77,6 +83,7 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode pants        = FindNode(result.Root, "hero.leg.left.pants");
             ShapeNode eye          = FindNode(result.Root, "hero.eye.left");
             ShapeNode backSpike    = FindNode(result.Root, "hero.hair.spike.back-right");
+            ShapeNode bootShaft    = FindNode(result.Root, "hero.leg.left.boot.shaft");
 
             Assert.That(result.Name, Is.EqualTo("Custom Hero"));
             Assert.That(result.Root.Transform.Scale, Is.EqualTo(new ForgeVector3(1.1f, 1.1f, 1.1f)));
@@ -90,6 +97,10 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(eye.Transform.Scale.Y, Is.EqualTo(0.105f * 1.2f * 0.75f).Within(0.0001f));
             Assert.That(backSpike.Transform.Position.Z, Is.EqualTo(0.44f * 1.15f).Within(0.0001f));
             Assert.That(backSpike.Transform.Scale.Y, Is.EqualTo(0.36f * 1.25f).Within(0.0001f));
+            Assert.That(bootShaft.Transform.Scale.Y, Is.EqualTo(0.58f * 1.15f * 1.08f).Within(0.0001f));
+            Assert.That(FindNode(result.Root, "hero.jacket.epaulette.right"), Is.Not.Null);
+            Assert.That(FindNode(result.Root, "hero.arm.left.finger.outer"), Is.Not.Null);
+            Assert.That(FindNode(result.Root, "hero.leg.right.boot.toe-panel"), Is.Not.Null);
         }
 
         [Test]

@@ -28,5 +28,10 @@
     "sideburnLength": 0.42,
     "spikeLength": 1.18,
     "backSpikeVolume": 1.12
+  },
+  "outfit": {
+    "detailScale": 1.15,
+    "shortsVolume": 1.08,
+    "bootHeight": 1.05
   }
 }

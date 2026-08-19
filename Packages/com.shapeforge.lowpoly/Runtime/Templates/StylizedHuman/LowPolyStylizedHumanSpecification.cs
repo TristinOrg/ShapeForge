@@ -34,6 +34,9 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Gets or sets semantic hair controls.</summary>
         public LowPolyStylizedHumanHair Hair { get; set; } = new();
+
+        /// <summary>Gets or sets layered outfit-detail controls.</summary>
+        public LowPolyStylizedHumanOutfit Outfit { get; set; } = new();
     }
 
     /// <summary>
@@ -116,5 +119,21 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Gets or sets the projection of layered spikes behind the skull.</summary>
         public float BackSpikeVolume { get; set; } = 1f;
+    }
+
+    /// <summary>
+    /// Defines normalized controls for layered Chibi clothing and footwear details.
+    /// </summary>
+    [Serializable]
+    public sealed class LowPolyStylizedHumanOutfit
+    {
+        /// <summary>Gets or sets the prominence of seams, cuffs, straps, and pockets.</summary>
+        public float DetailScale { get; set; } = 1f;
+
+        /// <summary>Gets or sets the volume of baggy shorts.</summary>
+        public float ShortsVolume { get; set; } = 1f;
+
+        /// <summary>Gets or sets the height of tall boot shafts.</summary>
+        public float BootHeight { get; set; } = 1f;
     }
 }
