@@ -163,7 +163,7 @@ Do not place complete animation formats or Unity Animator ownership in ShapeForg
 
 ### M7 — Engine adapters and export
 
-Status: Portable export scope done; multi-engine adapters deferred — [#8](https://github.com/TristinOrg/ShapeForge/issues/8). Unity Prefab compilation and adapter conformance are implemented in `eb652b2` and `d431b7b`; self-contained GLB export in `94cd8b9`; the licensed external FBX/USD tool boundary in `c3863b3`.
+Status: Portable export scope done; multi-engine adapters out of current scope — [#8](https://github.com/TristinOrg/ShapeForge/issues/8). Unity Prefab compilation and adapter conformance are implemented in `eb652b2` and `d431b7b`; self-contained GLB export in `94cd8b9`; the licensed external FBX/USD tool boundary in `c3863b3`; GLB validation and auditable converter profiles in `cc902cc` and `d9a7ae4`.
 
 Develop only after Core contracts stabilize:
 
@@ -199,7 +199,7 @@ MCP must remain a thin orchestration surface, not a second implementation of Sha
 ## Immediate continuation
 
 1. Keep `python tools/shapeforge.py repository` and `python tools/shapeforge.py verify` green as contracts evolve.
-2. Exercise reference reconstruction against a broader curated image corpus and record measurable failure modes.
-3. Harden GLB compatibility with external validator fixtures and real consuming pipelines.
-4. Add Godot or Unreal adapters only when the target toolchain and a real project are available for end-to-end validation.
-5. Record the chosen converter, version, command, and license before publishing FBX/USD artifacts.
+2. Populate `shapeforge.reconstruction-corpus/1.0` manifests with licensed reference images and use `benchmark-reconstruction` to record measurable failure modes; corpus automation landed in `e2aa238`.
+3. Run `validate-glb` with the Khronos validator and real consuming pipelines; local structural and external-command validation landed in `cc902cc`.
+4. Create a pinned converter profile from `Docs/converter-profile.example.json` before publishing FBX/USD artifacts; profile enforcement and reporting landed in `d9a7ae4`.
+5. Keep Godot and Unreal adapters outside the current scope until a target project and end-to-end toolchain are explicitly selected.

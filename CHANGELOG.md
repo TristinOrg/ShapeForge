@@ -2,6 +2,14 @@
 
 All notable repository-level changes are documented here. Package-specific details are available in each package's `CHANGELOG.md`.
 
+## [Unreleased]
+
+### Added
+
+- GLB 2.0 structural validation with optional external validator execution and machine-readable reports.
+- Auditable FBX/USD converter profiles that pin tool identity, version, license, formats, and command.
+- Curated reference-reconstruction corpus benchmarks with thresholds and aggregated failure modes.
+
 ## [0.1.0] - 2026-08-01
 
 ### Added
