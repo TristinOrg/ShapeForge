@@ -55,7 +55,9 @@ namespace ShapeForge.LowPoly.Tests
                     Volume         = 1.12f,
                     Parting        = 0.3f,
                     FringeLength   = 0.8f,
-                    SideburnLength = 0.2f
+                    SideburnLength = 0.2f,
+                    SpikeLength    = 1.25f,
+                    BackSpikeVolume = 1.15f
                 },
                 Face         = new()
                 {
@@ -74,6 +76,7 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode shoulder     = FindNode(result.Root, "hero.arm.right.shoulder.pivot");
             ShapeNode pants        = FindNode(result.Root, "hero.leg.left.pants");
             ShapeNode eye          = FindNode(result.Root, "hero.eye.left");
+            ShapeNode backSpike    = FindNode(result.Root, "hero.hair.spike.back-right");
 
             Assert.That(result.Name, Is.EqualTo("Custom Hero"));
             Assert.That(result.Root.Transform.Scale, Is.EqualTo(new ForgeVector3(1.1f, 1.1f, 1.1f)));
@@ -85,6 +88,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(resultHead.ProfileCageSections, Has.Count.EqualTo(5));
             Assert.That(eye.Transform.Position.X, Is.EqualTo(-0.205f * 0.9f).Within(0.0001f));
             Assert.That(eye.Transform.Scale.Y, Is.EqualTo(0.105f * 1.2f * 0.75f).Within(0.0001f));
+            Assert.That(backSpike.Transform.Position.Z, Is.EqualTo(0.44f * 1.15f).Within(0.0001f));
+            Assert.That(backSpike.Transform.Scale.Y, Is.EqualTo(0.36f * 1.25f).Within(0.0001f));
         }
 
         [Test]

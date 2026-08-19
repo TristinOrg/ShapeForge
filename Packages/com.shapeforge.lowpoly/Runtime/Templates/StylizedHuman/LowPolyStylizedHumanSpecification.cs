@@ -110,5 +110,11 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Gets or sets sideburn length around the ears.</summary>
         public float SideburnLength { get; set; } = 0.5f;
+
+        /// <summary>Gets or sets the length of silhouette-defining crown and side spikes.</summary>
+        public float SpikeLength { get; set; } = 1f;
+
+        /// <summary>Gets or sets the projection of layered spikes behind the skull.</summary>
+        public float BackSpikeVolume { get; set; } = 1f;
     }
 }

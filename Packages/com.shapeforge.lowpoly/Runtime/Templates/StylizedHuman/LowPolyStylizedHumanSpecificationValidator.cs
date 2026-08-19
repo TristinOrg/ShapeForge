@@ -47,6 +47,8 @@ namespace ShapeForge.LowPoly
             ValidateRange(specification.Hair.Parting, 0.15f, 0.85f, "hair.parting");
             ValidateRange(specification.Hair.FringeLength, 0f, 1f, "hair.fringeLength");
             ValidateRange(specification.Hair.SideburnLength, 0f, 1f, "hair.sideburnLength");
+            ValidateRange(specification.Hair.SpikeLength, 0.6f, 1.5f, "hair.spikeLength");
+            ValidateRange(specification.Hair.BackSpikeVolume, 0.6f, 1.5f, "hair.backSpikeVolume");
         }
 
         private static void ValidateRange(float value, float minimum, float maximum, string path)

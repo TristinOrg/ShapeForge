@@ -218,6 +218,7 @@ namespace ShapeForge.LowPoly
                     3,
                     1);
                 AddHairDetails(head, hairShape);
+                AddLayeredHairSpikes(head, hairShape);
             });
         }
 
@@ -298,6 +299,57 @@ namespace ShapeForge.LowPoly
                         .ExtrudedProfile(0.025f, 0.004f,
                             new(-0.5f, 0.5f), new(0.18f, 0.38f), new(0.5f, -0.5f), new(-0.08f, -0.2f))
                         .ColorRole("hair.light"));
+        }
+
+        private static void AddLayeredHairSpikes(ShapeNodeBuilder head, LowPolyStylizedHumanHair hair)
+        {
+            float length = hair.SpikeLength;
+            float back   = hair.BackSpikeVolume;
+            AddHairSpike(head, "crown-left", "Crown Left Spike", new(-0.16f, 1.03f, 0.02f),
+                new(-8f, -18f, 22f), new(0.18f, 0.31f * length, 0.14f), "hair.light");
+            AddHairSpike(head, "crown-center", "Crown Center Spike", new(0.04f, 1.1f, 0.04f),
+                new(-12f, 4f, -5f), new(0.17f, 0.36f * length, 0.15f), "hair");
+            AddHairSpike(head, "crown-right", "Crown Right Spike", new(0.25f, 1.01f, 0.06f),
+                new(-10f, 18f, -25f), new(0.17f, 0.3f * length, 0.14f), "hair.shadow");
+
+            AddHairSpike(head, "side-left-upper", "Left Upper Side Spike", new(-0.47f, 0.84f, 0.05f),
+                new(0f, -72f, 68f), new(0.16f, 0.3f * length, 0.14f), "hair");
+            AddHairSpike(head, "side-left-lower", "Left Lower Side Spike", new(-0.51f, 0.62f, 0.12f),
+                new(5f, -82f, 82f), new(0.15f, 0.27f * length, 0.13f), "hair.shadow");
+            AddHairSpike(head, "side-right-upper", "Right Upper Side Spike", new(0.5f, 0.84f, 0.06f),
+                new(0f, 72f, -68f), new(0.17f, 0.32f * length, 0.14f), "hair");
+            AddHairSpike(head, "side-right-lower", "Right Lower Side Spike", new(0.53f, 0.61f, 0.13f),
+                new(5f, 82f, -82f), new(0.15f, 0.28f * length, 0.13f), "hair.shadow");
+
+            AddHairSpike(head, "back-top", "Back Top Spike", new(0.12f, 0.96f, 0.4f * back),
+                new(72f, 8f, -8f), new(0.18f, 0.34f * length, 0.16f), "hair");
+            AddHairSpike(head, "back-left", "Back Left Spike", new(-0.3f, 0.78f, 0.43f * back),
+                new(78f, -34f, 28f), new(0.18f, 0.33f * length, 0.15f), "hair.shadow");
+            AddHairSpike(head, "back-right", "Back Right Spike", new(0.34f, 0.76f, 0.44f * back),
+                new(78f, 38f, -30f), new(0.19f, 0.36f * length, 0.16f), "hair");
+            AddHairSpike(head, "back-left-lower", "Back Left Lower Spike", new(-0.24f, 0.53f, 0.43f * back),
+                new(88f, -28f, 42f), new(0.16f, 0.29f * length, 0.14f), "hair.shadow");
+            AddHairSpike(head, "back-right-lower", "Back Right Lower Spike", new(0.26f, 0.5f, 0.44f * back),
+                new(88f, 30f, -44f), new(0.17f, 0.31f * length, 0.14f), "hair.shadow");
+        }
+
+        private static void AddHairSpike(
+            ShapeNodeBuilder head,
+            string           id,
+            string           name,
+            ForgeVector3     position,
+            ForgeVector3     rotation,
+            ForgeVector3     scale,
+            string           colorRole)
+        {
+            head.Shape($"hero.hair.spike.{id}", name, LowPolyShapeTypes.ExtrudedProfile, spike => spike
+                .Position(position.X, position.Y, position.Z)
+                .Rotation(rotation.X, rotation.Y, rotation.Z)
+                .Scale(scale.X, scale.Y, scale.Z)
+                .ExtrudedProfile(0.12f, 0.012f,
+                    new(-0.5f, 0.42f), new(-0.2f, 0.5f), new(0.5f, -0.5f), new(-0.32f, -0.12f))
+                .ProfileSmoothing(1)
+                .ColorRole(colorRole));
         }
 
         private static void AddReferenceCage(

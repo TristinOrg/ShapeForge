@@ -46,12 +46,14 @@
     "hair": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["volume", "parting", "fringeLength", "sideburnLength"],
+      "required": ["volume", "parting", "fringeLength", "sideburnLength", "spikeLength", "backSpikeVolume"],
       "properties": {
         "volume": { "type": "number", "minimum": 0.8, "maximum": 1.3 },
         "parting": { "type": "number", "minimum": 0.15, "maximum": 0.85 },
         "fringeLength": { "type": "number", "minimum": 0, "maximum": 1 },
-        "sideburnLength": { "type": "number", "minimum": 0, "maximum": 1 }
+        "sideburnLength": { "type": "number", "minimum": 0, "maximum": 1 },
+        "spikeLength": { "type": "number", "minimum": 0.6, "maximum": 1.5 },
+        "backSpikeVolume": { "type": "number", "minimum": 0.6, "maximum": 1.5 }
       }
     }
   }

@@ -25,6 +25,8 @@
     "volume": 1.08,
     "parting": 0.7,
     "fringeLength": 0.72,
-    "sideburnLength": 0.42
+    "sideburnLength": 0.42,
+    "spikeLength": 1.18,
+    "backSpikeVolume": 1.12
   }
 }
