@@ -10,7 +10,7 @@ The Fantasy Hero uses authored, semantically aligned profile cages for a coheren
 
 `LowPolyHumanoidHeroPreset` starts from the complete `LowPolyHeroPreset` definition, preserves every authored appearance node, then reparents its pivots and inserts the missing Chest, Neck, Hand, and Foot bones required by `UnityHumanoidAvatarBuilder`. The original display preset remains unchanged.
 
-Use `LowPolyShapeCapabilityCatalog.Instance` to query all eleven supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
+Use `LowPolyShapeCapabilityCatalog.Instance` to query all twelve supported geometry types without reflection. `TryGet` performs a cached exact-ID lookup. Call `CreateDocument` and serialize it through the Unity Adapter only when external tools need the complete machine-readable catalog.
 
 `LowPolyStylizedHumanTemplate` is the first optional semantic compiler. It accepts a validated `LowPolyStylizedHumanSpecification` with readable body, head, and hair controls, then produces the same articulated Shape Definition used by the Hero preset. Its Draft 2020-12 Schema and prompt-ready example live under `Documentation~/Templates`.
 

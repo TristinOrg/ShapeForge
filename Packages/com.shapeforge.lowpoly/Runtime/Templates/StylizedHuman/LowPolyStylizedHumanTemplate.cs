@@ -15,6 +15,7 @@ namespace ShapeForge.LowPoly
                 ShapeTypes.Group,
                 LowPolyShapeTypes.Sphere,
                 LowPolyShapeTypes.Capsule,
+                LowPolyShapeTypes.HairTuft,
                 LowPolyShapeTypes.ExtrudedProfile,
                 LowPolyShapeTypes.ProfileLoft,
                 LowPolyShapeTypes.ProfileCage,

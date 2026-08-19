@@ -23,7 +23,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(FindNode(definition.Root, "hero.head"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.hair"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.eye.left"), Is.Not.Null);
-            Assert.That(FindNode(definition.Root, "hero.eye.right"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.eye.left").MirrorAxis, Is.EqualTo(ShapeMirrorAxis.X));
             Assert.That(FindNode(definition.Root, "hero.mouth"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.spine.pivot"), Is.Not.Null);
         }
@@ -98,7 +98,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(backSpike.Transform.Position.Z, Is.EqualTo(0.44f * 1.15f).Within(0.0001f));
             Assert.That(backSpike.Transform.Scale.Y, Is.EqualTo(0.36f * 1.25f).Within(0.0001f));
             Assert.That(bootShaft.Transform.Scale.Y, Is.EqualTo(0.58f * 1.15f * 1.08f).Within(0.0001f));
-            Assert.That(FindNode(result.Root, "hero.jacket.epaulette.right"), Is.Not.Null);
+            Assert.That(FindNode(result.Root, "hero.jacket.epaulette.left").MirrorAxis,
+                Is.EqualTo(ShapeMirrorAxis.X));
             Assert.That(FindNode(result.Root, "hero.arm.left.finger.outer"), Is.Not.Null);
             Assert.That(FindNode(result.Root, "hero.leg.right.boot.toe-panel"), Is.Not.Null);
         }
@@ -198,11 +199,12 @@ namespace ShapeForge.LowPoly.Tests
         {
             LowPolyStylizedHumanSpecification specification = LowPolyNoctisChibiPreset.CreateSpecification();
 
-            Assert.That(specification.Proportions.HeadScale, Is.EqualTo(1.15f));
+            Assert.That(specification.Proportions.HeadScale, Is.EqualTo(1.18f));
             Assert.That(specification.Head.JawWidth, Is.LessThan(0.9f));
             Assert.That(specification.Hair.FringeLength, Is.GreaterThanOrEqualTo(0.9f));
             Assert.That(specification.Hair.BackSpikeVolume, Is.GreaterThan(1f));
-            Assert.That(specification.Outfit.BootHeight, Is.GreaterThan(1f));
+            Assert.That(specification.Outfit.ShortsVolume, Is.GreaterThan(1.2f));
+            Assert.That(specification.Outfit.BootHeight, Is.LessThan(1f));
         }
 
         [Test]
@@ -214,7 +216,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(FindNode(definition.Root, "hero.eye.left"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.hair.fringe.primary"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.hair.spike.back-right-lower"), Is.Not.Null);
-            Assert.That(FindNode(definition.Root, "hero.jacket.pocket.right"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.jacket.pocket.left").MirrorAxis,
+                Is.EqualTo(ShapeMirrorAxis.X));
             Assert.That(FindNode(definition.Root, "hero.arm.right.glove.cuff"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.leg.left.boot.laces"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.leg.right.sole"), Is.Not.Null);

@@ -61,7 +61,7 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(color.g, Is.EqualTo(expectedColor.g).Within(0.0001f));
             Assert.That(color.b, Is.EqualTo(expectedColor.b).Within(0.0001f));
             Assert.That(color.a, Is.EqualTo(expectedColor.a).Within(0.0001f));
-            Assert.That(prefabRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(42));
+            Assert.That(prefabRoot.GetComponent<UnityShapeAppearanceManifest>().BindingCount, Is.EqualTo(74));
             UnityShapeAssetManifest assetManifest = prefabRoot.GetComponent<UnityShapeAssetManifest>();
             Assert.That(assetManifest.Schema, Is.EqualTo(ShapeDefinition.CurrentSchema));
             Assert.That(assetManifest.NodeCount, Is.EqualTo(prefabRoot.GetComponent<UnityShapeModel>().BindingCount));

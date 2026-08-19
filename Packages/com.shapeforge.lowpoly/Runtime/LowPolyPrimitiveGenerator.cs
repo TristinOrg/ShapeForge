@@ -24,6 +24,7 @@ namespace ShapeForge.LowPoly
             return node != null &&
                    (PrimitiveTypes.ContainsKey(node.Type) ||
                     node.Type == LowPolyShapeTypes.Wedge ||
+                    node.Type == LowPolyShapeTypes.HairTuft ||
                     node.Type == LowPolyShapeTypes.Frustum ||
                     node.Type == LowPolyShapeTypes.ExtrudedProfile ||
                     node.Type == LowPolyShapeTypes.ProfileLoft ||
@@ -68,6 +69,9 @@ namespace ShapeForge.LowPoly
         {
             if (node.Type == LowPolyShapeTypes.Wedge)
                 return LowPolyProceduralMeshCache.GetWedge();
+
+            if (node.Type == LowPolyShapeTypes.HairTuft)
+                return LowPolyProceduralMeshCache.GetHairTuft();
 
             if (node.Type == LowPolyShapeTypes.ExtrudedProfile)
             {

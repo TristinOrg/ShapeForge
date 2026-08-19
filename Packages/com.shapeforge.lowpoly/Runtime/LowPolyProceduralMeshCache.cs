@@ -21,6 +21,12 @@ namespace ShapeForge.LowPoly
             return GetOrCreate(key, CreateWedge);
         }
 
+        public static Mesh GetHairTuft()
+        {
+            MeshKey key = new(LowPolyShapeTypes.HairTuft, 0f, 0f, 0f, 0f);
+            return GetOrCreate(key, CreateHairTuft);
+        }
+
         public static Mesh GetFrustum(float topWidth, float topDepth, float bottomWidth, float bottomDepth)
         {
             MeshKey key = new(
@@ -488,6 +494,23 @@ namespace ShapeForge.LowPoly
             builder.AddTriangle(bottomFrontLeft, bottomBackLeft, topBackLeft);
             builder.AddTriangle(bottomBackRight, bottomFrontRight, topBackRight);
             return builder.Build("Low Poly Wedge");
+        }
+
+        private static Mesh CreateHairTuft()
+        {
+            Vector3 frontLeft  = new(-0.5f, -0.5f, -0.5f);
+            Vector3 frontRight = new(0.5f, -0.5f, -0.5f);
+            Vector3 backRight  = new(0.42f, -0.5f, 0.5f);
+            Vector3 backLeft   = new(-0.42f, -0.5f, 0.5f);
+            Vector3 tip        = new(0f, 0.5f, 0.08f);
+            MeshBuilder builder = new();
+
+            builder.AddQuad(frontLeft, backLeft, backRight, frontRight);
+            builder.AddTriangle(frontLeft, frontRight, tip);
+            builder.AddTriangle(frontRight, backRight, tip);
+            builder.AddTriangle(backRight, backLeft, tip);
+            builder.AddTriangle(backLeft, frontLeft, tip);
+            return builder.Build("Low Poly Hair Tuft");
         }
 
         private static Mesh CreateFrustum(

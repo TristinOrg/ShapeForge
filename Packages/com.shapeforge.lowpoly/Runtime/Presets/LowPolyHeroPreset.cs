@@ -362,13 +362,10 @@ namespace ShapeForge.LowPoly
             ForgeVector3     scale,
             string           colorRole)
         {
-            head.Shape($"hero.hair.spike.{id}", name, LowPolyShapeTypes.ExtrudedProfile, spike => spike
+            head.Shape($"hero.hair.spike.{id}", name, LowPolyShapeTypes.HairTuft, spike => spike
                 .Position(position.X, position.Y, position.Z)
                 .Rotation(rotation.X, rotation.Y, rotation.Z)
                 .Scale(scale.X, scale.Y, scale.Z)
-                .ExtrudedProfile(0.12f, 0.012f,
-                    new(-0.5f, 0.42f), new(-0.2f, 0.5f), new(0.5f, -0.5f), new(-0.32f, -0.12f))
-                .ProfileSmoothing(1)
                 .ColorRole(colorRole));
         }
 
@@ -724,10 +721,10 @@ namespace ShapeForge.LowPoly
                 OverallScale = 1f,
                 Proportions  = new()
                 {
-                    HeadScale     = 1.15f,
+                    HeadScale     = 1.18f,
                     ShoulderWidth = 0.9f,
-                    BodyWidth     = 0.92f,
-                    LegLength     = 1.05f
+                    BodyWidth     = 1.08f,
+                    LegLength     = 0.88f
                 },
                 Head         = new()
                 {
@@ -755,8 +752,8 @@ namespace ShapeForge.LowPoly
                 Outfit       = new()
                 {
                     DetailScale  = 1.2f,
-                    ShortsVolume = 1.12f,
-                    BootHeight   = 1.08f
+                    ShortsVolume = 1.22f,
+                    BootHeight   = 0.95f
                 }
             };
         }

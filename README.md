@@ -135,7 +135,7 @@ Stable node IDs are part of the data contract. They support regeneration, diagno
 
 ## Supported Low Poly geometry
 
-The official backend publishes eleven discoverable capabilities:
+The official backend publishes twelve discoverable capabilities:
 
 - Cube
 - Sphere
