@@ -154,6 +154,23 @@ def run_external_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_glb_validation(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_glb_validate import validate_glb
+    except ModuleNotFoundError:
+        from shapeforge_glb_validate import validate_glb
+
+    result = validate_glb(Path(args.source), args.validator, args.timeout)
+    output = json.dumps(result, indent=2, ensure_ascii=False)
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(output + "\n", encoding="utf-8")
+    else:
+        print(output)
+    return 0 if result["valid"] else 1
+
+
 def run_verify(args: argparse.Namespace) -> int:
     client = McpClient(args.instance)
     client.call("read_console", {"action": "clear"})
@@ -254,6 +271,12 @@ def parser() -> argparse.ArgumentParser:
     export_glb.add_argument("--asset", dest="argument", required=True, help="Output .glb path")
     export_glb.add_argument("-o", "--output", help="Output export report")
     export_glb.set_defaults(handler=run_document, other=None)
+    validate_glb = commands.add_parser("validate-glb")
+    validate_glb.add_argument("source", help="ShapeForge GLB asset")
+    validate_glb.add_argument("--validator", nargs="+", help="External validator command containing {input}")
+    validate_glb.add_argument("--timeout", type=int, default=120)
+    validate_glb.add_argument("-o", "--output", help="Output validation report")
+    validate_glb.set_defaults(handler=run_glb_validation)
     external = commands.add_parser("export-external")
     external.add_argument("source", help="ShapeForge GLB")
     external.add_argument("--asset", required=True, help="Output .fbx or USD-family asset")

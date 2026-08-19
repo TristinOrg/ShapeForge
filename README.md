@@ -257,6 +257,8 @@ python tools/shapeforge.py inventory model.json inventory.json
 python tools/shapeforge.py compare comparison.json
 python tools/shapeforge.py render model.json capture.json --images Library/ShapeForge/Renders -o capture-manifest.json
 python tools/shapeforge.py export-glb model.json --asset Library/ShapeForge/model.glb -o export-report.json
+python tools/shapeforge.py validate-glb Library/ShapeForge/model.glb -o glb-validation.json
+python tools/shapeforge.py validate-glb Library/ShapeForge/model.glb --validator gltf-validator -i {input}
 python tools/shapeforge.py export-external Library/ShapeForge/model.glb --asset Exports/model.fbx --converter blender --background --python convert.py -- {input} {output}
 python tools/shapeforge.py image-compare reference-images.json capture-manifest.json -o comparison.json
 python tools/shapeforge.py image-reconstruct model.json reference-images.json capture.json -o best-model.json --work Library/ShapeForge/Reconstruction
