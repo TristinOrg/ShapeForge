@@ -143,6 +143,17 @@ def run_image_reconstruction(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_reconstruction_benchmark(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_reconstruction_benchmark import run_benchmark
+    except ModuleNotFoundError:
+        from shapeforge_reconstruction_benchmark import run_benchmark
+
+    result = run_benchmark(Path(args.manifest), Path(args.output), Path(args.work))
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0 if result["passed"] else 1
+
+
 def run_external_export(args: argparse.Namespace) -> int:
     try:
         from tools.shapeforge_external_export import export_external, export_with_profile
@@ -308,6 +319,11 @@ def parser() -> argparse.ArgumentParser:
     image_reconstruct.add_argument("--target-score", type=float, default=0.9)
     image_reconstruct.add_argument("--min-improvement", type=float, default=0.005)
     image_reconstruct.set_defaults(handler=run_image_reconstruction)
+    benchmark = commands.add_parser("benchmark-reconstruction")
+    benchmark.add_argument("manifest", help="Curated reconstruction corpus manifest")
+    benchmark.add_argument("-o", "--output", required=True, help="Aggregate benchmark report")
+    benchmark.add_argument("--work", required=True, help="Per-case artifacts folder")
+    benchmark.set_defaults(handler=run_reconstruction_benchmark)
     repository = commands.add_parser("repository")
     repository.set_defaults(handler=run_repository)
     verify = commands.add_parser("verify")

@@ -263,6 +263,7 @@ python tools/shapeforge.py export-external Library/ShapeForge/model.glb --asset 
 python tools/shapeforge.py export-external Library/ShapeForge/model.glb --asset Exports/model.fbx --profile Docs/converter-profile.json
 python tools/shapeforge.py image-compare reference-images.json capture-manifest.json -o comparison.json
 python tools/shapeforge.py image-reconstruct model.json reference-images.json capture.json -o best-model.json --work Library/ShapeForge/Reconstruction
+python tools/shapeforge.py benchmark-reconstruction Docs/reconstruction-corpus.json -o Library/ShapeForge/benchmark.json --work Library/ShapeForge/Benchmark
 python tools/shapeforge.py plan construction-plan.json
 python tools/shapeforge.py step model.json construction-plan.json --pass structure -o result.json
 python tools/shapeforge.py game model.json game-metadata.json
