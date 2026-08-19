@@ -1,0 +1,20 @@
+{
+  "schema": "shapeforge.converter-profile/1.0",
+  "id": "organization/tool-name",
+  "version": "replace-with-pinned-version",
+  "license": "replace-with-SPDX-or-license-reference",
+  "formats": [
+    "fbx",
+    "usd",
+    "usda",
+    "usdc",
+    "usdz"
+  ],
+  "command": [
+    "converter-executable",
+    "--input",
+    "{input}",
+    "--output",
+    "{output}"
+  ]
+}

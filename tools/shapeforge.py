@@ -145,11 +145,15 @@ def run_image_reconstruction(args: argparse.Namespace) -> int:
 
 def run_external_export(args: argparse.Namespace) -> int:
     try:
-        from tools.shapeforge_external_export import export_external
+        from tools.shapeforge_external_export import export_external, export_with_profile
     except ModuleNotFoundError:
-        from shapeforge_external_export import export_external
+        from shapeforge_external_export import export_external, export_with_profile
 
-    result = export_external(Path(args.source), Path(args.asset), args.converter, args.timeout)
+    result = (
+        export_with_profile(Path(args.source), Path(args.asset), Path(args.profile), args.timeout)
+        if args.profile
+        else export_external(Path(args.source), Path(args.asset), args.converter, args.timeout)
+    )
     print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
@@ -280,8 +284,10 @@ def parser() -> argparse.ArgumentParser:
     external = commands.add_parser("export-external")
     external.add_argument("source", help="ShapeForge GLB")
     external.add_argument("--asset", required=True, help="Output .fbx or USD-family asset")
-    external.add_argument("--converter", nargs="+", required=True,
-                          help="Executable and arguments containing {input} and {output}")
+    converter_source = external.add_mutually_exclusive_group(required=True)
+    converter_source.add_argument("--converter", nargs="+",
+                                  help="Executable and arguments containing {input} and {output}")
+    converter_source.add_argument("--profile", help="Auditable converter profile JSON")
     external.add_argument("--timeout", type=int, default=300)
     external.set_defaults(handler=run_external_export)
     discover = commands.add_parser("discover")
