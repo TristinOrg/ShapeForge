@@ -434,11 +434,14 @@ Use `ShapeForge > Generate` in the Unity Editor. Commands are Undo-aware and sel
 - **Inventor Workbench** — layered furniture, drawers, lamp, tools, storage, and props.
 - **Sentinel Robot** — articulated mechanical hierarchy with semantic pivots.
 - **Fantasy Hero** — authored stylized human using rounded procedural forms and a semantic rig.
+- **Noctis Chibi experiment** — tuned 3.5-head proportions, facial planes, layered volumetric hair, short jacket, cargo shorts, fingerless gloves, tall laced boots, and red soles.
 - **Japanese Town** — traditional buildings, market furniture, shrine pieces, lanterns, and vegetation.
 - **Shibuya Crossing** — 189 nodes and 162 renderers forming a modern scramble crossing, four media buildings, signals, signage, and a lightweight crowd.
 - **Animated examples** — centralized transform motion for the workbench, robot, and hero.
 
 Presets are examples of the same public API available to applications; they are not special generator code paths.
+
+For repeatable visual review, run `ShapeForge > Experiments > Render Noctis Chibi Reference Views`. The command writes seven transparent-background captures and a manifest to `Library/ShapeForgeExperiments/NoctisChibi/Renders` without modifying the active scene.
 
 ## Extending ShapeForge
 
