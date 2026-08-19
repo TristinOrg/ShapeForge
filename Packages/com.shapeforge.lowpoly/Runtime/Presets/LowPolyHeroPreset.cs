@@ -706,3 +706,71 @@ namespace ShapeForge.LowPoly
         }
     }
 }
+
+namespace ShapeForge.LowPoly
+{
+    /// <summary>
+    /// Provides a measured Chibi experiment inspired by the supplied multi-view nocturnal hero reference.
+    /// </summary>
+    public static class LowPolyNoctisChibiPreset
+    {
+        /// <summary>Creates the tuned semantic specification used by the experiment.</summary>
+        public static LowPolyStylizedHumanSpecification CreateSpecification()
+        {
+            return new()
+            {
+                Name         = "Nocturnal Chibi Hero Experiment",
+                Style        = LowPolyHeroPreset.StyleId,
+                OverallScale = 1f,
+                Proportions  = new()
+                {
+                    HeadScale     = 1.15f,
+                    ShoulderWidth = 0.9f,
+                    BodyWidth     = 0.92f,
+                    LegLength     = 1.05f
+                },
+                Head         = new()
+                {
+                    Width    = 0.98f,
+                    Height   = 1.02f,
+                    Depth    = 1.04f,
+                    JawWidth = 0.84f
+                },
+                Face         = new()
+                {
+                    EyeScale    = 1.08f,
+                    EyeSpacing  = 0.94f,
+                    EyeOpenness = 0.78f,
+                    MouthWidth  = 0.72f
+                },
+                Hair         = new()
+                {
+                    Volume          = 1.12f,
+                    Parting         = 0.66f,
+                    FringeLength    = 0.9f,
+                    SideburnLength  = 0.66f,
+                    SpikeLength     = 1.28f,
+                    BackSpikeVolume = 1.2f
+                },
+                Outfit       = new()
+                {
+                    DetailScale  = 1.2f,
+                    ShortsVolume = 1.12f,
+                    BootHeight   = 1.08f
+                }
+            };
+        }
+
+        /// <summary>Creates the deterministic experiment definition.</summary>
+        public static ShapeDefinition CreateDefinition()
+        {
+            return LowPolyStylizedHumanTemplate.Instance.Compile(CreateSpecification());
+        }
+
+        /// <summary>Creates the measured blue-black, warm-skin, black-clothing, and red-sole palette.</summary>
+        public static ShapeStyleDefinition CreateStyle()
+        {
+            return LowPolyHeroPreset.CreateStyle();
+        }
+    }
+}

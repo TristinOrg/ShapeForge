@@ -185,3 +185,54 @@ namespace ShapeForge.LowPoly.Tests
         }
     }
 }
+
+namespace ShapeForge.LowPoly.Tests
+{
+    /// <summary>
+    /// Verifies the measured Noctis Chibi experiment remains semantically complete and reproducible.
+    /// </summary>
+    public sealed class LowPolyNoctisChibiPresetTests
+    {
+        [Test]
+        public void SpecificationCapturesReferenceSilhouetteControls()
+        {
+            LowPolyStylizedHumanSpecification specification = LowPolyNoctisChibiPreset.CreateSpecification();
+
+            Assert.That(specification.Proportions.HeadScale, Is.EqualTo(1.15f));
+            Assert.That(specification.Head.JawWidth, Is.LessThan(0.9f));
+            Assert.That(specification.Hair.FringeLength, Is.GreaterThanOrEqualTo(0.9f));
+            Assert.That(specification.Hair.BackSpikeVolume, Is.GreaterThan(1f));
+            Assert.That(specification.Outfit.BootHeight, Is.GreaterThan(1f));
+        }
+
+        [Test]
+        public void DefinitionIncludesEveryHighRecognitionDetail()
+        {
+            ShapeDefinition definition = LowPolyNoctisChibiPreset.CreateDefinition();
+
+            Assert.That(new ShapeDefinitionValidator().Analyze(definition).IsValid, Is.True);
+            Assert.That(FindNode(definition.Root, "hero.eye.left"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.hair.fringe.primary"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.hair.spike.back-right-lower"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.jacket.pocket.right"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.arm.right.glove.cuff"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.leg.left.boot.laces"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.leg.right.sole"), Is.Not.Null);
+        }
+
+        private static ShapeNode FindNode(ShapeNode node, string id)
+        {
+            if (node.Id == id)
+                return node;
+
+            foreach (ShapeNode child in node.Children)
+            {
+                ShapeNode result = FindNode(child, id);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
+        }
+    }
+}

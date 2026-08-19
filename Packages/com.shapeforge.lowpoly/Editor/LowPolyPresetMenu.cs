@@ -1,3 +1,5 @@
+using System.IO;
+using Newtonsoft.Json;
 using ShapeForge.Unity;
 using ShapeForge.Unity.Editor;
 using UnityEditor;
@@ -61,7 +63,53 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyHumanoidHeroPreset.CreateStyle());
         }
 
-        [MenuItem("ShapeForge/Generate/Animated Humanoid T-Pose Hero From Selected Clip", false, 16)]
+        [MenuItem("ShapeForge/Generate/Noctis Chibi Reference Experiment", false, 16)]
+        private static void GenerateNoctisChibiExperiment()
+        {
+            Generate(
+                LowPolyNoctisChibiPreset.CreateDefinition(),
+                LowPolyNoctisChibiPreset.CreateStyle());
+        }
+
+        [MenuItem("ShapeForge/Experiments/Render Noctis Chibi Reference Views", false, 10)]
+        private static void RenderNoctisChibiReferenceViews()
+        {
+            const string outputFolder = "Library/ShapeForgeExperiments/NoctisChibi/Renders";
+            ShapeDefinition definition = LowPolyNoctisChibiPreset.CreateDefinition();
+            LowPolyModelGenerator generator = new(new[] { LowPolyNoctisChibiPreset.CreateStyle() });
+            GameObject generated = generator.Generate(definition);
+            try
+            {
+                ShapeRenderCaptureRequest request = new()
+                {
+                    Id          = "noctis-chibi/reference-experiment",
+                    CandidateId = "noctis-chibi/v1",
+                    Width       = 768,
+                    Height      = 768,
+                    Views       = new ShapeRenderCaptureView[]
+                    {
+                        View("front", 0f, 0f),
+                        View("front-three-quarter", 45f, 0f),
+                        View("side", 90f, 0f),
+                        View("back-three-quarter", 135f, 0f),
+                        View("back", 180f, 0f),
+                        View("top", 0f, 72f),
+                        View("bottom", 180f, -72f)
+                    }
+                };
+                ShapeRenderCaptureManifest manifest = UnityShapeReferenceRenderer.Render(
+                    generated, request, outputFolder);
+                string manifestPath = Path.Combine(outputFolder, "capture-manifest.json");
+                File.WriteAllText(manifestPath, JsonConvert.SerializeObject(manifest, Formatting.Indented));
+                Debug.Log($"ShapeForge Noctis Chibi experiment rendered to {Path.GetFullPath(outputFolder)}");
+            }
+            finally
+            {
+                Object.DestroyImmediate(generated);
+            }
+        }
+
+        [MenuItem("ShapeForge/Generate/Animated Humanoid T-Pose Hero From Selected Clip", false, 17)]
         private static void GenerateAnimatedHumanoidHero()
         {
             AnimationClip clip = Selection.activeObject as AnimationClip;
@@ -138,6 +186,17 @@ namespace ShapeForge.LowPoly.Editor
             Selection.activeGameObject = generated;
             EditorGUIUtility.PingObject(generated);
             return generated;
+        }
+
+        private static ShapeRenderCaptureView View(string id, float azimuth, float elevation)
+        {
+            return new()
+            {
+                Id           = id,
+                Azimuth      = azimuth,
+                Elevation    = elevation,
+                FramingScale = 1.08f
+            };
         }
 
         private static string CreateAsset(Avatar avatar, string name)
