@@ -22,6 +22,9 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(definition.Root.Children, Has.Count.EqualTo(6));
             Assert.That(FindNode(definition.Root, "hero.head"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.hair"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.eye.left"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.eye.right"), Is.Not.Null);
+            Assert.That(FindNode(definition.Root, "hero.mouth"), Is.Not.Null);
             Assert.That(FindNode(definition.Root, "hero.spine.pivot"), Is.Not.Null);
         }
 
@@ -53,6 +56,13 @@ namespace ShapeForge.LowPoly.Tests
                     Parting        = 0.3f,
                     FringeLength   = 0.8f,
                     SideburnLength = 0.2f
+                },
+                Face         = new()
+                {
+                    EyeScale    = 1.2f,
+                    EyeSpacing  = 0.9f,
+                    EyeOpenness = 0.75f,
+                    MouthWidth  = 0.8f
                 }
             };
 
@@ -63,6 +73,7 @@ namespace ShapeForge.LowPoly.Tests
             ShapeNode resultHead   = FindNode(result.Root, "hero.head");
             ShapeNode shoulder     = FindNode(result.Root, "hero.arm.right.shoulder.pivot");
             ShapeNode pants        = FindNode(result.Root, "hero.leg.left.pants");
+            ShapeNode eye          = FindNode(result.Root, "hero.eye.left");
 
             Assert.That(result.Name, Is.EqualTo("Custom Hero"));
             Assert.That(result.Root.Transform.Scale, Is.EqualTo(new ForgeVector3(1.1f, 1.1f, 1.1f)));
@@ -72,6 +83,8 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(resultHair.Transform.Scale, Is.Not.EqualTo(baselineHair.Transform.Scale));
             Assert.That(resultHair.ProfileCageSections, Has.Count.EqualTo(5));
             Assert.That(resultHead.ProfileCageSections, Has.Count.EqualTo(5));
+            Assert.That(eye.Transform.Position.X, Is.EqualTo(-0.205f * 0.9f).Within(0.0001f));
+            Assert.That(eye.Transform.Scale.Y, Is.EqualTo(0.105f * 1.2f * 0.75f).Within(0.0001f));
         }
 
         [Test]
@@ -87,6 +100,10 @@ namespace ShapeForge.LowPoly.Tests
             LowPolyStylizedHumanSpecification invalidParting = new();
             invalidParting.Hair.Parting = 1f;
             Assert.Throws<ShapeValidationException>(() => validator.Validate(invalidParting));
+
+            LowPolyStylizedHumanSpecification invalidFace = new();
+            invalidFace.Face.EyeOpenness = 0f;
+            Assert.Throws<ShapeValidationException>(() => validator.Validate(invalidFace));
         }
 
         [Test]

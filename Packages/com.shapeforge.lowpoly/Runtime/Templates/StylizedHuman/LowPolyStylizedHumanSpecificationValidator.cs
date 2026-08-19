@@ -26,8 +26,9 @@ namespace ShapeForge.LowPoly
             if (string.IsNullOrWhiteSpace(specification.Style))
                 throw new ShapeValidationException("A stylized human requires a style ID.");
 
-            if (specification.Proportions == null || specification.Head == null || specification.Hair == null)
-                throw new ShapeValidationException("A stylized human requires proportions, head, and hair data.");
+            if (specification.Proportions == null || specification.Head == null ||
+                specification.Face == null || specification.Hair == null)
+                throw new ShapeValidationException("A stylized human requires proportions, head, face, and hair data.");
 
             ValidateRange(specification.OverallScale, 0.5f, 2f, "overallScale");
             ValidateRange(specification.Proportions.HeadScale, 0.7f, 1.4f, "proportions.headScale");
@@ -38,6 +39,10 @@ namespace ShapeForge.LowPoly
             ValidateRange(specification.Head.Height, 0.75f, 1.3f, "head.height");
             ValidateRange(specification.Head.Depth, 0.75f, 1.3f, "head.depth");
             ValidateRange(specification.Head.JawWidth, 0.7f, 1.25f, "head.jawWidth");
+            ValidateRange(specification.Face.EyeScale, 0.6f, 1.5f, "face.eyeScale");
+            ValidateRange(specification.Face.EyeSpacing, 0.7f, 1.3f, "face.eyeSpacing");
+            ValidateRange(specification.Face.EyeOpenness, 0.35f, 1.4f, "face.eyeOpenness");
+            ValidateRange(specification.Face.MouthWidth, 0.5f, 1.5f, "face.mouthWidth");
             ValidateRange(specification.Hair.Volume, 0.8f, 1.3f, "hair.volume");
             ValidateRange(specification.Hair.Parting, 0.15f, 0.85f, "hair.parting");
             ValidateRange(specification.Hair.FringeLength, 0f, 1f, "hair.fringeLength");

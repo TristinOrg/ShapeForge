@@ -60,7 +60,9 @@ namespace ShapeForge.LowPoly
                 {
                     hero.Scale(specification.OverallScale, specification.OverallScale, specification.OverallScale);
                     AddBody(hero, proportions);
-                    AddHead(hero, headCage, hairCage, proportions.HeadScale, specification.Head, specification.Hair);
+                    AddHead(
+                        hero, headCage, hairCage, proportions.HeadScale,
+                        specification.Head, specification.Face, specification.Hair);
                     float shoulderX = 0.36f * proportions.ShoulderWidth * proportions.BodyWidth;
                     AddArm(hero, "left", "Left", -shoulderX);
                     AddArm(hero, "right", "Right", shoulderX);
@@ -170,6 +172,7 @@ namespace ShapeForge.LowPoly
             LowPolyReferenceProfileCage   hairCage,
             float                         headScale,
             LowPolyStylizedHumanHead      headShape,
+            LowPolyStylizedHumanFace      faceShape,
             LowPolyStylizedHumanHair      hairShape)
         {
             hero.Group("hero.head.pivot", "Head Pivot", head =>
@@ -200,6 +203,7 @@ namespace ShapeForge.LowPoly
                     3,
                     1);
                 AddEars(head, headShape);
+                AddFaceDetails(head, faceShape);
                 AddReferenceCage(
                     head,
                     "hero.hair",
@@ -215,6 +219,33 @@ namespace ShapeForge.LowPoly
                     1);
                 AddHairDetails(head, hairShape);
             });
+        }
+
+        private static void AddFaceDetails(ShapeNodeBuilder head, LowPolyStylizedHumanFace face)
+        {
+            float eyeX      = 0.205f * face.EyeSpacing;
+            float eyeWidth  = 0.15f * face.EyeScale;
+            float eyeHeight = 0.105f * face.EyeScale * face.EyeOpenness;
+            head.Shape("hero.eye.left", "Left Stylized Eye", LowPolyShapeTypes.ExtrudedProfile, eye => eye
+                    .Position(-eyeX, 0.43f, -0.448f)
+                    .Rotation(0f, 0f, -5f)
+                    .Scale(eyeWidth, eyeHeight, 1f)
+                    .ExtrudedProfile(0.018f, 0.003f,
+                        new(-0.5f, 0f), new(-0.28f, 0.42f), new(0.2f, 0.5f),
+                        new(0.5f, 0.12f), new(0.24f, -0.48f), new(-0.28f, -0.42f))
+                    .ColorRole("eye")
+                    .Mirror(ShapeMirrorAxis.X))
+                .Shape("hero.eye.glint.left", "Left Eye Glint", LowPolyShapeTypes.Sphere, glint => glint
+                    .Position(-eyeX - (eyeWidth * 0.12f), 0.455f, -0.462f)
+                    .Scale(0.023f * face.EyeScale, 0.018f * face.EyeScale, 0.009f)
+                    .Color(0.72f, 0.82f, 0.94f)
+                    .Mirror(ShapeMirrorAxis.X))
+                .Shape("hero.mouth", "Subtle Chibi Mouth", LowPolyShapeTypes.ExtrudedProfile, mouth => mouth
+                    .Position(0f, 0.205f, -0.472f)
+                    .Scale(0.075f * face.MouthWidth, 0.025f, 1f)
+                    .ExtrudedProfile(0.012f, 0.002f,
+                        new(-0.5f, 0.12f), new(0f, -0.2f), new(0.5f, 0.12f), new(0f, 0.18f))
+                    .ColorRole("mouth"));
         }
 
         private static void AddEars(ShapeNodeBuilder head, LowPolyStylizedHumanHead shape)

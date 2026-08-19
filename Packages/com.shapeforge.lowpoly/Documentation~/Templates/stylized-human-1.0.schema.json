@@ -32,6 +32,17 @@
         "jawWidth": { "type": "number", "minimum": 0.7, "maximum": 1.25 }
       }
     },
+    "face": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eyeScale", "eyeSpacing", "eyeOpenness", "mouthWidth"],
+      "properties": {
+        "eyeScale": { "type": "number", "minimum": 0.6, "maximum": 1.5 },
+        "eyeSpacing": { "type": "number", "minimum": 0.7, "maximum": 1.3 },
+        "eyeOpenness": { "type": "number", "minimum": 0.35, "maximum": 1.4 },
+        "mouthWidth": { "type": "number", "minimum": 0.5, "maximum": 1.5 }
+      }
+    },
     "hair": {
       "type": "object",
       "additionalProperties": false,

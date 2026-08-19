@@ -29,6 +29,9 @@ namespace ShapeForge.LowPoly
         /// <summary>Gets or sets semantic head proportions.</summary>
         public LowPolyStylizedHumanHead Head { get; set; } = new();
 
+        /// <summary>Gets or sets stylized facial-feature controls.</summary>
+        public LowPolyStylizedHumanFace Face { get; set; } = new();
+
         /// <summary>Gets or sets semantic hair controls.</summary>
         public LowPolyStylizedHumanHair Hair { get; set; } = new();
     }
@@ -69,6 +72,25 @@ namespace ShapeForge.LowPoly
 
         /// <summary>Gets or sets lower-face and jaw width.</summary>
         public float JawWidth { get; set; } = 1f;
+    }
+
+    /// <summary>
+    /// Defines normalized Chibi facial-feature controls around the template defaults.
+    /// </summary>
+    [Serializable]
+    public sealed class LowPolyStylizedHumanFace
+    {
+        /// <summary>Gets or sets eye width and height together.</summary>
+        public float EyeScale { get; set; } = 1f;
+
+        /// <summary>Gets or sets horizontal eye spacing.</summary>
+        public float EyeSpacing { get; set; } = 1f;
+
+        /// <summary>Gets or sets the visible vertical eye opening.</summary>
+        public float EyeOpenness { get; set; } = 1f;
+
+        /// <summary>Gets or sets mouth width.</summary>
+        public float MouthWidth { get; set; } = 1f;
     }
 
     /// <summary>

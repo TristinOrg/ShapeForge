@@ -15,6 +15,12 @@
     "depth": 1.02,
     "jawWidth": 0.86
   },
+  "face": {
+    "eyeScale": 1.1,
+    "eyeSpacing": 0.94,
+    "eyeOpenness": 0.82,
+    "mouthWidth": 0.8
+  },
   "hair": {
     "volume": 1.08,
     "parting": 0.7,
