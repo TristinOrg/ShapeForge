@@ -25,9 +25,6 @@ namespace ShapeForge.LowPoly
             Basic(LowPolyShapeTypes.Wedge, "A unit triangular prism.",
                 "Roof slopes, ramps, fins, simple hair spikes, and directional accents.",
                 "Only one fixed triangular-prism topology."),
-            Basic(LowPolyShapeTypes.HairTuft, "A four-sided volume tapering from a compact base to one tip.",
-                "Layered hair clumps, fur tufts, feathers, foliage tips, and directional silhouette accents.",
-                "One straight tapered tuft; bend or compound curvature requires multiple authored parts."),
             new(
                 LowPolyShapeTypes.Frustum,
                 "A centered box volume with independent top and bottom dimensions.",

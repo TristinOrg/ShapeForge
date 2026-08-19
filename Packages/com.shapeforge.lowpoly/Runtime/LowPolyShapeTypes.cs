@@ -31,11 +31,6 @@ namespace ShapeForge.LowPoly
         public const string Wedge = "lowpoly/wedge";
 
         /// <summary>
-        /// Identifies a four-sided tapered tuft with a compact base and one directional tip.
-        /// </summary>
-        public const string HairTuft = "lowpoly/hair-tuft";
-
-        /// <summary>
         /// Identifies a centered tapered box controlled by top and bottom dimensions.
         /// </summary>
         public const string Frustum = "lowpoly/frustum";

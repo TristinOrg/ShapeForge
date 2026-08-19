@@ -58,7 +58,7 @@ Schema provides versioned engine-agnostic shape and style documents with optiona
 ## Testing And Validation
 
 - Unity Test Framework is installed.
-- Seventy-seven first-party EditMode tests cover fluent authoring, published JSON contracts, extraction guidance, cached style inheritance, validated capability and semantic-template discovery/export, stylized-human semantic compilation, generic reference mapping, runtime generation, prepared count- and time-budgeted batches, hierarchy adaptation, validation, lifecycle-safe appearance, shared render resources, procedural geometry including independent profile cages, presets, and motion-ready pivots.
+- First-party EditMode tests cover fluent authoring, published JSON contracts, extraction guidance, cached style inheritance, validated capability and semantic-template discovery/export, generic reference mapping, runtime generation, prepared count- and time-budgeted batches, hierarchy adaptation, validation, lifecycle-safe appearance, shared render resources, procedural geometry including independent profile cages, remaining presets, and motion-ready pivots.
 - `ShapeForge > Diagnostics > Benchmark JSON Generation` measures 200 alternating Table and Robot JSON generations, managed heap growth, and shared render-resource counts without saving generated objects.
 - The benchmark reports JSON parsing and prepared-definition generation separately. Repeated runtime models should call `LowPolyModelGenerator.ParseJson` once and reuse the validated definition.
 - Prepared batches use `UnityShapeGenerationPlan` to validate an immutable definition once before repeated generation.

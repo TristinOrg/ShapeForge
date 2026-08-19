@@ -7,7 +7,6 @@ namespace ShapeForge.LowPoly
     {
         /// <summary>Gets the cached catalog of official Low Poly semantic compilers.</summary>
         public static ShapeTemplateCatalog Instance { get; } = new(
-            LowPolyStylizedHumanTemplate.Instance,
             LowPolyHairTemplate.Instance,
             LowPolyArmorTemplate.Instance,
             LowPolyWeaponTemplate.Instance,

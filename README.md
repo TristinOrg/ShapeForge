@@ -135,7 +135,7 @@ Stable node IDs are part of the data contract. They support regeneration, diagno
 
 ## Supported Low Poly geometry
 
-The official backend publishes twelve discoverable capabilities:
+The official backend publishes eleven discoverable capabilities:
 
 - Cube
 - Sphere
@@ -298,7 +298,7 @@ The complete deterministic reference-image path uses `shapeforge.reference-image
 
 Game Semantic Metadata is also portable. A `shapeforge.game-metadata/1.0` document binds sockets, grips, interaction and IK anchors, damage zones, collider rules, LOD membership, and gameplay tags to stable node IDs. Core validates those bindings; the Unity adapter compiles them into child transforms, native colliders, `LODGroup`, and a cached runtime manifest. This keeps gameplay intent readable and editable without placing Unity types in Core.
 
-The official Low Poly semantic library now covers the ordered Hair, Armor, Weapon, Building, and Vehicle categories alongside the stylized-human template. Catalog descriptors expose bounded dimensions for tool discovery. Each template compiles stable node IDs and can publish a matching Detail Inventory and Quality Policy; versioned JSON Schema and representative specifications live under `Packages/com.shapeforge.lowpoly/Documentation~/Templates`.
+The official Low Poly semantic library covers the ordered Hair, Armor, Weapon, Building, and Vehicle categories. Catalog descriptors expose bounded dimensions for tool discovery. Each template compiles stable node IDs and can publish a matching Detail Inventory and Quality Policy; versioned JSON Schema and representative specifications live under `Packages/com.shapeforge.lowpoly/Documentation~/Templates`.
 
 Reconstruction Orchestration persists Assessment, Detail Inventory, Construction Plan, Render Compare, reviewed ShapePatch, and Quality Policy as one `shapeforge.reconstruction/1.0` workflow. `ShapeReconstructionOrchestrator` advances exactly one deterministic stage, applies corrections transactionally, and stops at an authored iteration bound. Python only transports requests to the C# implementation; providers remain outside ShapeForge.
 
@@ -313,15 +313,6 @@ Construction Plans organize generation into resumable dependency-ordered passes:
 ## Semantic templates
 
 `ShapeTemplate<TSpecification>` compiles domain-readable specifications into ordinary `ShapeDefinition` documents. `ShapeTemplateCatalog` exposes versioned descriptors with category, tags, required shape capabilities, and specification schema IDs.
-
-The first official compiler is `LowPolyStylizedHumanTemplate`, with readable controls for:
-
-- overall scale;
-- head scale and proportions;
-- shoulder and body width;
-- leg length;
-- jaw and depth controls;
-- hair volume, parting, fringe, and sideburn length.
 
 Templates are optional convenience layers. Raw Shape Definitions remain the universal interchange format for characters, furniture, buildings, robots, environments, and future categories.
 
@@ -433,15 +424,11 @@ Use `ShapeForge > Generate` in the Unity Editor. Commands are Undo-aware and sel
 
 - **Inventor Workbench** — layered furniture, drawers, lamp, tools, storage, and props.
 - **Sentinel Robot** — articulated mechanical hierarchy with semantic pivots.
-- **Fantasy Hero** — authored stylized human using rounded procedural forms and a semantic rig.
-- **Noctis Chibi experiment** — tuned 3.5-head proportions, facial planes, layered volumetric hair, short jacket, cargo shorts, fingerless gloves, tall laced boots, and red soles.
 - **Japanese Town** — traditional buildings, market furniture, shrine pieces, lanterns, and vegetation.
 - **Shibuya Crossing** — 189 nodes and 162 renderers forming a modern scramble crossing, four media buildings, signals, signage, and a lightweight crowd.
 - **Animated examples** — centralized transform motion for the workbench, robot, and hero.
 
 Presets are examples of the same public API available to applications; they are not special generator code paths.
-
-For repeatable visual review, run `ShapeForge > Experiments > Render Noctis Chibi Reference Views`. The command writes seven transparent-background captures and a manifest to `Library/ShapeForgeExperiments/NoctisChibi/Renders` without modifying the active scene.
 
 ## Extending ShapeForge
 

@@ -1,9 +1,6 @@
-using System.IO;
-using Newtonsoft.Json;
 using ShapeForge.Unity;
 using ShapeForge.Unity.Editor;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 
 namespace ShapeForge.LowPoly.Editor
@@ -13,8 +10,6 @@ namespace ShapeForge.LowPoly.Editor
     /// </summary>
     internal static class LowPolyPresetMenu
     {
-        private const string GeneratedAssetFolder = "Assets/ShapeForge/Generated";
-
         [MenuItem("ShapeForge/Generate/Inventor Workbench", false, 10)]
         private static void GenerateWorkbench()
         {
@@ -39,102 +34,12 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyJapaneseTownPreset.CreateStyle());
         }
 
-        [MenuItem("ShapeForge/Generate/Fantasy Hero", false, 13)]
-        private static void GenerateHero()
-        {
-            Generate(
-                LowPolyHeroPreset.CreateDefinition(),
-                LowPolyHeroPreset.CreateStyle());
-        }
-
         [MenuItem("ShapeForge/Generate/Shibuya Crossing", false, 14)]
         private static void GenerateShibuyaCrossing()
         {
             Generate(
                 LowPolyShibuyaCrossingPreset.CreateDefinition(),
                 LowPolyShibuyaCrossingPreset.CreateStyle());
-        }
-
-        [MenuItem("ShapeForge/Generate/Humanoid T-Pose Hero", false, 15)]
-        private static void GenerateHumanoidHero()
-        {
-            Generate(
-                LowPolyHumanoidHeroPreset.CreateDefinition(),
-                LowPolyHumanoidHeroPreset.CreateStyle());
-        }
-
-        [MenuItem("ShapeForge/Generate/Noctis Chibi Reference Experiment", false, 16)]
-        private static void GenerateNoctisChibiExperiment()
-        {
-            Generate(
-                LowPolyNoctisChibiPreset.CreateDefinition(),
-                LowPolyNoctisChibiPreset.CreateStyle());
-        }
-
-        [MenuItem("ShapeForge/Experiments/Render Noctis Chibi Reference Views", false, 10)]
-        private static void RenderNoctisChibiReferenceViews()
-        {
-            const string outputFolder = "Library/ShapeForgeExperiments/NoctisChibi/Renders";
-            ShapeDefinition definition = LowPolyNoctisChibiPreset.CreateDefinition();
-            LowPolyModelGenerator generator = new(new[] { LowPolyNoctisChibiPreset.CreateStyle() });
-            GameObject generated = generator.Generate(definition);
-            try
-            {
-                ShapeRenderCaptureRequest request = new()
-                {
-                    Id          = "noctis-chibi/reference-experiment",
-                    CandidateId = "noctis-chibi/v1",
-                    Width       = 768,
-                    Height      = 768,
-                    Views       = new ShapeRenderCaptureView[]
-                    {
-                        View("front", 0f, 0f),
-                        View("front-three-quarter", 45f, 0f),
-                        View("side", 90f, 0f),
-                        View("back-three-quarter", 135f, 0f),
-                        View("back", 180f, 0f),
-                        View("top", 0f, 72f),
-                        View("bottom", 180f, -72f)
-                    }
-                };
-                ShapeRenderCaptureManifest manifest = UnityShapeReferenceRenderer.Render(
-                    generated, request, outputFolder);
-                string manifestPath = Path.Combine(outputFolder, "capture-manifest.json");
-                File.WriteAllText(manifestPath, JsonConvert.SerializeObject(manifest, Formatting.Indented));
-                Debug.Log($"ShapeForge Noctis Chibi experiment rendered to {Path.GetFullPath(outputFolder)}");
-            }
-            finally
-            {
-                Object.DestroyImmediate(generated);
-            }
-        }
-
-        [MenuItem("ShapeForge/Generate/Animated Humanoid T-Pose Hero From Selected Clip", false, 17)]
-        private static void GenerateAnimatedHumanoidHero()
-        {
-            AnimationClip clip = Selection.activeObject as AnimationClip;
-            if (clip == null || !clip.humanMotion)
-            {
-                EditorUtility.DisplayDialog(
-                    "Select a Humanoid AnimationClip",
-                    "Select an imported Humanoid AnimationClip in the Project window before generating this preview.",
-                    "OK");
-                return;
-            }
-
-            ShapeDefinition definition = LowPolyHumanoidHeroPreset.CreateDefinition();
-            GameObject generated = Generate(definition, LowPolyHumanoidHeroPreset.CreateStyle());
-            Avatar     avatar    = UnityHumanoidAvatarBuilder.CreateAvatar(
-                generated.GetComponent<UnityShapeModel>(),
-                definition.Rig);
-
-            string             avatarPath  = CreateAsset(avatar, "Humanoid Hero Avatar");
-            AnimatorController controller = CreatePreviewController(clip);
-            Animator           animator    = Undo.AddComponent<Animator>(generated);
-            animator.avatar                    = AssetDatabase.LoadAssetAtPath<Avatar>(avatarPath);
-            animator.applyRootMotion           = true;
-            animator.runtimeAnimatorController = controller;
-            Selection.activeGameObject         = generated;
         }
 
         [MenuItem("ShapeForge/Generate/Animated Inventor Workbench", false, 20)]
@@ -153,15 +58,6 @@ namespace ShapeForge.LowPoly.Editor
                 LowPolyRobotPreset.CreateDefinition(),
                 LowPolyRobotPreset.CreateStyle(),
                 LowPolyMotionPreset.RobotShowcase);
-        }
-
-        [MenuItem("ShapeForge/Generate/Animated Fantasy Hero", false, 22)]
-        private static void GenerateAnimatedHero()
-        {
-            Generate(
-                LowPolyHeroPreset.CreateDefinition(),
-                LowPolyHeroPreset.CreateStyle(),
-                LowPolyMotionPreset.HumanHeroWalk);
         }
 
         private static GameObject Generate(
@@ -188,35 +84,5 @@ namespace ShapeForge.LowPoly.Editor
             return generated;
         }
 
-        private static ShapeRenderCaptureView View(string id, float azimuth, float elevation)
-        {
-            return new()
-            {
-                Id           = id,
-                Azimuth      = azimuth,
-                Elevation    = elevation,
-                FramingScale = 1.08f
-            };
-        }
-
-        private static string CreateAsset(Avatar avatar, string name)
-        {
-            string assetPath = AssetDatabase.GenerateUniqueAssetPath($"{GeneratedAssetFolder}/{name}.asset");
-            AssetDatabase.CreateAsset(avatar, assetPath);
-            AssetDatabase.SaveAssets();
-            return assetPath;
-        }
-
-        private static AnimatorController CreatePreviewController(AnimationClip clip)
-        {
-            string assetPath = AssetDatabase.GenerateUniqueAssetPath(
-                $"{GeneratedAssetFolder}/{clip.name} Humanoid Preview.controller");
-            AnimatorController controller = AnimatorController.CreateAnimatorControllerAtPath(assetPath);
-            AnimatorState state = controller.layers[0].stateMachine.AddState("Preview");
-            state.motion = clip;
-            controller.layers[0].stateMachine.defaultState = state;
-            AssetDatabase.SaveAssets();
-            return controller;
-        }
     }
 }

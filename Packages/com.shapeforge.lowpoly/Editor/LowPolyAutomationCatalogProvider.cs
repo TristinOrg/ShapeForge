@@ -33,7 +33,6 @@ namespace ShapeForge.LowPoly.Editor
         {
             LowPolyModelGenerator generator = new(new[]
             {
-                LowPolyHeroPreset.CreateStyle(),
                 LowPolyRobotPreset.CreateStyle(),
                 LowPolyWorkbenchPreset.CreateStyle(),
                 LowPolyJapaneseTownPreset.CreateStyle(),

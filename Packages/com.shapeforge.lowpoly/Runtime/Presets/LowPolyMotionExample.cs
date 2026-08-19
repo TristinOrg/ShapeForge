@@ -42,9 +42,6 @@ namespace ShapeForge.LowPoly
                 case LowPolyMotionPreset.WorkbenchShowcase:
                     EvaluateWorkbench(phase);
                     break;
-                case LowPolyMotionPreset.HumanHeroWalk:
-                    EvaluateHuman(phase, phase * walkSpeed * duration);
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -63,9 +60,6 @@ namespace ShapeForge.LowPoly
                     break;
                 case LowPolyMotionPreset.WorkbenchShowcase:
                     EvaluateWorkbench(phase);
-                    break;
-                case LowPolyMotionPreset.HumanHeroWalk:
-                    EvaluateHuman(phase, elapsedTime * walkSpeed);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -115,31 +109,6 @@ namespace ShapeForge.LowPoly
             SetPositionOffset(3, new(0f, openAmount * 0.04f, 0f));
         }
 
-        private void EvaluateHuman(float phase, float distance)
-        {
-            float cycle      = phase * Mathf.PI * 2f;
-            float stride     = Mathf.Sin(cycle);
-            float weight     = Mathf.Cos(cycle);
-            float doubleStep = Mathf.Cos(cycle * 2f);
-            float leftSwing  = Mathf.Max(0f, stride);
-            float rightSwing = Mathf.Max(0f, -stride);
-            float rootLift   = (1f - doubleStep) * 0.012f;
-
-            SetPositionOffset(0, new(0f, rootLift, -distance));
-            SetPositionOffset(1, new(weight * 0.018f, -rootLift * 0.35f, 0f));
-            SetRotationOffset(1, new(0f, -stride * 4.5f, -weight * 2.2f));
-            SetRotationOffset(2, new(4f, stride * 3.2f, weight * 1.4f));
-            SetRotationOffset(3, new(-2f, -stride * 1.6f, -weight * 0.7f));
-            SetRotationOffset(4, new(-stride * 23f, 0f, -3f));
-            SetRotationOffset(5, new(stride * 23f, 0f, 3f));
-            SetRotationOffset(6, new(10f + (leftSwing * 12f), 0f, 0f));
-            SetRotationOffset(7, new(10f + (rightSwing * 12f), 0f, 0f));
-            SetRotationOffset(8, new(stride * 27f, 0f, 0f));
-            SetRotationOffset(9, new(-stride * 27f, 0f, 0f));
-            SetRotationOffset(10, new(-(leftSwing * 42f), 0f, 0f));
-            SetRotationOffset(11, new(-(rightSwing * 42f), 0f, 0f));
-        }
-
         private void EnsureBindings()
         {
             if (targets.Count > 0)
@@ -158,23 +127,6 @@ namespace ShapeForge.LowPoly
                 Bind("robot.leg.right.hip.pivot");
                 Bind("robot.leg.left.knee.pivot");
                 Bind("robot.leg.right.knee.pivot");
-                return;
-            }
-
-            if (preset == LowPolyMotionPreset.HumanHeroWalk)
-            {
-                Bind("hero");
-                Bind("hero.pelvis.pivot");
-                Bind("hero.spine.pivot");
-                Bind("hero.head.pivot");
-                Bind("hero.arm.left.shoulder.pivot");
-                Bind("hero.arm.right.shoulder.pivot");
-                Bind("hero.arm.left.elbow.pivot");
-                Bind("hero.arm.right.elbow.pivot");
-                Bind("hero.leg.left.hip.pivot");
-                Bind("hero.leg.right.hip.pivot");
-                Bind("hero.leg.left.knee.pivot");
-                Bind("hero.leg.right.knee.pivot");
                 return;
             }
 
@@ -260,7 +212,6 @@ namespace ShapeForge.LowPoly
     public enum LowPolyMotionPreset
     {
         RobotShowcase     = 0,
-        WorkbenchShowcase = 1,
-        HumanHeroWalk     = 2
+        WorkbenchShowcase = 1
     }
 }

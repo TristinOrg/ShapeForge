@@ -83,11 +83,10 @@ namespace ShapeForge.LowPoly.Tests
         {
             ShapeNode root          = new("procedural", "Procedural Shapes", ShapeTypes.Group);
             ShapeNode wedge         = new("wedge", "Wedge", LowPolyShapeTypes.Wedge);
-            ShapeNode hairTuft      = new("tuft", "Hair Tuft", LowPolyShapeTypes.HairTuft);
             ShapeNode firstFrustum  = CreateFrustum("frustum-a", "Frustum A", 0.45f);
             ShapeNode secondFrustum = CreateFrustum("frustum-b", "Frustum B", 0.45f);
             ShapeNode wideFrustum   = CreateFrustum("frustum-c", "Frustum C", 0.8f);
-            root.Add(wedge).Add(hairTuft).Add(firstFrustum).Add(secondFrustum).Add(wideFrustum);
+            root.Add(wedge).Add(firstFrustum).Add(secondFrustum).Add(wideFrustum);
 
             UnityShapeModelGenerator generator = new(new IUnityShapeGenerator[]
             {
@@ -97,7 +96,6 @@ namespace ShapeForge.LowPoly.Tests
             generatedRoot = generator.Generate(new("Procedural Shapes", root));
 
             Mesh wedgeMesh     = generatedRoot.transform.Find("Wedge").GetComponent<MeshFilter>().sharedMesh;
-            Mesh tuftMesh      = generatedRoot.transform.Find("Hair Tuft").GetComponent<MeshFilter>().sharedMesh;
             Mesh firstMesh     = generatedRoot.transform.Find("Frustum A").GetComponent<MeshFilter>().sharedMesh;
             Mesh secondMesh    = generatedRoot.transform.Find("Frustum B").GetComponent<MeshFilter>().sharedMesh;
             Mesh differentMesh = generatedRoot.transform.Find("Frustum C").GetComponent<MeshFilter>().sharedMesh;
@@ -105,8 +103,6 @@ namespace ShapeForge.LowPoly.Tests
             Assert.That(wedgeMesh.vertexCount, Is.EqualTo(18));
             Assert.That(wedgeMesh.hideFlags, Is.EqualTo(HideFlags.None));
             Assert.That(wedgeMesh.normals[0].y, Is.LessThan(-0.99f));
-            Assert.That(tuftMesh.name, Is.EqualTo("Low Poly Hair Tuft"));
-            Assert.That(tuftMesh.bounds.size, Is.EqualTo(Vector3.one));
             Assert.That(firstMesh.vertexCount, Is.EqualTo(24));
             Assert.That(firstMesh.normals[0].y, Is.LessThan(-0.99f));
             Assert.That(firstMesh, Is.SameAs(secondMesh));
