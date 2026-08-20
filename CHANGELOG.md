@@ -8,6 +8,7 @@ All notable repository-level changes are documented here. Package-specific detai
 
 - Deterministic, category-neutral reference-image preprocessing for characters, buildings, props, vehicles, and other assets.
 - A versioned reference-blueprint contract, validator, JSON Schema, and explicit low-confidence review queue.
+- A resumable reference pipeline with provenance-aware review and an explicit category-compiler handoff.
 - GLB 2.0 structural validation with optional external validator execution and machine-readable reports.
 - Auditable FBX/USD converter profiles that pin tool identity, version, license, formats, and command.
 - Curated reference-reconstruction corpus benchmarks with thresholds and aggregated failure modes.
