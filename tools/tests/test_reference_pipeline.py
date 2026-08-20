@@ -35,6 +35,29 @@ class ShapeForgeReferencePipelineTests(unittest.TestCase):
             self.assertEqual(reviewed["classification"]["category"], "building")
             self.assertEqual(reviewed["reviewQueue"], [])
 
+    def test_printed_annotations_override_sampled_colors_without_ai(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root   = Path(directory)
+            source = root / "asset.png"
+            image = Image.new("RGB", (300, 400), (210, 210, 210))
+            ImageDraw.Draw(image).rectangle((80, 60, 220, 360), fill=(30, 40, 50))
+            image.save(source)
+            annotations = root / "annotations.json"
+            annotations.write_text(json.dumps({
+                "schema": "shapeforge.reference-annotations/1.0",
+                "blueprintId": "asset",
+                "palette": [{"id": "material-main", "hex": "#1C2D44", "label": "Main"}],
+                "measurements": {"heightUnits": 3.5},
+                "annotations": [{"regionId": "notes", "text": "stylized low-poly", "language": "en"}],
+            }), encoding="utf-8")
+
+            result = run_pipeline(source, root / "work", annotations_path=annotations)
+            blueprint = json.loads(Path(result["artifacts"]["blueprint"]).read_text(encoding="utf-8"))
+
+            self.assertEqual(blueprint["palette"][0]["hex"], "#1C2D44")
+            self.assertEqual(blueprint["palette"][0]["source"], "printed-label")
+            self.assertEqual(blueprint["measurements"]["heightUnits"], 3.5)
+
 
 if __name__ == "__main__":
     unittest.main()

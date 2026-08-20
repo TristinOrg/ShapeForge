@@ -14,14 +14,19 @@ except ModuleNotFoundError:
 
 PIPELINE_SCHEMA = "shapeforge.reference-pipeline/1.0"
 REVIEW_SCHEMA   = "shapeforge.reference-review/1.0"
+ANNOTATION_SCHEMA = "shapeforge.reference-annotations/1.0"
 
 
-def run_pipeline(source: Path, work: Path, review_path: Path | None = None) -> dict[str, Any]:
+def run_pipeline(source: Path, work: Path, review_path: Path | None = None,
+                 annotations_path: Path | None = None) -> dict[str, Any]:
     """Run deterministic stages and stop at the explicit compiler handoff boundary."""
     source = source.resolve()
     work.mkdir(parents=True, exist_ok=True)
     blueprint_path = work / "reference-blueprint.json"
     blueprint      = write_blueprint(source, blueprint_path, work / "views")
+    if annotations_path is not None:
+        blueprint = _apply_annotations(blueprint, annotations_path)
+        _write_json(blueprint_path, blueprint)
     review         = _read_review(review_path, blueprint["id"]) if review_path is not None else None
     review_template = work / "review-template.json"
     _write_json(review_template, _review_template(blueprint))
@@ -51,6 +56,27 @@ def run_pipeline(source: Path, work: Path, review_path: Path | None = None) -> d
     }
     _write_json(work / "pipeline.json", manifest)
     return manifest
+
+
+def _apply_annotations(blueprint: dict[str, Any], path: Path) -> dict[str, Any]:
+    annotations = json.loads(path.read_text(encoding="utf-8"))
+    if annotations.get("schema") != ANNOTATION_SCHEMA:
+        raise ValueError("Unsupported reference-annotations schema.")
+    if annotations.get("blueprintId") != blueprint["id"]:
+        raise ValueError("Annotation blueprintId does not match the measured blueprint.")
+    palette = annotations.get("palette", [])
+    for sample in palette:
+        value = sample.get("hex", "")
+        if len(value) != 7 or value[0] != "#" or any(character not in "0123456789abcdefABCDEF" for character in value[1:]):
+            raise ValueError("Annotation palette colors require #RRGGBB values.")
+    if palette:
+        blueprint["palette"] = [{**sample, "source": sample.get("source", "printed-label"),
+                                  "confidence": float(sample.get("confidence", 1.0))} for sample in palette]
+    blueprint["annotations"] = annotations.get("annotations", [])
+    blueprint["measurements"].update(annotations.get("measurements", {}))
+    blueprint["reviewQueue"] = [item for item in blueprint["reviewQueue"]
+                                if item["kind"] != "printed-annotations"]
+    return blueprint
 
 
 def _review_template(blueprint: dict[str, Any]) -> dict[str, Any]:

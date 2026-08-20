@@ -146,7 +146,8 @@ def run_reference_pipeline(args: argparse.Namespace) -> int:
         from shapeforge_reference_pipeline import run_pipeline
 
     review = Path(args.review).resolve() if args.review else None
-    result = run_pipeline(Path(args.source), Path(args.work), review)
+    annotations = Path(args.annotations).resolve() if args.annotations else None
+    result = run_pipeline(Path(args.source), Path(args.work), review, annotations)
     print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
@@ -340,6 +341,7 @@ def parser() -> argparse.ArgumentParser:
     reference_pipeline.add_argument("source", help="Reference image or sheet")
     reference_pipeline.add_argument("--work", required=True, help="Persistent pipeline workspace")
     reference_pipeline.add_argument("--review", help="Completed Reference Review JSON")
+    reference_pipeline.add_argument("--annotations", help="OCR or transcribed Reference Annotations JSON")
     reference_pipeline.set_defaults(handler=run_reference_pipeline)
     image_reconstruct = commands.add_parser("image-reconstruct")
     image_reconstruct.add_argument("source", help="Initial ShapeDefinition JSON")
