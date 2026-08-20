@@ -22,10 +22,55 @@ namespace ShapeForge
                 diagnostics.Add(Error("shape.reference.blueprint.views", "A blueprint requires between 1 and 16 views.", "/views"));
             else
                 ValidateViews(blueprint.Views, diagnostics);
+            ValidateEvidence(blueprint.EvidenceRegions, diagnostics);
+            ValidatePalette(blueprint.Palette, diagnostics);
             ValidateConfidence(blueprint.Classification?.Confidence ?? float.NaN,
                 "/classification/confidence", diagnostics);
             ValidateReviewQueue(blueprint.ReviewQueue, diagnostics);
             return new(diagnostics);
+        }
+
+        private static void ValidateEvidence(IList<ShapeReferenceEvidenceRegion> regions,
+            ICollection<ShapeDiagnostic> diagnostics)
+        {
+            if (regions == null || regions.Count > 256)
+            {
+                diagnostics.Add(Error("shape.reference.blueprint.evidence.count", "Evidence supports at most 256 regions.", "/evidenceRegions"));
+                return;
+            }
+            HashSet<string> ids = new(StringComparer.Ordinal);
+            for (int index = 0; index < regions.Count; index++)
+            {
+                ShapeReferenceEvidenceRegion region = regions[index];
+                string path = $"/evidenceRegions/{index}";
+                if (region == null || string.IsNullOrWhiteSpace(region.Id) || !ids.Add(region.Id) ||
+                    string.IsNullOrWhiteSpace(region.Kind) || string.IsNullOrWhiteSpace(region.ImagePath))
+                    diagnostics.Add(Error("shape.reference.blueprint.evidence.item", "Evidence requires a unique ID, kind, and image path.", path));
+                else
+                {
+                    ValidateBounds(region.Bounds, $"{path}/bounds", diagnostics);
+                    ValidateConfidence(region.Confidence, $"{path}/confidence", diagnostics);
+                }
+            }
+        }
+
+        private static void ValidatePalette(IList<ShapeReferencePaletteSample> palette,
+            ICollection<ShapeDiagnostic> diagnostics)
+        {
+            if (palette == null || palette.Count > 256)
+            {
+                diagnostics.Add(Error("shape.reference.blueprint.palette.count", "Palettes support at most 256 samples.", "/palette"));
+                return;
+            }
+            for (int index = 0; index < palette.Count; index++)
+            {
+                ShapeReferencePaletteSample sample = palette[index];
+                if (sample == null || string.IsNullOrWhiteSpace(sample.Hex) ||
+                    !System.Text.RegularExpressions.Regex.IsMatch(sample.Hex, "^#[0-9A-Fa-f]{6}$"))
+                    diagnostics.Add(Error("shape.reference.blueprint.palette.hex", "Palette colors require #RRGGBB values.", $"/palette/{index}/hex"));
+                else
+                    ValidateConfidence(sample.Confidence, $"/palette/{index}/confidence", diagnostics);
+            }
         }
 
         private static void ValidateViews(IList<ShapeReferenceBlueprintView> views,

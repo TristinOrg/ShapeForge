@@ -8,6 +8,7 @@
     "id": { "type": "string", "minLength": 1 },
     "sourceImage": { "type": "string", "minLength": 1 },
     "coordinateSystem": { "const": "image-normalized/top-left" },
+    "layoutProfile": { "type": "string", "minLength": 1 },
     "views": {
       "type": "array", "minItems": 1, "maxItems": 16,
       "items": {
@@ -36,7 +37,33 @@
       }
     },
     "measurements": { "type": "object", "additionalProperties": { "type": "number" } },
-    "palette": { "type": "array" },
+    "palette": { "type": "array", "maxItems": 256, "items": {
+      "type": "object", "required": ["hex"], "properties": {
+        "id": { "type": "string" },
+        "hex": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "source": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }, "additionalProperties": false
+    } },
+    "evidenceRegions": { "type": "array", "maxItems": 256, "items": {
+      "type": "object", "required": ["id", "kind", "imagePath", "bounds", "confidence"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string", "minLength": 1 },
+        "imagePath": { "type": "string", "minLength": 1 },
+        "bounds": {
+          "type": "object", "required": ["x", "y", "width", "height"],
+          "properties": {
+            "x": { "type": "number", "minimum": 0, "maximum": 1 },
+            "y": { "type": "number", "minimum": 0, "maximum": 1 },
+            "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+            "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+          }, "additionalProperties": false
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }, "additionalProperties": false
+    } },
     "classification": {
       "type": "object", "required": ["category", "confidence"],
       "properties": {

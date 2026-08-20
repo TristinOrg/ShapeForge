@@ -22,6 +22,21 @@ namespace ShapeForge.Tests
         }
 
         [Test]
+        public void HighFidelityEvidenceAndLabeledPaletteValidate()
+        {
+            ShapeReferenceBlueprint blueprint = Blueprint("reference-sheet");
+            blueprint.Palette.Add(new() { Id = "hair", Hex = "#1C2D44", Source = "printed-label", Confidence = 0.98f });
+            blueprint.EvidenceRegions.Add(new()
+            {
+                Id = "top", Kind = "orthographic-view", ImagePath = "top.png",
+                Bounds = new() { X = 0.01f, Y = 0.61f, Width = 0.17f, Height = 0.37f },
+                Confidence = 0.8f
+            });
+
+            Assert.That(new ShapeReferenceBlueprintValidator().Analyze(blueprint).IsValid, Is.True);
+        }
+
+        [Test]
         public void InvalidBoundsAndConfidenceFail()
         {
             ShapeReferenceBlueprint blueprint = Blueprint("invalid");

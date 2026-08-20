@@ -19,12 +19,16 @@ namespace ShapeForge
         public string SourceImage { get; set; } = string.Empty;
         /// <summary>Gets or sets the normalized coordinate convention.</summary>
         public string CoordinateSystem { get; set; } = "image-normalized/top-left";
+        /// <summary>Gets or sets the detected layout profile used to extract evidence.</summary>
+        public string LayoutProfile { get; set; } = "single-or-turntable";
         /// <summary>Gets or sets measured views.</summary>
         public IList<ShapeReferenceBlueprintView> Views { get; set; } = new List<ShapeReferenceBlueprintView>();
         /// <summary>Gets or sets cross-view scalar measurements.</summary>
         public IDictionary<string, float> Measurements { get; set; } = new Dictionary<string, float>();
         /// <summary>Gets or sets dominant measured colors.</summary>
         public IList<ShapeReferencePaletteSample> Palette { get; set; } = new List<ShapeReferencePaletteSample>();
+        /// <summary>Gets or sets auditable source regions such as details, diagrams, and annotations.</summary>
+        public IList<ShapeReferenceEvidenceRegion> EvidenceRegions { get; set; } = new List<ShapeReferenceEvidenceRegion>();
         /// <summary>Gets or sets the optional asset classification.</summary>
         public ShapeReferenceClassification Classification { get; set; } = new();
         /// <summary>Gets or sets facts that deterministic analysis could not resolve.</summary>
@@ -65,10 +69,32 @@ namespace ShapeForge
     [Serializable]
     public sealed class ShapeReferencePaletteSample
     {
+        /// <summary>Gets or sets the optional stable swatch identifier.</summary>
+        public string Id { get; set; } = string.Empty;
         /// <summary>Gets or sets an RGB hexadecimal color.</summary>
         public string Hex { get; set; } = string.Empty;
         /// <summary>Gets or sets normalized pixel coverage.</summary>
         public float Coverage { get; set; }
+        /// <summary>Gets or sets how the color was obtained.</summary>
+        public string Source { get; set; } = "pixel-cluster";
+        /// <summary>Gets or sets measurement confidence.</summary>
+        public float Confidence { get; set; } = 1f;
+    }
+
+    /// <summary>Stores an auditable crop containing geometry, detail, color, measurement, or text evidence.</summary>
+    [Serializable]
+    public sealed class ShapeReferenceEvidenceRegion
+    {
+        /// <summary>Gets or sets the stable region identifier.</summary>
+        public string Id { get; set; } = string.Empty;
+        /// <summary>Gets or sets the evidence kind.</summary>
+        public string Kind { get; set; } = string.Empty;
+        /// <summary>Gets or sets the isolated crop path.</summary>
+        public string ImagePath { get; set; } = string.Empty;
+        /// <summary>Gets or sets the region bounds in the original image.</summary>
+        public ShapeReferenceBounds Bounds { get; set; } = new();
+        /// <summary>Gets or sets extraction confidence.</summary>
+        public float Confidence { get; set; }
     }
 
     /// <summary>Stores an optional category proposed outside deterministic measurement.</summary>
