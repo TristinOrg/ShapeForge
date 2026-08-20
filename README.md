@@ -29,6 +29,20 @@ ShapeForge is suitable for experimentation, tooling integrations, procedural con
 - **Low Poly is an implementation.** Developers can add realistic, voxel, SDF, custom-mesh, or engine-specific generators without changing Core.
 - **Performance is explicit.** Meshes and materials are cached, repeated definitions can be prepared once, and large batches remain caller-budgeted.
 
+## Deterministic reference preprocessing
+
+Reference images can be converted into an engine-neutral blueprint before any model is authored:
+
+```powershell
+python tools/shapeforge.py reference-blueprint "reference.png" `
+  -o "Library/ShapeForgeBlueprints/asset/reference-blueprint.json" `
+  --crops "Library/ShapeForgeBlueprints/asset/views"
+```
+
+The same command accepts a character sheet, building, prop, vehicle, or other visual asset. It extracts reproducible view crops, normalized bounds, silhouettes, proportions, palette samples, and confidence values. It intentionally leaves category, semantic part names, hidden geometry, scale, and orientation unresolved instead of guessing.
+
+Only entries in `reviewQueue` require interpretation by a person or optional AI. A category-specific compiler can then translate the reviewed blueprint into a ShapeForge construction plan; Schema and Core remain category-, style-, engine-, and AI-provider-neutral.
+
 ## Architecture
 
 ```mermaid
