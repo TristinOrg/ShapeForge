@@ -174,7 +174,8 @@ def run_offline_reconstruction(args: argparse.Namespace) -> int:
 
     result = optimize_images(
         Path(args.source), Path(args.reference), Path(args.capture), Path(args.output), Path(args.work),
-        args.max_evaluations, args.min_improvement, cli_invoke, not args.no_profiles)
+        args.max_evaluations, args.min_improvement, cli_invoke, not args.no_profiles,
+        target_score=args.target_score)
     print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
@@ -374,6 +375,7 @@ def parser() -> argparse.ArgumentParser:
     offline_reconstruct.add_argument("--work", required=True, help="Evaluation artifact folder")
     offline_reconstruct.add_argument("--max-evaluations", type=int, default=100)
     offline_reconstruct.add_argument("--min-improvement", type=float, default=0.0005)
+    offline_reconstruct.add_argument("--target-score", type=float, default=0.995)
     offline_reconstruct.add_argument("--no-profiles", action="store_true", help="Skip profile control-point fitting")
     offline_reconstruct.set_defaults(handler=run_offline_reconstruction)
     benchmark = commands.add_parser("benchmark-reconstruction")

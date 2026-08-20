@@ -25,7 +25,8 @@ DEFAULT_SCORE_WEIGHTS = {"silhouette": 0.45, "proportion": 0.30, "detail": 0.15,
 def optimize_images(model_path: Path, reference_path: Path, capture_path: Path,
                     output_path: Path, work_path: Path, maximum_evaluations: int,
                     minimum_improvement: float, invoke: Invoke, include_profiles: bool = True,
-                    score_weights: dict[str, float] | None = None) -> dict[str, Any]:
+                    score_weights: dict[str, float] | None = None,
+                    target_score: float = 0.995) -> dict[str, Any]:
     """Fit all discoverable model parameters through repeated offline render comparison."""
     reference_path  = reference_path.resolve()
     capture_template = _read_json(capture_path.resolve())
@@ -44,11 +45,24 @@ def optimize_images(model_path: Path, reference_path: Path, capture_path: Path,
         capture           = dict(capture_template)
         capture["id"]          = f"{capture_template.get('id', 'capture')}/evaluation-{index}"
         capture["candidateId"] = f"candidate/evaluation-{index}"
+        if model_document.is_file() and comparison_path.is_file() and _read_json(model_document) == candidate:
+            comparison = _read_json(comparison_path)
+            score, metrics = score_comparison(comparison, weights)
+            return score, {"metrics": metrics, "model": str(model_document),
+                           "comparison": str(comparison_path), "captureManifest": str(capture_manifest),
+                           "cached": True}
         _write_json(model_document, candidate)
         _write_json(capture_document, capture)
-        invoke(["render", str(model_document), str(capture_document), "--images", str(images),
-                "-o", str(capture_manifest)])
-        comparison = compare_manifests(reference_path, capture_manifest)
+        try:
+            invoke(["render", str(model_document), str(capture_document), "--images", str(images),
+                    "-o", str(capture_manifest)])
+            comparison = compare_manifests(reference_path, capture_manifest)
+        except (RuntimeError, ValueError, OSError) as error:
+            if index == 0:
+                raise
+            error_path = folder / "error.json"
+            _write_json(error_path, {"error": str(error), "rejected": True})
+            return 0.0, {"model": str(model_document), "error": str(error), "rejected": True}
         _write_json(comparison_path, comparison)
         score, metrics = score_comparison(comparison, weights)
         return score, {"metrics": metrics, "model": str(model_document),
@@ -56,11 +70,12 @@ def optimize_images(model_path: Path, reference_path: Path, capture_path: Path,
 
     best, optimizer_report = optimize_model(
         initial_model, evaluate, maximum_evaluations, minimum_improvement,
-        include_profiles=include_profiles)
+        include_profiles=include_profiles, target_score=target_score)
     _write_json(output_path, best)
     result = {
         "schema": "shapeforge.offline-image-reconstruction-report/1.0",
-        "status": "completed",
+        "status": optimizer_report["status"],
+        "targetScore": target_score,
         "bestScore": optimizer_report["bestScore"],
         "bestModel": str(output_path.resolve()),
         "evaluations": optimizer_report["evaluations"],
