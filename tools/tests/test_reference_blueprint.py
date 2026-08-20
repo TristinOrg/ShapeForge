@@ -45,6 +45,26 @@ class ShapeForgeReferenceBlueprintTests(unittest.TestCase):
             self.assertEqual([view["viewId"] for view in result["views"]], ["source"])
             self.assertEqual(result["classification"]["category"], "unresolved")
 
+    def test_grid_sheet_preserves_top_bottom_details_and_labeled_swatch_samples(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            source = folder / "grid.png"
+            image  = Image.new("RGB", (1500, 1000), (170, 170, 170))
+            draw   = ImageDraw.Draw(image)
+            draw.rectangle((0, 600, 1499, 620), fill=(25, 35, 45))
+            for box in ((70, 680, 200, 900), (340, 680, 470, 900)):
+                draw.ellipse(box, fill=(30, 45, 65))
+            for center in (70, 200, 330, 460, 590):
+                draw.rectangle((center - 25, 100, center + 25, 520), fill=(25, 25, 28))
+            image.save(source)
+
+            result = analyze_reference(source, folder / "views")
+
+            self.assertEqual(result["layoutProfile"], "reference-sheet-grid/1.0")
+            self.assertEqual([view["viewId"] for view in result["views"][-2:]], ["top", "bottom"])
+            self.assertEqual(len(result["evidenceRegions"]), 11)
+            self.assertEqual(result["palette"][0]["source"], "labeled-swatch-sample")
+
 
 if __name__ == "__main__":
     unittest.main()

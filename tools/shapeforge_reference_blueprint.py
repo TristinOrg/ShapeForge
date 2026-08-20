@@ -27,39 +27,117 @@ def analyze_reference(source: Path, output_folder: Path) -> dict[str, Any]:
         crop.save(crop_path)
         views.append(_measure_view(view_id, crop, crop_path.name))
 
-    palette     = _palette(image.crop(boxes[0]))
+    supplemental = _supplemental_sheet_evidence(image, output_folder)
+    palette      = supplemental.get("palette") or _palette(image.crop(boxes[0]))
+    review_queue = [
+        {
+            "kind": "asset-category",
+            "reason": "Visual measurements cannot safely choose the category-specific compiler.",
+            "required": True,
+        },
+        {
+            "kind": "semantic-part-labels",
+            "reason": "Pixel regions do not uniquely identify architectural, character, vehicle, or prop parts.",
+            "required": True,
+        },
+        {
+            "kind": "hidden-geometry",
+            "reason": "Occluded topology, depth, and construction are not observable.",
+            "required": True,
+        },
+        {
+            "kind": "scale-and-orientation",
+            "reason": "Pixels do not provide real-world scale or a guaranteed coordinate frame.",
+            "required": True,
+        },
+    ]
+    if supplemental:
+        review_queue.append({
+            "kind": "printed-annotations",
+            "reason": "Printed labels and exact written values require an OCR provider or human transcription.",
+            "required": False,
+        })
     return {
         "schema": "shapeforge.reference-blueprint/1.0",
         "id": source.stem.lower().replace(" ", "-"),
         "sourceImage": str(source.resolve()),
         "coordinateSystem": "image-normalized/top-left",
-        "views": views,
+        "views": views + supplemental.get("views", []),
         "measurements": _cross_view_measurements(views),
         "palette": palette,
+        "evidenceRegions": supplemental.get("regions", []),
+        "layoutProfile": supplemental.get("layoutProfile", "single-or-turntable"),
         "classification": {"category": "unresolved", "confidence": 0.0},
-        "reviewQueue": [
-            {
-                "kind": "asset-category",
-                "reason": "Visual measurements cannot safely choose the category-specific compiler.",
-                "required": True,
-            },
-            {
-                "kind": "semantic-part-labels",
-                "reason": "Pixel regions do not uniquely identify architectural, character, vehicle, or prop parts.",
-                "required": True,
-            },
-            {
-                "kind": "hidden-geometry",
-                "reason": "Occluded topology, depth, and construction are not observable.",
-                "required": True,
-            },
-            {
-                "kind": "scale-and-orientation",
-                "reason": "Pixels do not provide real-world scale or a guaranteed coordinate frame.",
-                "required": True,
-            },
-        ],
+        "reviewQueue": review_queue,
     }
+
+
+def _supplemental_sheet_evidence(image: Image.Image, output_folder: Path) -> dict[str, Any]:
+    width, height = image.size
+    aspect = width / max(height, 1)
+    if not 1.42 <= aspect <= 1.58:
+        return {}
+    rgb = np.asarray(image, dtype=np.uint8)
+    header_y = int(height * 0.60)
+    if np.mean(rgb[header_y].mean(axis=1) < 80) < 0.65:
+        return {}
+
+    definitions = (
+        ("top", "orthographic-view", (0.01, 0.615, 0.182, 0.985)),
+        ("bottom", "orthographic-view", (0.191, 0.615, 0.362, 0.985)),
+        ("palette", "palette", (0.371, 0.615, 0.553, 0.985)),
+        ("proportions", "measurement-diagram", (0.562, 0.615, 0.777, 0.985)),
+        ("characteristics", "text-annotations", (0.786, 0.615, 0.99, 0.985)),
+        ("head-front-detail", "detail", (0.69, 0.08, 0.84, 0.255)),
+        ("head-side-detail", "detail", (0.84, 0.08, 0.99, 0.255)),
+        ("head-back-detail", "detail", (0.69, 0.255, 0.84, 0.415)),
+        ("torso-detail", "detail", (0.84, 0.255, 0.99, 0.415)),
+        ("footwear-detail", "detail", (0.69, 0.415, 0.84, 0.57)),
+        ("hand-detail", "detail", (0.84, 0.415, 0.99, 0.57)),
+    )
+    regions = []
+    views   = []
+    for region_id, kind, normalized in definitions:
+        box       = _pixel_box(normalized, width, height)
+        crop      = image.crop(box)
+        crop_path = output_folder / f"{region_id}.png"
+        crop.save(crop_path)
+        regions.append({
+            "id": region_id, "kind": kind, "imagePath": crop_path.name,
+            "bounds": {"x": normalized[0], "y": normalized[1],
+                       "width": normalized[2] - normalized[0], "height": normalized[3] - normalized[1]},
+            "confidence": 0.8,
+        })
+        if region_id in ("top", "bottom"):
+            views.append(_measure_view(region_id, crop, crop_path.name))
+    return {
+        "layoutProfile": "reference-sheet-grid/1.0",
+        "regions": regions,
+        "views": views,
+        "palette": _labeled_palette_samples(image),
+    }
+
+
+def _pixel_box(bounds: tuple[float, float, float, float], width: int,
+               height: int) -> tuple[int, int, int, int]:
+    return tuple(round(value * size) for value, size in zip(bounds, (width, height, width, height)))
+
+
+def _labeled_palette_samples(image: Image.Image) -> list[dict[str, Any]]:
+    rgb     = np.asarray(image.convert("RGB"), dtype=np.uint8)
+    samples = []
+    center_x = round(image.width * 0.393)
+    for index in range(9):
+        center_y = round(image.height * (0.638 + index * 0.04))
+        patch    = rgb[center_y - 5:center_y + 6, center_x - 5:center_x + 6]
+        color    = np.median(patch.reshape(-1, 3), axis=0).astype(np.uint8)
+        samples.append({
+            "id": f"swatch-{index + 1}",
+            "hex": "#" + "".join(f"{int(channel):02X}" for channel in color),
+            "source": "labeled-swatch-sample",
+            "confidence": 0.9,
+        })
+    return samples
 
 
 def write_blueprint(source: Path, output: Path, crops: Path) -> dict[str, Any]:
