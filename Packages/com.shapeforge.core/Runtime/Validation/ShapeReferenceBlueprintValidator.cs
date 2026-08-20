@@ -31,6 +31,20 @@ namespace ShapeForge
             return new(diagnostics);
         }
 
+        /// <summary>Throws when a blueprint violates the reference-blueprint contract.</summary>
+        public void Validate(ShapeReferenceBlueprint blueprint)
+        {
+            ShapeDiagnosticReport report = Analyze(blueprint);
+            if (report.IsValid)
+                return;
+
+            foreach (ShapeDiagnostic diagnostic in report.Diagnostics)
+            {
+                if (diagnostic.Severity == ShapeDiagnosticSeverity.Error)
+                    throw new ShapeValidationException(diagnostic.Code, diagnostic.Message, path: diagnostic.Path);
+            }
+        }
+
         private static void ValidateAnnotations(IList<ShapeReferenceAnnotation> annotations,
             ICollection<ShapeDiagnostic> diagnostics)
         {
