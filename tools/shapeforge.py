@@ -166,6 +166,19 @@ def run_image_reconstruction(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_offline_reconstruction(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_reconstruct_images import cli_invoke, optimize_images
+    except ModuleNotFoundError:
+        from shapeforge_reconstruct_images import cli_invoke, optimize_images
+
+    result = optimize_images(
+        Path(args.source), Path(args.reference), Path(args.capture), Path(args.output), Path(args.work),
+        args.max_evaluations, args.min_improvement, cli_invoke, not args.no_profiles)
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
 def run_reconstruction_benchmark(args: argparse.Namespace) -> int:
     try:
         from tools.shapeforge_reconstruction_benchmark import run_benchmark
@@ -353,6 +366,16 @@ def parser() -> argparse.ArgumentParser:
     image_reconstruct.add_argument("--target-score", type=float, default=0.9)
     image_reconstruct.add_argument("--min-improvement", type=float, default=0.005)
     image_reconstruct.set_defaults(handler=run_image_reconstruction)
+    offline_reconstruct = commands.add_parser("offline-reconstruct")
+    offline_reconstruct.add_argument("source", help="Initial ShapeDefinition JSON")
+    offline_reconstruct.add_argument("reference", help="Reference Images manifest")
+    offline_reconstruct.add_argument("capture", help="Render Capture template")
+    offline_reconstruct.add_argument("-o", "--output", required=True, help="Best output ShapeDefinition")
+    offline_reconstruct.add_argument("--work", required=True, help="Evaluation artifact folder")
+    offline_reconstruct.add_argument("--max-evaluations", type=int, default=100)
+    offline_reconstruct.add_argument("--min-improvement", type=float, default=0.0005)
+    offline_reconstruct.add_argument("--no-profiles", action="store_true", help="Skip profile control-point fitting")
+    offline_reconstruct.set_defaults(handler=run_offline_reconstruction)
     benchmark = commands.add_parser("benchmark-reconstruction")
     benchmark.add_argument("manifest", help="Curated reconstruction corpus manifest")
     benchmark.add_argument("-o", "--output", required=True, help="Aggregate benchmark report")

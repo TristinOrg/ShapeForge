@@ -12,11 +12,85 @@ from typing import Any, Callable
 
 try:
     from tools.shapeforge_image_compare import compare_manifests, measure_manifest_aspects
+    from tools.shapeforge_offline_optimizer import optimize_model
 except ModuleNotFoundError:
     from shapeforge_image_compare import compare_manifests, measure_manifest_aspects
+    from shapeforge_offline_optimizer import optimize_model
 
 
 Invoke = Callable[[list[str]], None]
+DEFAULT_SCORE_WEIGHTS = {"silhouette": 0.45, "proportion": 0.30, "detail": 0.15, "color": 0.10}
+
+
+def optimize_images(model_path: Path, reference_path: Path, capture_path: Path,
+                    output_path: Path, work_path: Path, maximum_evaluations: int,
+                    minimum_improvement: float, invoke: Invoke, include_profiles: bool = True,
+                    score_weights: dict[str, float] | None = None) -> dict[str, Any]:
+    """Fit all discoverable model parameters through repeated offline render comparison."""
+    reference_path  = reference_path.resolve()
+    capture_template = _read_json(capture_path.resolve())
+    initial_model   = _read_json(model_path.resolve())
+    work_path.mkdir(parents=True, exist_ok=True)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    weights = score_weights or DEFAULT_SCORE_WEIGHTS
+
+    def evaluate(candidate: dict[str, Any], index: int) -> tuple[float, dict[str, Any]]:
+        folder           = work_path / f"evaluation-{index:04d}"
+        model_document   = folder / "model.json"
+        capture_document = folder / "capture.json"
+        capture_manifest = folder / "capture-manifest.json"
+        comparison_path  = folder / "comparison.json"
+        images           = folder / "images"
+        capture           = dict(capture_template)
+        capture["id"]          = f"{capture_template.get('id', 'capture')}/evaluation-{index}"
+        capture["candidateId"] = f"candidate/evaluation-{index}"
+        _write_json(model_document, candidate)
+        _write_json(capture_document, capture)
+        invoke(["render", str(model_document), str(capture_document), "--images", str(images),
+                "-o", str(capture_manifest)])
+        comparison = compare_manifests(reference_path, capture_manifest)
+        _write_json(comparison_path, comparison)
+        score, metrics = score_comparison(comparison, weights)
+        return score, {"metrics": metrics, "model": str(model_document),
+                       "comparison": str(comparison_path), "captureManifest": str(capture_manifest)}
+
+    best, optimizer_report = optimize_model(
+        initial_model, evaluate, maximum_evaluations, minimum_improvement,
+        include_profiles=include_profiles)
+    _write_json(output_path, best)
+    result = {
+        "schema": "shapeforge.offline-image-reconstruction-report/1.0",
+        "status": "completed",
+        "bestScore": optimizer_report["bestScore"],
+        "bestModel": str(output_path.resolve()),
+        "evaluations": optimizer_report["evaluations"],
+        "acceptedChanges": optimizer_report["acceptedChanges"],
+        "discoveredParameters": optimizer_report["discoveredParameters"],
+        "scoreWeights": weights,
+        "history": optimizer_report["history"],
+    }
+    _write_json(work_path / "report.json", result)
+    return result
+
+
+def score_comparison(comparison: dict[str, Any], weights: dict[str, float] | None = None) -> tuple[float, dict[str, float]]:
+    """Aggregate confidence- and view-weighted comparison metrics."""
+    weights = weights or DEFAULT_SCORE_WEIGHTS
+    total_metric_weight = sum(weights.values())
+    if total_metric_weight <= 0:
+        raise ValueError("At least one comparison score weight must be positive.")
+    totals = {name: 0.0 for name in weights}
+    total_view_weight = 0.0
+    for view in comparison.get("views") or []:
+        view_weight = float(view.get("weight", 1.0)) * float(view.get("confidence", 1.0))
+        total_view_weight += view_weight
+        for name in weights:
+            totals[name] += float(view.get("scores", {}).get(name, 0.0)) * view_weight
+    if total_view_weight <= 0:
+        raise ValueError("Comparison requires at least one positively weighted view.")
+    metrics = {name: value / total_view_weight for name, value in totals.items()}
+    score = sum(metrics[name] * weight for name, weight in weights.items()) / total_metric_weight
+    return round(score, 6), {name: round(value, 6) for name, value in metrics.items()}
 
 
 def reconstruct_images(

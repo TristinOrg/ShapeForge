@@ -5,10 +5,21 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from tools.shapeforge_reconstruct_images import reconstruct_images
+from tools.shapeforge_reconstruct_images import optimize_images, reconstruct_images, score_comparison
 
 
 class ShapeForgeImageReconstructionTests(unittest.TestCase):
+    def test_weighted_score_prioritizes_silhouette_and_view_confidence(self):
+        comparison = {"views": [
+            {"weight": 2, "confidence": 1, "scores": {"silhouette": 1, "proportion": 0.5, "detail": 0, "color": 0}},
+            {"weight": 1, "confidence": 0.5, "scores": {"silhouette": 0, "proportion": 0.5, "detail": 1, "color": 1}},
+        ]}
+
+        score, metrics = score_comparison(comparison)
+
+        self.assertGreater(metrics["silhouette"], 0.7)
+        self.assertGreater(score, 0.5)
+
     def test_loop_improves_global_proportion_and_preserves_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
@@ -54,6 +65,33 @@ class ShapeForgeImageReconstructionTests(unittest.TestCase):
             self.assertGreater(result["bestScore"], 0.6)
             self.assertGreaterEqual(len(result["iterations"]), 2)
             self.assertTrue((work / "report.json").is_file())
+
+    def test_offline_optimizer_renders_candidates_and_preserves_best(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            reference_image = folder / "reference.png"
+            self._rectangle(reference_image, 100, 100)
+            reference = folder / "reference.json"
+            reference.write_text(json.dumps({
+                "schema": "shapeforge.reference-images/1.0", "id": "reference",
+                "images": [{"viewId": "front", "imagePath": str(reference_image), "weight": 1}],
+            }), encoding="utf-8")
+            model = folder / "model.json"
+            model.write_text(json.dumps({"schema": "shapeforge.shape/1.0", "root": {
+                "id": "model", "transform": {"position": {"x": 0, "y": 0, "z": 0},
+                "scale": {"x": 1.6, "y": 1, "z": 1}}, "children": []}}), encoding="utf-8")
+            capture = folder / "capture.json"
+            capture.write_text(json.dumps({"schema": "shapeforge.render-capture/1.0", "id": "capture",
+                                            "views": [{"id": "front"}]}), encoding="utf-8")
+            output = folder / "best.json"
+
+            result = optimize_images(model, reference, capture, output, folder / "work", 8, 0.0001,
+                                     self._invoke, include_profiles=False)
+
+            optimized = json.loads(output.read_text(encoding="utf-8"))
+            self.assertLess(optimized["root"]["transform"]["scale"]["x"], 1.6)
+            self.assertGreater(result["acceptedChanges"], 0)
+            self.assertEqual(result["evaluations"], 8)
 
     def _invoke(self, arguments):
         command = arguments[0]
