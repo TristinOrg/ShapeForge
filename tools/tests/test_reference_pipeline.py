@@ -19,6 +19,10 @@ class ShapeForgeReferencePipelineTests(unittest.TestCase):
 
             waiting = run_pipeline(source, root / "work")
             self.assertEqual(waiting["status"], "awaiting-review")
+            reference_images = json.loads(Path(waiting["artifacts"]["referenceImages"]).read_text(encoding="utf-8"))
+            capture_template = json.loads(Path(waiting["artifacts"]["captureTemplate"]).read_text(encoding="utf-8"))
+            self.assertEqual([item["viewId"] for item in reference_images["images"]],
+                             [item["id"] for item in capture_template["views"]])
             template_path = Path(waiting["artifacts"]["reviewTemplate"])
             review = json.loads(template_path.read_text(encoding="utf-8"))
             for decision in review["decisions"]:

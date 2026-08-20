@@ -27,6 +27,10 @@ def run_pipeline(source: Path, work: Path, review_path: Path | None = None,
     if annotations_path is not None:
         blueprint = _apply_annotations(blueprint, annotations_path)
         _write_json(blueprint_path, blueprint)
+    reference_images = work / "reference-images.json"
+    capture_template = work / "render-capture.template.json"
+    _write_json(reference_images, _reference_images(blueprint, work / "views"))
+    _write_json(capture_template, _capture_template(blueprint))
     review         = _read_review(review_path, blueprint["id"]) if review_path is not None else None
     review_template = work / "review-template.json"
     _write_json(review_template, _review_template(blueprint))
@@ -50,12 +54,43 @@ def run_pipeline(source: Path, work: Path, review_path: Path | None = None,
             "views": str((work / "views").resolve()),
             "reviewTemplate": str(review_template.resolve()),
             "reviewedBlueprint": str(reviewed_path.resolve()) if reviewed_path else None,
+            "referenceImages": str(reference_images.resolve()),
+            "captureTemplate": str(capture_template.resolve()),
         },
         "remainingReviewKinds": remaining,
         "nextStage": "category-compiler" if status == "ready-for-compiler" else "human-or-ai-review",
     }
     _write_json(work / "pipeline.json", manifest)
     return manifest
+
+
+def _reference_images(blueprint: dict[str, Any], views_folder: Path) -> dict[str, Any]:
+    return {
+        "schema": "shapeforge.reference-images/1.0",
+        "id": blueprint["id"],
+        "images": [{
+            "viewId": view["viewId"],
+            "imagePath": str((views_folder / view["imagePath"]).resolve()),
+            "weight": 1.5 if view["viewId"] in ("front", "side", "back", "top", "bottom") else 1.0,
+        } for view in blueprint["views"]],
+    }
+
+
+def _capture_template(blueprint: dict[str, Any]) -> dict[str, Any]:
+    angles = {
+        "source": (0, 0), "front": (0, 0), "front-three-quarter": (45, 0),
+        "side": (90, 0), "back-three-quarter": (135, 0), "back": (180, 0),
+        "top": (0, 90), "bottom": (0, -90),
+    }
+    return {
+        "schema": "shapeforge.render-capture/1.0",
+        "id": f"{blueprint['id']}/offline-fit",
+        "candidateId": f"{blueprint['id']}/candidate",
+        "width": 512, "height": 512,
+        "views": [{"id": view["viewId"], "azimuth": angles.get(view["viewId"], (0, 0))[0],
+                   "elevation": angles.get(view["viewId"], (0, 0))[1], "framingScale": 1.1}
+                  for view in blueprint["views"]],
+    }
 
 
 def _apply_annotations(blueprint: dict[str, Any], path: Path) -> dict[str, Any]:
