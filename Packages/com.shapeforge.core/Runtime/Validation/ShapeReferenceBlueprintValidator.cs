@@ -24,10 +24,28 @@ namespace ShapeForge
                 ValidateViews(blueprint.Views, diagnostics);
             ValidateEvidence(blueprint.EvidenceRegions, diagnostics);
             ValidatePalette(blueprint.Palette, diagnostics);
+            ValidateAnnotations(blueprint.Annotations, diagnostics);
             ValidateConfidence(blueprint.Classification?.Confidence ?? float.NaN,
                 "/classification/confidence", diagnostics);
             ValidateReviewQueue(blueprint.ReviewQueue, diagnostics);
             return new(diagnostics);
+        }
+
+        private static void ValidateAnnotations(IList<ShapeReferenceAnnotation> annotations,
+            ICollection<ShapeDiagnostic> diagnostics)
+        {
+            if (annotations == null || annotations.Count > 512)
+            {
+                diagnostics.Add(Error("shape.reference.blueprint.annotation.count", "Blueprints support at most 512 annotations.", "/annotations"));
+                return;
+            }
+            for (int index = 0; index < annotations.Count; index++)
+            {
+                ShapeReferenceAnnotation annotation = annotations[index];
+                if (annotation == null || string.IsNullOrWhiteSpace(annotation.RegionId) ||
+                    string.IsNullOrWhiteSpace(annotation.Text))
+                    diagnostics.Add(Error("shape.reference.blueprint.annotation.item", "Annotations require a region ID and text.", $"/annotations/{index}"));
+            }
         }
 
         private static void ValidateEvidence(IList<ShapeReferenceEvidenceRegion> regions,

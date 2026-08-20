@@ -29,6 +29,8 @@ namespace ShapeForge
         public IList<ShapeReferencePaletteSample> Palette { get; set; } = new List<ShapeReferencePaletteSample>();
         /// <summary>Gets or sets auditable source regions such as details, diagrams, and annotations.</summary>
         public IList<ShapeReferenceEvidenceRegion> EvidenceRegions { get; set; } = new List<ShapeReferenceEvidenceRegion>();
+        /// <summary>Gets or sets transcribed or OCR-produced reference annotations.</summary>
+        public IList<ShapeReferenceAnnotation> Annotations { get; set; } = new List<ShapeReferenceAnnotation>();
         /// <summary>Gets or sets the optional asset classification.</summary>
         public ShapeReferenceClassification Classification { get; set; } = new();
         /// <summary>Gets or sets facts that deterministic analysis could not resolve.</summary>
@@ -71,6 +73,8 @@ namespace ShapeForge
     {
         /// <summary>Gets or sets the optional stable swatch identifier.</summary>
         public string Id { get; set; } = string.Empty;
+        /// <summary>Gets or sets the optional printed color label.</summary>
+        public string Label { get; set; } = string.Empty;
         /// <summary>Gets or sets an RGB hexadecimal color.</summary>
         public string Hex { get; set; } = string.Empty;
         /// <summary>Gets or sets normalized pixel coverage.</summary>
@@ -79,6 +83,18 @@ namespace ShapeForge
         public string Source { get; set; } = "pixel-cluster";
         /// <summary>Gets or sets measurement confidence.</summary>
         public float Confidence { get; set; } = 1f;
+    }
+
+    /// <summary>Stores text evidence with its source region and language.</summary>
+    [Serializable]
+    public sealed class ShapeReferenceAnnotation
+    {
+        /// <summary>Gets or sets the evidence-region identifier.</summary>
+        public string RegionId { get; set; } = string.Empty;
+        /// <summary>Gets or sets transcribed text.</summary>
+        public string Text { get; set; } = string.Empty;
+        /// <summary>Gets or sets an optional BCP-47 language tag.</summary>
+        public string Language { get; set; } = string.Empty;
     }
 
     /// <summary>Stores an auditable crop containing geometry, detail, color, measurement, or text evidence.</summary>
