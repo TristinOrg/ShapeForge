@@ -39,6 +39,11 @@ def analyze_reference(source: Path, output_folder: Path) -> dict[str, Any]:
         "classification": {"category": "unresolved", "confidence": 0.0},
         "reviewQueue": [
             {
+                "kind": "asset-category",
+                "reason": "Visual measurements cannot safely choose the category-specific compiler.",
+                "required": True,
+            },
+            {
                 "kind": "semantic-part-labels",
                 "reason": "Pixel regions do not uniquely identify architectural, character, vehicle, or prop parts.",
                 "required": True,

@@ -28,7 +28,7 @@ class ShapeForgeReferenceBlueprintTests(unittest.TestCase):
                              ["front", "front-three-quarter", "side", "back-three-quarter", "back"])
             self.assertGreater(len(result["views"][0]["silhouette"]), 20)
             self.assertEqual(result["classification"]["category"], "unresolved")
-            self.assertEqual(len(result["reviewQueue"]), 3)
+            self.assertEqual(len(result["reviewQueue"]), 4)
 
     def test_single_building_image_uses_same_category_neutral_contract(self):
         with tempfile.TemporaryDirectory() as directory:

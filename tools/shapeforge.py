@@ -139,6 +139,18 @@ def run_reference_blueprint(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_reference_pipeline(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_reference_pipeline import run_pipeline
+    except ModuleNotFoundError:
+        from shapeforge_reference_pipeline import run_pipeline
+
+    review = Path(args.review).resolve() if args.review else None
+    result = run_pipeline(Path(args.source), Path(args.work), review)
+    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return 0
+
+
 def run_image_reconstruction(args: argparse.Namespace) -> int:
     try:
         from tools.shapeforge_reconstruct_images import cli_invoke, reconstruct_images
@@ -324,6 +336,11 @@ def parser() -> argparse.ArgumentParser:
     reference_blueprint.add_argument("-o", "--output", required=True, help="Output Reference Blueprint JSON")
     reference_blueprint.add_argument("--crops", required=True, help="Output folder for isolated views")
     reference_blueprint.set_defaults(handler=run_reference_blueprint)
+    reference_pipeline = commands.add_parser("reference-pipeline")
+    reference_pipeline.add_argument("source", help="Reference image or sheet")
+    reference_pipeline.add_argument("--work", required=True, help="Persistent pipeline workspace")
+    reference_pipeline.add_argument("--review", help="Completed Reference Review JSON")
+    reference_pipeline.set_defaults(handler=run_reference_pipeline)
     image_reconstruct = commands.add_parser("image-reconstruct")
     image_reconstruct.add_argument("source", help="Initial ShapeDefinition JSON")
     image_reconstruct.add_argument("reference", help="Reference Images manifest")
