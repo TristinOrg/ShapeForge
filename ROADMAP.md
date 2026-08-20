@@ -76,6 +76,7 @@ Every milestone should include, where applicable:
 - Detail Inventory contract and definition coverage analysis — `88b99f2`.
 - Detail Inventory Schema, Unity JSON, CLI command, and documentation — `0e14b52`.
 - Deterministic multi-view Unity capture, Python image comparison, and bounded reconstruction loop — `954f32c`, `942d491`, `ba05bbc`.
+- Staged offline inverse modeling across transforms, primitive parameters, and profile cages with multi-view scoring and rollback — `adc4048`, `87e851c`, `06d7270`.
 
 ### Automation CLI — Implemented
 
