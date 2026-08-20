@@ -168,19 +168,19 @@ def _largest_component(mask: np.ndarray) -> np.ndarray:
 
 
 def _sample_silhouette(mask: np.ndarray, offset_x: int, offset_y: int,
-                       width: int, height: int) -> list[list[float]]:
+                       width: int, height: int) -> list[dict[str, float]]:
     points = []
     rows   = np.linspace(0, mask.shape[0] - 1, 32, dtype=int)
     for row in rows:
         xs = np.nonzero(mask[row])[0]
         if len(xs):
-            points.append([round((offset_x + int(xs.min())) / width, 6),
-                           round((offset_y + row) / height, 6)])
+            points.append({"x": round((offset_x + int(xs.min())) / width, 6),
+                           "y": round((offset_y + row) / height, 6)})
     for row in rows[::-1]:
         xs = np.nonzero(mask[row])[0]
         if len(xs):
-            points.append([round((offset_x + int(xs.max())) / width, 6),
-                           round((offset_y + row) / height, 6)])
+            points.append({"x": round((offset_x + int(xs.max())) / width, 6),
+                           "y": round((offset_y + row) / height, 6)})
     return points
 
 

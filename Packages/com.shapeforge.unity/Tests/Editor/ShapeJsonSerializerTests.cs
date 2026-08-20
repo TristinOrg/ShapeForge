@@ -283,5 +283,24 @@ namespace ShapeForge.Unity.Tests
             Assert.That(result.Parts[0].Front.Confidence, Is.EqualTo(0.95f));
             Assert.That(result.Parts[0].Front.Silhouette[2], Is.EqualTo(new ForgeVector2(0.5f, 0.9f)));
         }
+
+        [Test]
+        public void ReferenceBlueprintAcceptsPreprocessorVectorContract()
+        {
+            const string json = "{\"schema\":\"shapeforge.reference-blueprint/1.0\",\"id\":\"building\"," +
+                                "\"sourceImage\":\"building.png\",\"coordinateSystem\":\"image-normalized/top-left\"," +
+                                "\"views\":[{\"viewId\":\"source\",\"imagePath\":\"building.png\"," +
+                                "\"foregroundBounds\":{\"x\":0.1,\"y\":0.1,\"width\":0.8,\"height\":0.8}," +
+                                "\"silhouette\":[{\"x\":0.1,\"y\":0.1},{\"x\":0.9,\"y\":0.1},{\"x\":0.5,\"y\":0.9}]," +
+                                "\"confidence\":0.8}],\"classification\":{\"category\":\"unresolved\",\"confidence\":0}," +
+                                "\"reviewQueue\":[]}";
+            ShapeJsonSerializer serializer = new();
+
+            ShapeReferenceBlueprint result = serializer.DeserializeSpecification<ShapeReferenceBlueprint>(
+                json,
+                new ShapeReferenceBlueprintValidator().Validate);
+
+            Assert.That(result.Views[0].Silhouette[2], Is.EqualTo(new ForgeVector2(0.5f, 0.9f)));
+        }
     }
 }

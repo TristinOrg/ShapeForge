@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shapeforge.dev/schemas/shapeforge.reference-blueprint-1.0.schema.json",
+  "type": "object",
+  "required": ["schema", "id", "sourceImage", "coordinateSystem", "views", "classification", "reviewQueue"],
+  "properties": {
+    "schema": { "const": "shapeforge.reference-blueprint/1.0" },
+    "id": { "type": "string", "minLength": 1 },
+    "sourceImage": { "type": "string", "minLength": 1 },
+    "coordinateSystem": { "const": "image-normalized/top-left" },
+    "views": {
+      "type": "array", "minItems": 1, "maxItems": 16,
+      "items": {
+        "type": "object", "required": ["viewId", "imagePath", "foregroundBounds", "silhouette", "confidence"],
+        "properties": {
+          "viewId": { "type": "string", "minLength": 1 },
+          "imagePath": { "type": "string", "minLength": 1 },
+          "foregroundBounds": {
+            "type": "object", "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "number", "minimum": 0, "maximum": 1 },
+              "y": { "type": "number", "minimum": 0, "maximum": 1 },
+              "width": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+              "height": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+            }, "additionalProperties": false
+          },
+          "silhouette": {
+            "type": "array", "minItems": 3, "maxItems": 512,
+            "items": { "type": "object", "required": ["x", "y"], "properties": {
+              "x": { "type": "number", "minimum": 0, "maximum": 1 },
+              "y": { "type": "number", "minimum": 0, "maximum": 1 }
+            }, "additionalProperties": false }
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }, "additionalProperties": false
+      }
+    },
+    "measurements": { "type": "object", "additionalProperties": { "type": "number" } },
+    "palette": { "type": "array" },
+    "classification": {
+      "type": "object", "required": ["category", "confidence"],
+      "properties": {
+        "category": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }, "additionalProperties": false
+    },
+    "reviewQueue": { "type": "array", "maxItems": 128 }
+  },
+  "additionalProperties": false
+}
