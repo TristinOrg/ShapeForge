@@ -129,6 +129,16 @@ def run_image_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def run_reference_blueprint(args: argparse.Namespace) -> int:
+    try:
+        from tools.shapeforge_reference_blueprint import write_blueprint
+    except ModuleNotFoundError:
+        from shapeforge_reference_blueprint import write_blueprint
+
+    write_blueprint(Path(args.source).resolve(), Path(args.output).resolve(), Path(args.crops).resolve())
+    return 0
+
+
 def run_image_reconstruction(args: argparse.Namespace) -> int:
     try:
         from tools.shapeforge_reconstruct_images import cli_invoke, reconstruct_images
@@ -309,6 +319,11 @@ def parser() -> argparse.ArgumentParser:
     image_compare.add_argument("candidate", help="Candidate Render Capture manifest")
     image_compare.add_argument("-o", "--output", help="Output Render Compare JSON")
     image_compare.set_defaults(handler=run_image_compare)
+    reference_blueprint = commands.add_parser("reference-blueprint")
+    reference_blueprint.add_argument("source", help="Single image or five-view reference sheet")
+    reference_blueprint.add_argument("-o", "--output", required=True, help="Output Reference Blueprint JSON")
+    reference_blueprint.add_argument("--crops", required=True, help="Output folder for isolated views")
+    reference_blueprint.set_defaults(handler=run_reference_blueprint)
     image_reconstruct = commands.add_parser("image-reconstruct")
     image_reconstruct.add_argument("source", help="Initial ShapeDefinition JSON")
     image_reconstruct.add_argument("reference", help="Reference Images manifest")
